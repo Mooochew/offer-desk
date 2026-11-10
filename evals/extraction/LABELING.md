@@ -16,6 +16,15 @@ The extractor sees the title, company, listed locations and the full description
 | `degree` | `none`, `bachelors`, `masters`, `phd`, `unknown` | The lowest degree listed as required, even if "or equivalent experience" is allowed. "BS/MS" → `bachelors`. Explicitly not required → `none`. Not mentioned → `unknown`. |
 | `is_new_grad_friendly` | `yes`, `no`, `unknown` | `yes`: the posting explicitly targets new grads, recent graduates, junior or early-career people, **or** requires 0 years. A level-I title alone is not enough. `no`: requires 3+ years, an active clearance, current student enrollment (graduates can't apply), or is clearly senior. Otherwise `unknown`. |
 
+## Tie-breakers (from the independent label audit, `LABEL_AUDIT.md`)
+
+- **New-grad conflicts:** if a `yes` condition and a `no` condition both apply (e.g. "0-2 years" but "currently enrolled"), `no` wins.
+- **Degree with no level:** a required "degree in Computer Science or related field" with no level stated → `bachelors`.
+- **Office or remote:** if fully remote is an allowed option ("from one of our US hubs or remotely"), → `remote`.
+- **Travel** requirements don't change the work mode.
+- **Explicit beats hashtags:** a stated office schedule wins over `#LI-Remote` / `#LI-Hybrid` tags.
+- **Years inside an OR bullet:** if one option in a single bullet has no year count (e.g. "a degree OR 2+ years"), that bullet adds no minimum.
+
 ## Reading the scores
 
 Report each field's accuracy **next to a trivial baseline**: the score of a "model" that always gives the most common label (for example, 14 of 16 cases have clearance `unknown`, so always answering `unknown` already scores 87.5% on clearance). A prompt only helps where it beats that baseline. The rare cases (an active clearance, ability to obtain) matter most.
@@ -24,7 +33,7 @@ Skills and evidence quotes are also extracted but aren't scored (too subjective 
 
 ## The tricky cases these labels cover
 
-- "Entry-level" title but 2+ to 5+ years required (Coinbase, Writer)
+- Titles that pass the entry-level filter but require 2+ to 5+ years (Coinbase "Software Engineer-1", Writer "AI deployment engineer")
 - Numbers that aren't experience: 401(k) vesting (Verkada), company age (Smartsheet)
 - "1.5+ years" that a careless read turns into "5+" (Affirm)
 - Ranges (Roblox 1–3, Amplitude 2–4, Zoox 0–2)

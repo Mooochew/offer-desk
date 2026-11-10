@@ -1,5 +1,5 @@
 {
-  "status": "draft labels by Claude, corrected after the Phase 2 independent review; needs a human check (see LABELING.md)",
+  "status": "labels audited by an independent AI labeler (blind relabel + adjudication); human spot-check still recommended",
   "cases": [
     {
       "id": "greenhouse-5280545007",
