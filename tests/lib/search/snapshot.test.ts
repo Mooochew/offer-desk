@@ -31,6 +31,20 @@ describe("loadSnapshotJobs", () => {
     expect(jobs[0]).not.toHaveProperty("description");
   });
 
+  // Phase 2 review S1: seeding must not replace newer live postings with older snapshot copies.
+  it("never overwrites a posting that already exists (live data wins)", async () => {
+    const { store, savedPostings } = memoryStore();
+    await store.upsertPostings({ name: "Acme", ats: "greenhouse", slug: "acme", tags: [] }, [
+      { ...saved(), raw: {}, description: "Fresh live description" },
+    ]);
+
+    const jobs = await loadSnapshotJobs({ takenAt: "2026-11-10", jobs: [saved({ description: "Old snapshot text" })] }, store);
+
+    expect(jobs).toHaveLength(1);
+    expect(savedPostings).toHaveLength(1);
+    expect(savedPostings[0].description).toBe("Fresh live description");
+  });
+
   it("rejects a malformed snapshot file instead of loading garbage", async () => {
     const { store } = memoryStore();
     await expect(loadSnapshotJobs({ takenAt: "x", jobs: [{ title: "no source" }] }, store)).rejects.toThrow();

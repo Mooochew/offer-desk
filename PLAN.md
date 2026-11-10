@@ -27,7 +27,7 @@
 
 | Rubric item | Weight | How we earn it |
 |---|---|---|
-| Problem & relevance | 10% | Clear new-grad pain point, problem section in the README, "140 → 57" breakdown that shows the time saved |
+| Problem & relevance | 10% | Clear new-grad pain point, problem section in the README, funnel breakdown that shows the time saved (real numbers: e.g. 7,905 engineering jobs → 28 for SoCal/remote in 30 days, before requirement checks) |
 | Design & implementation | 30% | Clean split between LLM and code, tool registry, confirmation by stored action ID, caching and backoff, tests |
 | Prompt engineering | 20% | Versioned prompts, few-shot extraction, Structured Outputs, validation-error retry, grounding rules, **a small extraction eval with before/after scores** in PROMPTS.md |
 | UI/UX | 10% | Three-panel layout, live status, preview modal, one-click demo profile |
@@ -139,7 +139,7 @@ DECISIONS.md  PROMPTS.md  README.md  .env.example
 | Table | Key columns |
 |---|---|
 | `postings` | id, source, source_id, company, title, location, remote, url, description, posted_at, dedupe_key, raw jsonb (unique on source + source_id) |
-| `extractions` | posting_id, description_hash (unique), extracted jsonb, status (`ok`/`failed`), confidence (`full`/`truncated`), model, prompt_version |
+| `extractions` | primary key (description_hash, prompt_version, model), extracted jsonb, status (`ok`/`failed`), confidence (`full`/`truncated`), error (DECISIONS 016) |
 | `board_cache` | key (`ats:slug`), jobs jsonb (normalized light list), fetched_at, expires_at, status |
 | `search_cache` | key (hash of source + normalized query + location + page), posting_ids[], status jsonb, expires_at (Adzuna only) |
 | `counters` | key (e.g. `adzuna:2026-11-09`, `openai:2026-11-09`, `user:<id>:<hour>`, `ip:<hash>:<hour>`), count, expires_at. Replaces the planned `quota` and `rate_limits` tables (DECISIONS 016) |
@@ -221,7 +221,7 @@ prefilter in code (title seniority words,       ├─ "why matched" line from f
                                                     (years / clearance / location) → final
 ```
 
-- **Board selection:** `data/ats_boards.json` has about 150 companies `{name, ats, slug, tags[]}` (tags like `backend`, `socal`, `remote-friendly`). Each search picks at most 40 boards by tag/keyword match. Concurrency 8, 5-second timeout per call.
+- **Board selection:** `data/ats_boards.json` has 145 companies `{name, ats, slug, tags[]}` (tags like `socal`, `ai`, `fintech`, `gaming`). Each search picks up to 60 boards: tag matches first, sources rotated (DECISIONS 024). Concurrency 8, 5-second timeout per call, 25 s refresh budget.
 - **Greenhouse two-pass fetch:** a board with `content=true` can be several MB (Stripe: 5.9 MB, 12.5x the list). Fetch the list first, match titles in code, then fetch content only for the matches.
 - **Cache per board (DECISIONS 005):** each board's normalized job list is cached about 6 hours and the query filter runs in code over the cache, because Lever and Ashby boards can be several MB with no light list mode. The per-query `search_cache` is kept only for Adzuna.
 - **Lever descriptions (DECISIONS 007):** requirements live in `lists[]`, so the description is built from intro + lists + additional.
@@ -353,6 +353,7 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 **Checkpoint:** run a real search from a script and look at counts, source status, and the dedupe result.
 
 ### Phase 3: Extraction and triage (≈3 h, day 2 morning)
+**Carried in from the Phase 2 review:** pick which ≤25 postings to extract with a **code pre-rank** (title new-grad signal, location match, recency, profile skill words in the title), not newest-first (DECISIONS 030). Report eval scores next to the trivial "most common label" baseline (LABELING.md).
 **Goal:** reliable structured requirements and a ranked, explainable shortlist.
 1. Hand-label about 15 real postings into `evals/extraction/` (I'll draft labels from the text; you check them, about 20 minutes).
 2. `prompts/extract.v1.md` → `extract.ts` with Structured Outputs, zod, a validation-error retry, and cache by description hash.
@@ -363,6 +364,7 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 **Checkpoint:** eval scores v1 vs v2 + a real triaged shortlist.
 
 ### Phase 4: Agent, tools, and safety (≈4 h, day 2)
+**Carried in from the Phase 2 review:** apply migration 0004 before any code writes `refs`/`files`/`messages`; short refs use `increment_counter` with a 10-year TTL (DECISIONS 032); truncate profile/notes in the state builder (S5); serve expired cache entries immediately and refresh within a deadline-bound budget; `maxDuration` 60 (DECISIONS 031).
 **Goal:** natural language in, real actions out, every step validated and logged, with destructive actions held for confirmation.
 1. Tool registry + refs resolver + executor (validate → resolve → ownership check → log → run or hold).
 2. All tools from section 4.8, including file builders (CSV, Markdown, `.ics`) + Storage + signed URLs.
@@ -387,6 +389,7 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 **Checkpoint:** you click through the demo script on the live URL.
 
 ### Phase 6: Ship (≈2 h, day 2 evening)
+**Carried in from the Phase 2 review:** add a daily Vercel cron that warms the board cache and touches Supabase, so graders don't hit a cold cache and the free Supabase project never pauses from inactivity (DECISIONS 033).
 **Goal:** everything submitted.
 1. README: problem, features, Mermaid architecture, LLM/code split, setup, env vars, known limitations (exact-match dedupe, Adzuna truncation, board list coverage, snapshot fallback).
 2. Finish PROMPTS.md and DECISIONS.md.
@@ -416,7 +419,7 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 |---|---|
 | Adzuna trial runs out during grading | It's optional; the app works fully without it |
 | A board slug stops working | Verify script before deploy; per-source status shows failures instead of hiding them |
-| Vercel timeout on big searches | 40-board cap, two-pass Greenhouse fetch, caching, parallel extraction capped at 25, `maxDuration` |
+| Vercel timeout on big searches | 60-board cap with a time budget, stale-while-revalidate and deadline-bound fetches (DECISIONS 031), two-pass Greenhouse fetch, caching, parallel extraction capped at 25, `maxDuration` |
 | Graders running up the OpenAI bill | Spend limit in the dashboard, per-session + global daily caps, extraction cache |
 | A source is down during grading | Partial results + the snapshot fallback |
 | Prompt injection inside a job description | Descriptions treated as delimited data, extraction model has no tools |
@@ -426,8 +429,8 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 
 1. Click **Load demo profile** (new-grad CS, SoCal or remote, TS/Python/Postgres).
 2. *"Find entry-level backend and full-stack roles in SoCal or remote posted this week"*. The step timeline and source chips appear live.
-3. The breakdown shows "140 → 57", with the evidence popover on a result that was dropped for "3+ years".
-4. *"Save the top 10 and give me an apply checklist"* → applications created + a checklist file card.
+3. The breakdown shows the real funnel (thousands of engineering jobs → a few dozen after the title/location/date prefilter → fewer after requirement checks), with the evidence popover on a result dropped for "3+ years" or an active clearance. Numbers change daily; rehearse the same day.
+4. *"Save the top 5 and give me an apply checklist"* → applications created + a checklist file card. (Use a count the rehearsal shows is available after triage.)
 5. *"Mark the first 5 as applied today; I have an interview with [company] Thursday at 2"* → stages update + `.ics` card.
 6. *"Archive everything I haven't touched in 3 weeks"* (on the seeded pipeline) → modal with the preview list → Confirm.
 7. *"Show my funnel this month"* → funnel tab.

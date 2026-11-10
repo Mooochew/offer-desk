@@ -58,6 +58,29 @@ describe("createSupabaseStore", () => {
     expect(ids.get("greenhouse:2")).toBe("id-2");
   });
 
+  it("insertMissingPostings inserts with ON CONFLICT DO NOTHING, then looks up every id", async () => {
+    const { admin, calls } = fakeSupabase((own) =>
+      own.some((call) => call.method === "select") ? { data: [{ id: "id-7", source: "greenhouse", source_id: "7" }] } : {},
+    );
+    const ids = await createSupabaseStore(admin).insertMissingPostings(board, [normalizedJob({ sourceId: "7" })]);
+
+    const upsert = calls.find((call) => call.method === "upsert")!;
+    expect(upsert.args[1]).toEqual({ onConflict: "source,source_id", ignoreDuplicates: true });
+    expect(calls.some((call) => call.method === "update")).toBe(false);
+    expect(calls.find((call) => call.method === "eq")!.args).toEqual(["source", "greenhouse"]);
+    expect(ids.get("greenhouse:7")).toBe("id-7");
+  });
+
+  it("insertMissingPostings surfaces insert and lookup errors", async () => {
+    const failing = fakeSupabase(() => ({ error: { message: "insert denied" } }));
+    await expect(createSupabaseStore(failing.admin).insertMissingPostings(board, [normalizedJob()])).rejects.toThrow("insert denied");
+
+    const lookupFails = fakeSupabase((own) => (own.some((call) => call.method === "select") ? { error: { message: "lookup denied" } } : {}));
+    await expect(createSupabaseStore(lookupFails.admin).insertMissingPostings(board, [normalizedJob({ description: null })])).rejects.toThrow(
+      "lookup denied",
+    );
+  });
+
   it("splits large upserts into batches of 200", async () => {
     const { admin, calls } = fakeSupabase(() => ({ data: [] }));
     const jobs = Array.from({ length: 450 }, (_, i) => normalizedJob({ sourceId: String(i) }));

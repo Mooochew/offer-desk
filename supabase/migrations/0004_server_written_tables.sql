@@ -1,4 +1,5 @@
--- Phase 1 review fixes (reviews/phase-1.md S1, N4).
+-- Phase 1 review fixes (reviews/phase-1.md S1, N4) and Phase 2 review S5 (reviews/phase-2.md).
+-- Not yet applied when the Phase 2 review ran, so its fixes are folded in here (one paste).
 
 -- S1: refs, files, result_sets and messages are written only by the server (which sets user_id
 -- from a verified session). Users keep read access to their own rows. Without this, a user could
@@ -7,10 +8,10 @@ revoke insert, update, delete
   on public.refs, public.files, public.result_sets, public.messages
   from authenticated;
 
-drop policy "own rows" on public.refs;
-drop policy "own rows" on public.files;
-drop policy "own rows" on public.result_sets;
-drop policy "own rows" on public.messages;
+drop policy if exists "own rows" on public.refs;
+drop policy if exists "own rows" on public.files;
+drop policy if exists "own rows" on public.result_sets;
+drop policy if exists "own rows" on public.messages;
 
 create policy "read own rows" on public.refs
   for select to authenticated using (user_id = (select auth.uid()));
@@ -51,3 +52,20 @@ $$;
 -- `create or replace` keeps existing grants, but restate them so this file is self-contained.
 revoke execute on function public.increment_counter(text, integer) from public, anon, authenticated;
 grant execute on function public.increment_counter(text, integer) to service_role;
+
+-- Phase 2 review S5: user-writable fields go into every agent prompt (profile) or the UI
+-- (notes), so cap their size. Without this, one anonymous visitor could store a huge blob and
+-- burn the shared OpenAI key and daily cap for everyone. The server also truncates when it
+-- builds the prompt (Phase 4); these limits are the backstop.
+alter table public.profiles
+  add constraint profiles_name_length check (name is null or length(name) <= 100),
+  add constraint profiles_skills_size check (
+    coalesce(array_length(skills, 1), 0) <= 50 and length(array_to_string(skills, ',')) <= 1500
+  ),
+  add constraint profiles_locations_size check (
+    coalesce(array_length(locations, 1), 0) <= 10 and length(array_to_string(locations, ',')) <= 500
+  ),
+  add constraint profiles_filters_size check (pg_column_size(filters) <= 2048);
+
+alter table public.applications
+  add constraint applications_notes_length check (length(notes) <= 2000);

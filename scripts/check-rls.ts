@@ -106,7 +106,17 @@ try {
 
     const peek = await bob.client.from(table).select("user_id").eq("user_id", alice.id);
     check(`${table}: other user cannot read it`, !peek.error && peek.data?.length === 0, peek.error?.message);
+
+    // Updates and deletes of your own server-written rows are blocked too (not just inserts).
+    const edit = await alice.client.from(table).delete().eq("user_id", alice.id).select();
+    check(`${table}: user cannot delete own row`, edit.error?.code === PERMISSION_DENIED || (edit.data?.length ?? 0) === 0, edit.error?.code);
   }
+
+  // Size limits on user-writable fields (migration 0004, Phase 2 review S5).
+  const hugeName = await alice.client.from("profiles").update({ name: "x".repeat(5000) }).eq("user_id", alice.id);
+  check("profiles: oversized name is rejected", Boolean(hugeName.error), hugeName.error?.code ?? "update succeeded");
+  const hugeNotes = await alice.client.from("applications").update({ notes: "x".repeat(10_000) }).eq("user_id", alice.id);
+  check("applications: oversized notes are rejected", Boolean(hugeNotes.error), hugeNotes.error?.code ?? "update succeeded");
 
   // Storage path must be under the owner's folder (migration 0004).
   const foreignPath = await admin.from("files").insert({

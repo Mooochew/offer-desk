@@ -41,9 +41,12 @@ const US_STATES =
 const US_STATE_CODES =
   "al|ak|az|ar|ca|co|ct|fl|ga|hi|id|il|ia|ks|ky|la|me|md|ma|mi|mn|ms|mo|mt|ne|nv|nh|nj|nm|ny|nc|nd|oh|ok|or|pa|ri|sc|sd|tn|tx|ut|vt|va|wa|wv|wi|wy|dc";
 
-/** Says US: the country, a coast, a state name, or a ", XX" state code. */
+/**
+ * Says US: the country, a coast, a state name, or a ", XX" state code. A bare "America" is not
+ * enough ("Remote - Latin America", "South America"; Phase 2 review S2).
+ */
 const US = new RegExp(
-  `\\b(us|u\\.s\\.?a?|usa|united states|america|west coast|east coast|${US_STATES})\\b|,\\s*(${US_STATE_CODES})\\b`,
+  `\\b(us|u\\.s\\.?a?|usa|united states|united states of america|west coast|east coast|${US_STATES})\\b|,\\s*(${US_STATE_CODES})\\b`,
   "i",
 );
 // Words that don't restrict where a remote job can be done.

@@ -8,6 +8,12 @@ describe("rolesInQuery", () => {
     expect(rolesInQuery("ML / AI engineer")).toEqual(["ml"]);
   });
 
+  // Phase 2 review: "Capital One" used to parse as a backend ("api") query.
+  it("needs whole words for api/server", () => {
+    expect(rolesInQuery("Capital One software engineer")).toEqual([]);
+    expect(rolesInQuery("API and server work")).toEqual(["backend"]);
+  });
+
   it("returns no roles for a general query", () => {
     expect(rolesInQuery("software engineer jobs")).toEqual([]);
   });
@@ -69,6 +75,8 @@ describe("seniority, internships, new-grad signals", () => {
     expect(isInternship("Software Engineering Intern", null)).toBe(true);
     expect(isInternship("Software Engineer", "Intern")).toBe(true);
     expect(isInternship("Software Engineer", "FullTime")).toBe(false);
+    // Phase 2 review: Zoox "Contract Student Worker" requires current enrollment.
+    expect(isInternship("Contract Student Worker - Software Engineer (40 hrs/wk)", null)).toBe(true);
   });
 
   it.each(["Software Engineer, New Grad", "Early Career Software Engineer", "Software Engineer-1", "Software Engineer I"])(

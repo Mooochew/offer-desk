@@ -16,6 +16,8 @@ export interface BoardStore {
   saveEntry(key: string, entry: CacheEntry): Promise<void>;
   /** Saves jobs to `postings` and returns each job's posting id, keyed by `${source}:${sourceId}`. */
   upsertPostings(board: Board, jobs: NormalizedJob[]): Promise<Map<string, string>>;
+  /** Inserts only jobs not already stored (existing rows are never changed) and returns all their ids. */
+  insertMissingPostings(board: Board, jobs: NormalizedJob[]): Promise<Map<string, string>>;
 }
 
 /** How each board's jobs were obtained for this search. */

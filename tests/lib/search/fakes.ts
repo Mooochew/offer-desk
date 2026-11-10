@@ -50,7 +50,18 @@ export function memoryStore(initial: Record<string, CacheEntry> = {}) {
       entries.set(key, entry);
     },
     async upsertPostings(_board, jobs) {
-      savedPostings.push(...jobs);
+      for (const job of jobs) {
+        const index = savedPostings.findIndex((saved) => saved.source === job.source && saved.sourceId === job.sourceId);
+        if (index >= 0) savedPostings[index] = job;
+        else savedPostings.push(job);
+      }
+      return new Map(jobs.map((job) => [`${job.source}:${job.sourceId}`, `posting-${job.sourceId}`]));
+    },
+    async insertMissingPostings(_board, jobs) {
+      for (const job of jobs) {
+        const exists = savedPostings.some((saved) => saved.source === job.source && saved.sourceId === job.sourceId);
+        if (!exists) savedPostings.push(job);
+      }
       return new Map(jobs.map((job) => [`${job.source}:${job.sourceId}`, `posting-${job.sourceId}`]));
     },
   };

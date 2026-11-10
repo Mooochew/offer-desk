@@ -136,3 +136,23 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 029. Transient board failures are expected; only 404s remove a board
 - **What:** `boards:verify --write` removes a board only on 404 or zero open jobs; timeouts and 5xx are reported as "kept: may be temporary".
 - **Why:** During the Phase 2 gate, Anduril's Greenhouse board (the biggest SoCal board for the demo) timed out for several minutes from Node (15 s × 3 attempts), then answered in about 160 ms. The old script would have deleted it. The search path already handles this case by design: a failed refresh serves stale cached jobs and backs off for 10 minutes (DECISIONS 023).
+
+## 030. Phase 2 review fixes (reviews/phase-2.md)
+- **S1:** the snapshot loader inserts only missing postings (`INSERT … ON CONFLICT DO NOTHING`, then looks up ids), so seeding or the fallback never replaces newer live postings with trimmed snapshot copies or changes their description hashes. Regression test added.
+- **S2:** a bare "America" no longer counts as US ("Remote - Latin America", "South America"). Regression tests added.
+- **S4:** three eval labels corrected after checking the posting text (Stripe "50% Telecommuting permitted" → hybrid; Twitch → new-grad unknown, requires professional experience; Zoox → new-grad no, requires current enrollment). The "level-I title" clause was removed from the new-grad rule. Eval results must be reported next to the trivial most-common-label baseline, because 14/16 clearance labels are `unknown`.
+- **S5:** migration 0004 (still unapplied, so amended rather than adding 0005) caps profile name/skills/locations/filters and application notes. `check:rls` now tests these and also that users can't delete their own server-written rows.
+- **Smaller:** whole-word `api`/`server` in role matching ("Capital One" isn't backend); "Student Worker" counts as an internship; `drop policy if exists` in 0004; `boards:verify` no longer counts unreachable boards as alive; PLAN doc drift fixed (extractions key, 60 boards, real funnel numbers in the demo script).
+- **Phase 3 pre-rank:** the ≤25 postings sent to extraction are chosen by a code pre-rank (new-grad title signal, location match, recency, profile skills in the title), not newest-first, so the demo's top results are the most promising ones.
+
+## 031. Cold-cache protection for graders (planned for Phase 4)
+- **What:** When a board's cache entry is expired, serve it immediately and refresh it inside the request's remaining budget; give each fetch a timeout bounded by the request deadline, not a fixed 5 s × 3 attempts; keep `maxDuration` at 60 s for `/api/agent`.
+- **Why:** The review showed the 25 s budget only stops *starting* fetches; one in flight can run about 16 s past it, and a turn may also run triage and LLM calls. Grading happens days after the cache was warmed (6 h TTL).
+
+## 032. Short refs use a 10-year counter TTL
+- **What:** Short refs (`J1`, `A1`, …) are numbered with `increment_counter('ref:<user>:<kind>', 10 years)`.
+- **Why:** Migration 0004 deletes expired counters on every increment; with a short TTL, numbering would restart at 1 and collide with the `(user_id, ref)` primary key (review S3). A 10-year TTL keeps the existing atomic function without a new SQL function.
+
+## 033. Daily warm-up cron (planned for Phase 6)
+- **What:** A Vercel cron (free plan allows daily) calls a protected endpoint that refreshes the most-used boards and touches Supabase.
+- **Why:** Keeps the cache warm for graders (DECISIONS 031) and prevents a free Supabase project from pausing after a week without activity (not verified for this project's plan; cheap insurance).

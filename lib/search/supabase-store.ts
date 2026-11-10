@@ -95,6 +95,30 @@ export function createSupabaseStore(admin: SupabaseClient): BoardStore & Descrip
       return ids;
     },
 
+    async insertMissingPostings(board, jobs) {
+      const ids = new Map<string, string>();
+      for (let start = 0; start < jobs.length; start += UPSERT_BATCH) {
+        const batchJobs = jobs.slice(start, start + UPSERT_BATCH);
+        const batch: PostingRow[] = batchJobs.map((job) => ({
+          ...postingRow(board, job),
+          description: job.description,
+          description_hash: job.description ? descriptionHash(job.description) : null,
+        }));
+        // `ignoreDuplicates` makes this INSERT ... ON CONFLICT DO NOTHING: existing rows are untouched.
+        const insert = await admin.from("postings").upsert(batch, { onConflict: "source,source_id", ignoreDuplicates: true });
+        if (insert.error) throw new Error(`postings insert failed: ${insert.error.message}`);
+
+        const { data, error } = await admin
+          .from("postings")
+          .select("id, source, source_id")
+          .eq("source", board.ats)
+          .in("source_id", batchJobs.map((job) => job.sourceId));
+        if (error) throw new Error(`postings lookup failed: ${error.message}`);
+        for (const row of data ?? []) ids.set(jobKey({ source: row.source, sourceId: row.source_id }), row.id);
+      }
+      return ids;
+    },
+
     async getPostings(ids) {
       if (ids.length === 0) return [];
       const { data, error } = await admin

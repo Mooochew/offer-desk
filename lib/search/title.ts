@@ -4,7 +4,8 @@
 type RoleGroup = { name: string; queryWords: RegExp; titleWords: RegExp };
 
 const ROLE_GROUPS: RoleGroup[] = [
-  { name: "backend", queryWords: /back[\s-]?end|server|api|distributed/i, titleWords: /back[\s-]?end|server|\bapi\b|distributed systems/i },
+  // Word boundaries matter: "Capital One" must not read as "api", "observer" not as "server".
+  { name: "backend", queryWords: /back[\s-]?end|\bservers?\b|\bapis?\b|distributed/i, titleWords: /back[\s-]?end|\bserver\b|\bapi\b|distributed systems/i },
   { name: "frontend", queryWords: /front[\s-]?end|\bweb\b|\bui\b|react/i, titleWords: /front[\s-]?end|\bweb\b|\bui\b|react/i },
   { name: "fullstack", queryWords: /full[\s-]?stack/i, titleWords: /full[\s-]?stack/i },
   { name: "mobile", queryWords: /mobile|\bios\b|android/i, titleWords: /mobile|\bios\b|android/i },
@@ -47,7 +48,8 @@ export function titleMatchesRoles(title: string, roles: string[]): boolean {
 
 const SENIOR_WORDS = /\b(senior|sr\.?|staff|principal|lead|manager|director|head of|vp|vice president|architect|distinguished|fellow|chief)\b/i;
 const SENIOR_LEVEL = /\b(iii|iv|v|vi)\b|\b(engineer|developer)\s+[3-9]\b|\b[le][5-9]\b/i;
-const INTERN_WORDS = /\bintern(ship)?\b|\bco-?op\b/i;
+// "Student Worker" roles require current enrollment, so graduated new grads can't apply.
+const INTERN_WORDS = /\bintern(ship)?\b|\bco-?op\b|\bstudent\b/i;
 const NEW_GRAD_WORDS = /new grad|graduate|entry[\s-]level|early[\s-]career|junior|university|\bassociate\b|\b(engineer|developer)[\s-]+(i|1)\b/i;
 
 /** Title says the role is above new-grad level (senior, staff, lead, manager, level III+, ...). */

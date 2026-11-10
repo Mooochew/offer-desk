@@ -33,7 +33,11 @@ results.forEach((result, index) => {
 });
 
 const totalJobs = results.reduce((sum, result) => sum + (result.ok ? result.value : 0), 0);
-console.log(`\n${ALL_BOARDS.length - dead.length}/${ALL_BOARDS.length} boards alive, ${totalJobs} open jobs in total.`);
+const answered = results.filter((result) => result.ok && result.value > 0).length;
+const unreachable = results.filter((result) => !result.ok).length - dead.filter((key) => !results[ALL_BOARDS.findIndex((b) => boardKey(b) === key)].ok).length;
+console.log(
+  `\n${answered}/${ALL_BOARDS.length} boards answered with jobs, ${dead.length} dead (removable), ${unreachable} unreachable this run (kept). ${totalJobs} open jobs in total.`,
+);
 
 if (write && dead.length) {
   const alive = ALL_BOARDS.filter((board) => !dead.includes(boardKey(board)));

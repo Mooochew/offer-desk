@@ -26,12 +26,17 @@ export const snapshotSchema = z.object({
   jobs: z.array(snapshotJobSchema),
 });
 
+/** Storage the snapshot loader needs: insert postings that don't exist yet, never update. */
+export type SnapshotStore = Pick<BoardStore, "insertMissingPostings">;
+
 /**
  * Loads saved real postings into the store and returns them as cached jobs. Used when every live
  * board fails (search fallback) and to seed the demo pipeline. Jobs keep their original source
- * ids, so they line up with live data rather than duplicating it.
+ * ids, so they line up with live data. Existing postings are left untouched: the snapshot is
+ * older (and descriptions are trimmed), so overwriting would degrade live data and change
+ * description hashes, which would miss the extraction cache (Phase 2 review S1).
  */
-export async function loadSnapshotJobs(rawSnapshot: unknown, store: Pick<BoardStore, "upsertPostings">): Promise<BoardJob[]> {
+export async function loadSnapshotJobs(rawSnapshot: unknown, store: SnapshotStore): Promise<BoardJob[]> {
   const snapshot = snapshotSchema.parse(rawSnapshot);
   const byBoard = new Map<string, { board: Board; jobs: NormalizedJob[] }>();
 
@@ -60,7 +65,7 @@ export async function loadSnapshotJobs(rawSnapshot: unknown, store: Pick<BoardSt
 
   const result: BoardJob[] = [];
   for (const { board, jobs } of byBoard.values()) {
-    const ids = await store.upsertPostings(board, jobs);
+    const ids = await store.insertMissingPostings(board, jobs);
     for (const job of jobs) {
       const postingId = ids.get(jobKey(job));
       if (postingId) result.push(toBoardJob(job, postingId));

@@ -11,7 +11,7 @@ describe("isUsRemoteText", () => {
   );
 
   // "Remote, KSA" passed as US-remote in the first live run (Phase 2).
-  it.each(["Remote, KSA", "Remote - Canada", "Remote (Europe)", "Remote, India"])("not US-remote: %s", (location) =>
+  it.each(["Remote, KSA", "Remote - Canada", "Remote (Europe)", "Remote, India", "Remote - Latin America", "Remote, South America"])("not US-remote: %s", (location) =>
     expect(isUsRemoteText(location)).toBe(false),
   );
 });

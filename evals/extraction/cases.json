@@ -1,5 +1,5 @@
 {
-  "status": "draft labels by Claude; needs a human check (see LABELING.md)",
+  "status": "draft labels by Claude, corrected after the Phase 2 independent review; needs a human check (see LABELING.md)",
   "cases": [
     {
       "id": "greenhouse-5280545007",
@@ -104,7 +104,7 @@
         "degree": "unknown",
         "is_new_grad_friendly": "unknown"
       },
-      "why": "'eligibility to obtain and maintain a US security clearance' → ability_to_obtain. No work-mode statement."
+      "why": "'eligibility to obtain and maintain a US security clearance' → ability_to_obtain. No work-mode statement. Degree not stated → unknown."
     },
     {
       "id": "greenhouse-5286149007",
@@ -134,7 +134,7 @@
         "degree": "bachelors",
         "is_new_grad_friendly": "unknown"
       },
-      "why": "'1+ years'. Its '20 years' is the company's age. Title level I, but 1+ years required → unknown."
+      "why": "'1+ years'. Its '20 years' is the company's age. Title level I, but 1+ years required → unknown. 'A degree in CS ... or equivalent practical experience' → bachelors (lowest degree named, alternative allowed)."
     },
     {
       "id": "lever-67982bee-811b-453b-8596-b53c13f7a78d",
@@ -147,9 +147,9 @@
         "clearance_required": "unknown",
         "location_type": "onsite",
         "degree": "bachelors",
-        "is_new_grad_friendly": "yes"
+        "is_new_grad_friendly": "no"
       },
-      "why": "'0-2 years' → 0. Student/recent-grad contract role, on-site."
+      "why": "'0-2 years' → 0, but requires CURRENT enrollment in a B.S./M.S. program, so a graduated new grad can't apply → no. On-site. (Also dropped by the internship prefilter now.)"
     },
     {
       "id": "greenhouse-8917377002",
@@ -162,9 +162,9 @@
         "clearance_required": "unknown",
         "location_type": "unknown",
         "degree": "bachelors",
-        "is_new_grad_friendly": "yes"
+        "is_new_grad_friendly": "unknown"
       },
-      "why": "No years stated at all. Level I title with no experience requirement → yes."
+      "why": "No years stated, but requires professional experience building consumer products at scale. Level-I title alone is not enough → unknown (Phase 2 review)."
     },
     {
       "id": "ashby-06c2599d-4dd5-4f97-843f-7194b546f042",
@@ -220,11 +220,11 @@
       "expected": {
         "years_required_min": 2,
         "clearance_required": "unknown",
-        "location_type": "unknown",
+        "location_type": "hybrid",
         "degree": "bachelors",
         "is_new_grad_friendly": "unknown"
       },
-      "why": "Bachelor's plus 2 years. No work-mode statement."
+      "why": "Bachelor's plus 2 years. '50% Telecommuting permitted' → hybrid (an earlier draft missed this; caught by the Phase 2 review)."
     },
     {
       "id": "ashby-2111a9b4-8dab-4562-9692-ad7cb2c7b968",
