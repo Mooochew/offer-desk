@@ -9,7 +9,7 @@
 - `npm run check:live`: **7/7 passed** against https://offer-desk-teal.vercel.app. This includes the new "server secrets are configured on the deployment", so Phase 1 N3 is verified live.
 - `npm run check:search`: **passed**. Both runs were served fully from cache: 1.3 s first, 0.8 s second, 0 boards refreshed, 60 boards (26 Greenhouse / 21 Ashby / 13 Lever). Breakdown: considered 7,905 → role −6,148 → seniority −981 → internship −83 → age −562 → location −103 → duplicates 0 → **28 remaining** (SoCal + remote, 30 days). 5/5 descriptions loaded as plain text, 3 of them Greenhouse pass-two fetches. I did **not** observe a cold search; the 6.5–8.6 s cold figure in DECISIONS 023 is **unverified** by me.
 - `npm run boards:verify` (no `--write`): "145/145 boards alive, 21,334 open jobs". `greenhouse:spacex` timed out in the same run and was counted as alive (see N4).
-- `gh run list --limit 3`: all 3 runs `success`, including HEAD `62d5277`. `origin/main` = HEAD; the working tree is clean.
+- `gh run list --limit 3`: all 3 runs `success`, including HEAD `48b933c`. `origin/main` = HEAD; the working tree is clean.
 - Read-only DB count with the admin key: 10,689 `postings` (2,307 with descriptions), 145 `board_cache` rows, 0 `counters`.
 - Behavior probes with `tsx` (scratch script, outside the repo): location and title edge cases. The results are cited in S2 and N2.
 - Eval labels: I read all 16 cases against their full snapshot text (results under S4).
@@ -122,3 +122,5 @@ I checked all 16 labels against the posting text and LABELING.md. 11 are correct
 - Real problems found live were turned into decisions plus regression tests: source rotation (024), US-remote rules (025), and not deleting temporarily unreachable boards (029, after the Anduril timeout).
 - Most Phase 1 findings were actually fixed in code and tests, not just marked done in the docs. The one that remains open (0004) is ready and correct, and `check:rls` fails exactly where it should until it's applied.
 - The eval labels are mostly careful and target real traps (vesting "2 year", company age "20 years", "1.5+", ITAR vs clearance, A-and-B years). Every case is tied to the snapshot by a CI test.
+
+> Note (2026-11-10): commit IDs in this report were updated after the repository history was rewritten to remove commit-message attribution trailers. The code at each commit is unchanged.

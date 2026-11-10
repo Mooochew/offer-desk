@@ -7,7 +7,7 @@
 - `npm run check`: **passes**. Lint: 0 errors, 2 warnings (both in the generated `coverage/` folder, see N1). Typecheck OK. Vitest: 3 files, 17 tests passed. Coverage on `lib/**`: 100% statements/branches/functions/lines (20/20/4/17), but that covers only `lib/env.ts` and `lib/supabase/server.ts`, since `browser.ts` is excluded. `next build` OK: `/` static, `/api/health` dynamic.
 - `npm run check:rls`: **14/14 passed**. Own-row CRUD on `profiles`, cross-user read/update/insert blocked, `action_log` insert refused (42501), all 5 shared tables refused (42501), `increment_counter` refused for users and working for the server, `exports` bucket private. Test users are deleted afterwards.
 - `npm run check:live`: **6/6 passed** against https://offer-desk-teal.vercel.app. Home page 200 with the right title, two anonymous sessions accepted and distinct, no token gives 401.
-- `gh run list --limit 3`: one run, `success`, for HEAD `36e049e` ("Add testing standards, CI, ...").
+- `gh run list --limit 3`: one run, `success`, for HEAD `974c63c` ("Add testing standards, CI, ...").
 - Manual checks against the live URL: `GET /api/health` gives 405, and `POST` with a garbage bearer token gives 401 `Invalid or expired session`.
 - Secret scan: `git log -p --all` has 0 matches for `sb_secret_…`/`sk-…` patterns. I downloaded all 7 JS chunks of the live page: 0 secret-key matches; the publishable key is present (expected). **However**, the server env zod schema (`supabaseSecretKey: …startsWith("sb_secret_")`) ships in the browser bundle (see S3).
 - `.env.local`: confirmed ignored (`.gitignore:11`) and never committed. Adzuna keys are empty. No values were printed.
@@ -112,3 +112,5 @@ PLAN.md:336 (Phase 1 step 1) and D8 call for shadcn/ui. There is no `components.
 - The extraction cache key includes prompt version + model. That stops a stale cache from silently corrupting the v1→v2 eval.
 - Phase 0 produced concrete, decision-driving findings rather than boilerplate: Greenhouse 12.5x content blow-up → two-pass fetch; Lever requirements in `lists[]`; Ashby `isRemote`/`workplaceType` conflict; The Muse 403. The model was chosen from measured token usage, not from a pricing page.
 - CI mirrors `npm run check` and is green on HEAD.
+
+> Note (2026-11-10): commit IDs in this report were updated after the repository history was rewritten to remove commit-message attribution trailers. The code at each commit is unchanged.
