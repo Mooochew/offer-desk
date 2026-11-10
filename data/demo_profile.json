@@ -1,0 +1,7 @@
+{
+  "name": "Demo New Grad",
+  "skills": ["TypeScript", "JavaScript", "React", "Node.js", "Python", "PostgreSQL", "Go", "AWS", "Docker", "Git", "REST APIs", "SQL"],
+  "places": ["socal"],
+  "remoteOk": true,
+  "maxYears": 2
+}

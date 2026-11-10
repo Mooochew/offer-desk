@@ -156,3 +156,25 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 033. Daily warm-up cron (planned for Phase 6)
 - **What:** A Vercel cron (free plan allows daily) calls a protected endpoint that refreshes the most-used boards and touches Supabase.
 - **Why:** Keeps the cache warm for graders (DECISIONS 031) and prevents a free Supabase project from pausing after a week without activity (not verified for this project's plan; cheap insurance).
+
+## 034. Hard filters use only grounded hard facts; "new-grad fit" only ranks (Phase 3)
+- **What:** A posting is dropped only for years above the user's maximum or a required active clearance (optionally clearance eligibility), each backed by a quote the code verified. `is_new_grad_friendly` changes the score (0/8/20 points) but never removes a job.
+- **Why:** After prompt v2, the remaining eval errors are borderline new-grad calls (a 2-year role labeled "no"). With 16 eval cases, tuning further risks fitting the test set. Using the soft judgment only for ranking means a residual model mistake can lower a job, never hide it from the user.
+- **Alternatives:** Filtering on `is_new_grad_friendly = no` (would hide good 2-year roles about 6% of the time); a v3 prompt (diminishing returns, overfitting risk).
+
+## 035. "Why it matched" is a code template, not an LLM call
+- **What:** `whyMatched` builds the line from extracted fields and the score breakdown ("Matches TypeScript, Go · 1+ yr · remote (US)").
+- **Why:** Free, instant, and it can't state anything the data doesn't hold, which the grounding rule requires. An LLM sentence would add cost and latency per result for no accuracy gain.
+
+## 036. Extraction: Structured Outputs + zod + verified evidence quotes + one corrective retry
+- **What:** Strict JSON schema on the Responses API, `reasoning.effort: "low"`, `store: false`; zod re-validation; every non-default answer needs a quote that code finds in the posting; one retry that lists the exact problems; then "extraction failed" (shown to the user, never dropped silently). API errors aren't cached; validation failures are.
+- **Why:** Strict mode guarantees shape, not truth. The quote check makes "don't make things up" enforceable, and the retry fixed every failure in the eval (v1: 5/48 needed it, 0 failed after).
+- **Cache key:** `(description_hash, "<prompt version>/<check version>", model)`, so changing either the prompt or the validator re-runs extraction instead of serving stale judgments.
+
+## 037. Prompt v2 adopted after the eval
+- **What:** `CURRENT_EXTRACTION_PROMPT = extract-v2`. v1 83.8% → v2 97.5–98.3% overall (3 runs each, two v2 runs), new-grad field 43.8% (below the 56.3% trivial baseline) → about 90%. Details and the failure-by-failure changes are in PROMPTS.md.
+- **Why the few-shot examples are synthetic:** taking them from eval postings would inflate the score; a test fails if an example's company appears in the eval set.
+
+## 038. Code pre-rank chooses the ≤25 postings to extract; LLM client owns retries and quota
+- **What:** `preRank` scores titles for new-grad wording, profile skills, preferred place and recency, and extracts the top 25 (DECISIONS 030). The OpenAI SDK's own retries are off (`maxRetries: 0`); `createResponder` applies the shared retry policy (429/5xx, Retry-After, jitter) and counts every attempt against the global daily quota (500/day, `createDailyQuota`), which is never retried once exceeded and fails closed if the counter can't be read.
+- **Why:** One retry policy and one place to count cost. Measured live: 25 extractions in about 20 s on first run; the cached rerun took 0.4 s with 0 model calls.

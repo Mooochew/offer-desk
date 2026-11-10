@@ -99,10 +99,15 @@ export function isUsRemote(job: Pick<BoardJob, "remote" | "locations">): boolean
   return job.remote === "remote" && (job.locations.length === 0 || job.locations.some((location) => US.test(location)));
 }
 
+/** True if any of the job's locations is in one of `places` (false when no places are given). */
+export function inPreferredPlace(job: Pick<BoardJob, "locations">, places: readonly string[]): boolean {
+  const names = places.flatMap(expandPlace);
+  return names.length > 0 && job.locations.some((location) => mentionsPlace(location, names));
+}
+
 /** True if the job is in one of the preferred places, or is US-remote and remote is OK. */
 export function matchesLocation(job: Pick<BoardJob, "remote" | "locations">, preference: LocationPreference): boolean {
   if (preference.places.length === 0 && !preference.remoteOk) return true;
   if (preference.remoteOk && isUsRemote(job)) return true;
-  const names = preference.places.flatMap(expandPlace);
-  return job.locations.some((location) => mentionsPlace(location, names));
+  return inPreferredPlace(job, preference.places);
 }

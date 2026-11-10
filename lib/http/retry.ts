@@ -17,6 +17,8 @@ export type RetryOptions = {
   sleep?: (ms: number) => Promise<void>;
   /** Injected for tests; defaults to Math.random. */
   random?: () => number;
+  /** Extra veto: return false to stop retrying an error that would otherwise be retried. */
+  shouldRetry?: (error: unknown) => boolean;
 };
 
 const realSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -28,7 +30,7 @@ export function isRetryable(error: unknown): boolean {
 }
 
 /** Delay before the next attempt: Retry-After if the server sent one, else exponential backoff with full jitter. */
-export function retryDelayMs(error: unknown, attempt: number, options: Required<Omit<RetryOptions, "sleep">>): number {
+export function retryDelayMs(error: unknown, attempt: number, options: Required<Omit<RetryOptions, "sleep" | "shouldRetry">>): number {
   if (error instanceof HttpError && error.retryAfterMs !== null) {
     return Math.min(error.retryAfterMs, options.maxDelayMs);
   }
@@ -51,7 +53,8 @@ export async function withRetry<T>(operation: () => Promise<T>, options: RetryOp
       return await operation();
     } catch (error) {
       const isLastAttempt = attempt >= settings.attempts - 1;
-      if (isLastAttempt || !isRetryable(error)) throw error;
+      const vetoed = options.shouldRetry ? !options.shouldRetry(error) : false;
+      if (isLastAttempt || vetoed || !isRetryable(error)) throw error;
       await sleep(retryDelayMs(error, attempt, settings));
     }
   }
