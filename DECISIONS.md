@@ -75,3 +75,7 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 014. Next.js 16 + `@types/node` 24
 - **What:** Scaffolded with create-next-app (Next 16.4, React 19.3, Tailwind 4, Turbopack). Bumped `@types/node` from 20 to 24 to match the local Node 24 and satisfy vitest 5's peer dependency.
 - **Why:** Forcing the install (`--legacy-peer-deps`) would hide a real version mismatch.
+
+## 015. Explicit grants for every role
+- **What:** Migrations grant table access explicitly: `authenticated` on user tables (RLS still applies), `service_role` on everything (0003), nothing for `anon`.
+- **Why:** This Supabase project doesn't auto-grant new tables to its roles. The RLS check script caught it: the server got "permission denied for table counters". Explicit grants make the access rules readable in one place instead of depending on project defaults.
