@@ -64,7 +64,7 @@
 | UI | Tailwind + shadcn/ui, lucide icons, Recharts (funnel) | Fast and clean without designing from scratch |
 | Hosting | Vercel | Decided. Deploys from GitHub on every push |
 | DB / Auth / Files | Supabase: Postgres, anonymous auth, Storage | One service for all three. Row Level Security isolates graders |
-| LLM | OpenAI SDK. **Responses API vs Chat Completions to be confirmed in Phase 0** against current docs | Function calling + Structured Outputs |
+| LLM | OpenAI SDK, **Responses API** (DECISIONS 009) | Function calling + Structured Outputs (`text.format`) |
 | Models | `OPENAI_MODEL` (agent) and `OPENAI_EXTRACT_MODEL` (extraction), both env vars | Extraction is high-volume, so it can use a cheaper model |
 | Validation | zod | Validates tool arguments and LLM output |
 | Tests | Vitest | Unit tests for the deterministic core |
@@ -140,7 +140,8 @@ DECISIONS.md  PROMPTS.md  README.md  .env.example
 |---|---|
 | `postings` | id, source, source_id, company, title, location, remote, url, description, posted_at, dedupe_key, raw jsonb (unique on source + source_id) |
 | `extractions` | posting_id, description_hash (unique), extracted jsonb, status (`ok`/`failed`), confidence (`full`/`truncated`), model, prompt_version |
-| `search_cache` | key (hash of source + normalized query + location + page), posting_ids[], status jsonb, expires_at |
+| `board_cache` | key (`ats:slug`), jobs jsonb (normalized light list), fetched_at, expires_at, status |
+| `search_cache` | key (hash of source + normalized query + location + page), posting_ids[], status jsonb, expires_at (Adzuna only) |
 | `quota` | key (e.g. `adzuna:2026-11-09`, `openai:2026-11-09`), count |
 
 **User-owned** (Row Level Security: `user_id = auth.uid()` on every table):
@@ -222,7 +223,9 @@ prefilter in code (title seniority words,       ├─ "why matched" line from f
 ```
 
 - **Board selection:** `data/ats_boards.json` has about 150 companies `{name, ats, slug, tags[]}` (tags like `backend`, `socal`, `remote-friendly`). Each search picks at most 40 boards by tag/keyword match. Concurrency 8, 5-second timeout per call.
-- **Greenhouse two-pass fetch:** a board with `content=true` can be several MB (Stripe was). Fetch the list first, match titles in code, then fetch content only for the matches.
+- **Greenhouse two-pass fetch:** a board with `content=true` can be several MB (Stripe: 5.9 MB, 12.5x the list). Fetch the list first, match titles in code, then fetch content only for the matches.
+- **Cache per board (DECISIONS 005):** each board's normalized job list is cached about 6 hours and the query filter runs in code over the cache, because Lever and Ashby boards can be several MB with no light list mode. The per-query `search_cache` is kept only for Adzuna.
+- **Lever descriptions (DECISIONS 007):** requirements live in `lists[]`, so the description is built from intro + lists + additional.
 - **Adzuna:** used only when `ADZUNA_APP_ID`/`ADZUNA_APP_KEY` are set and the daily global budget (e.g. 150 calls/day in `quota`) isn't used up. If descriptions are truncated (to verify in Phase 0), extraction is marked `confidence: truncated`, and fields not found stay `unknown`. Never guessed.
 - **Snapshot fallback:** `data/sample_postings.json` (a real snapshot taken with a script before deploy) is used by "Seed sample pipeline", and by search **only if every live source fails**. The UI marks those results as a snapshot.
 
