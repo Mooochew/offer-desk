@@ -57,6 +57,7 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 010. Model choice: decided from the account's model list
 - **What:** `OPENAI_MODEL` (agent) and `OPENAI_EXTRACT_MODEL` (extraction) stay env vars. In Phase 1 we list the models the key can access and pick a small current model for the agent and the cheapest nano-class model for extraction, after checking prices on OpenAI's pricing page.
 - **Why:** Third-party pricing pages disagree on current model names and prices.
+- **Result (2026-11-09):** `gpt-6-luna` for both. Official pricing: $0.10 in / $0.50 out per 1M tokens. On a tiny Structured Outputs test, both `gpt-6-luna` and `gpt-5-nano` ($0.05 / $0.40) answered correctly, but nano used 192 reasoning tokens (billed as output) against luna's 26, so luna was about half the cost per call. Estimate: one 25-posting triage ≈ $0.01, one agent turn ≈ $0.001. Phase 3's eval can re-check luna against nano on extraction accuracy.
 
 ## 011. Vercel function duration
 - **What:** Set `maxDuration` on `/api/agent` to 60 s, well under the Hobby maximum.
