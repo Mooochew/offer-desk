@@ -107,3 +107,28 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 022. Split env config into public and server modules
 - **What:** `lib/env/public.ts` (browser-safe) and `lib/env/server.ts` (imports `server-only`).
 - **Why:** The Phase 1 review found the server env schema (variable names, no values) in the browser bundle, because the browser client imported the shared module. Now the build fails if server config is ever imported from client code.
+
+## 023. Board cache holds light job lists; descriptions live in `postings` (Phase 2)
+- **What:** Refreshing a board keeps only engineering titles, upserts them (with descriptions where the source gives them) into `postings`, and stores a light list (title, locations, dates, url, posting id; no description) in `board_cache.jobs`. Searches filter the light lists in code. Descriptions are loaded only for the postings that need them (`loadDescriptions`), which also does pass two of the Greenhouse fetch and saves the result.
+- **Why (end goal: a fast, reliable demo search on free tiers):** A search over 60 boards reads kilobytes of light lists instead of megabytes of descriptions, and needed no schema change. Measured: cold search over 60 boards 6.5–8.6 s; warm search 0.3–0.7 s.
+- **Alternatives:** One `postings` row per job queried with SQL (needs `board_key`/`closed_at` columns and a migration, plus tracking closed jobs); full descriptions inside the cache (Ashby/Lever boards are multi-MB).
+
+## 024. Board selection rotates sources; refresh cap equals board count
+- **What:** `selectBoards` takes tag matches first, then rotates Greenhouse/Ashby/Lever within each score. A search refreshes up to all 60 selected boards; the 25 s time budget is the guard.
+- **Why:** Found in the first live run: listing order picked 57 Greenhouse boards out of 60, so OpenAI, Ramp, Notion, etc. were barely searched. With a refresh cap (40) below the board count (60), the second identical search refreshed 20 more boards and returned different results, which would confuse a grader.
+
+## 025. Role and location rules tightened from live results
+- **What:** A role match needs a builder word (engineer/developer/scientist/programmer); a generic match needs a software word ("software", SWE, SDE, programmer), not "engineer" alone. A remote location counts as US only if it says US, a US state/coast, or a ", XX" state code, or it says just "Remote" with no non-US places beside it. `, IN` and `, DE` are excluded (India/Germany).
+- **Why:** The first live search let in "Battery Systems Engineer", "Curriculum Developer", "Operations Analyst, … Platform", "Remote, KSA" and a Europe-only role with a bare "Remote". Requiring a positive US signal is safer than listing every other country. Each case is now a regression test.
+
+## 026. Real-postings snapshot
+- **What:** `npm run snapshot` saves 120 real new-grad-relevant postings (46 companies, all three sources, full descriptions) to `data/sample_postings.json` (≈0.8 MB). It backs "Seed sample pipeline", the search fallback when every live board fails (labelled `usedSnapshot`), and the extraction eval.
+- **Why:** The demo (30%) must work even if a job board is down during grading, and the eval needs fixed inputs.
+
+## 027. Extraction eval: 16 cases, labeling rules as the spec (moved into Phase 2)
+- **What:** `evals/extraction/cases.json` has 16 real postings with draft labels for years, clearance, location type, degree and new-grad fit; `LABELING.md` defines each rule. The extractor will receive title, company, listed locations and description. Labels need a human check before Phase 3.
+- **Why:** Phase 1 review risk (day 2 overload). The cases were chosen for traps found in real text: 401(k) vesting "2 year", company age "20 years", "1.5+" vs "5+", ITAR vs clearance, A-and-B year requirements.
+- **Evidence for the README problem statement:** of the 120 snapshot postings that passed the title filter for entry-level software roles, many still require 3+ to 10+ years (e.g. Affirm "Software Engineer II" 1.5+, Writer 5+, Gusto 10+). That gap is what Phase 3 closes.
+
+## 028. Scripts run with `tsx --conditions=react-server`, as `.mts`
+- **What:** Scripts that import app code use `tsx` (handles the `@/` path alias and JSON imports) with the `react-server` condition, under which the `server-only` package is a no-op (same as Next.js on the server). They use the `.mts` extension so top-level `await` works without setting `"type": "module"` for the whole Next.js project.

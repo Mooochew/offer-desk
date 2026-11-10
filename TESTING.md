@@ -8,9 +8,10 @@ Every phase ends at a **gate** (see [PLAN.md](PLAN.md#phase-gate)). A phase is n
 |---|---|---|---|
 | **Static** | Lint + types | `npm run lint`, `npm run typecheck` | Local + CI |
 | **Unit** | Deterministic code (normalizers, dedupe, filters, scoring, validators, tool executor, confirmation flow, file builders) | `npm test` | Local + CI |
-| **Coverage** | Floors on `lib/**`: 80% lines, 80% functions, 75% branches | `npm run test:coverage` | Local + CI |
+| **Coverage** | Floors on `lib/**`: 90% lines, 90% functions, 85% branches (raised from 80/80/75 after Phase 2) | `npm run test:coverage` | Local + CI |
 | **Build** | Production build succeeds | `npm run build` | Local + CI |
-| **Live checks** | Real Supabase and the deployed URL: RLS isolation, session flow | `npm run check:rls`, `npm run check:live` | Local, at each gate |
+| **Live checks** | Real Supabase, real job boards and the deployed URL: RLS isolation, session flow, a full search (cold + cached) with description loading | `npm run check:rls`, `npm run check:live`, `npm run check:search` | Local, at each gate |
+| **Data checks** | Board registry still alive; snapshot and eval files valid and consistent | `npm run boards:verify` (local), `tests/data/*` (CI) | Local + CI |
 | **Prompt evals** | LLM extraction accuracy against hand-labeled postings (from Phase 3) | `npm run eval` | Local, when a prompt changes |
 | **Independent review** | Architecture, test quality, assignment alignment | Phase reviewer agent | At each gate |
 
@@ -42,4 +43,4 @@ evals/        labeled data for prompt evals
 ## Known quirks
 
 - **Vitest 5 + rejecting `vi.fn()` in a mocked module.** A `vi.fn()` that rejects inside a `vi.mock(...)` factory fails the test even when the code under test catches the error. For "this dependency fails" cases, use a plain function with a settable implementation (see `tests/api/health.test.ts`).
-- **`npm` optional dependency bug.** If Vitest says "Cannot find native binding" (rolldown), delete `node_modules` and `package-lock.json` and run `npm install` again. Don't add the platform binary as a direct dependency, because CI runs on Linux.
+- **`npm` optional dependency bug.** If Vitest says "Cannot find native binding" (rolldown), delete `node_modules` and `package-lock.json` and run `npm install` again. Don't add the platform binary as a direct dependency, because CI runs on Linux. **`npm install <package>` can trigger this** by dropping the platform entries from the lockfile (it happened when adding `tsx`). After adding a dependency, check `grep -c '@rolldown/binding-' package-lock.json` is non-zero; CI would also fail.

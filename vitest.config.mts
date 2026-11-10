@@ -23,7 +23,7 @@ export default defineConfig({
       provider: "v8",
       include: ["lib/**/*.ts"],
       // Floors for deterministic code; raised as phases add core logic (see TESTING.md).
-      thresholds: { lines: 80, functions: 80, branches: 75 },
+      thresholds: { lines: 90, functions: 90, branches: 85 },
     },
   },
 });

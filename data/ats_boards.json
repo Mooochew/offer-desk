@@ -1,0 +1,1200 @@
+[
+  {
+    "name": "Stripe",
+    "ats": "greenhouse",
+    "slug": "stripe",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Airbnb",
+    "ats": "greenhouse",
+    "slug": "airbnb",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Databricks",
+    "ats": "greenhouse",
+    "slug": "databricks",
+    "tags": [
+      "data",
+      "ai"
+    ]
+  },
+  {
+    "name": "Figma",
+    "ats": "greenhouse",
+    "slug": "figma",
+    "tags": [
+      "devtools",
+      "design"
+    ]
+  },
+  {
+    "name": "Discord",
+    "ats": "greenhouse",
+    "slug": "discord",
+    "tags": [
+      "consumer",
+      "gaming"
+    ]
+  },
+  {
+    "name": "Reddit",
+    "ats": "greenhouse",
+    "slug": "reddit",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Pinterest",
+    "ats": "greenhouse",
+    "slug": "pinterest",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Lyft",
+    "ats": "greenhouse",
+    "slug": "lyft",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Robinhood",
+    "ats": "greenhouse",
+    "slug": "robinhood",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Coinbase",
+    "ats": "greenhouse",
+    "slug": "coinbase",
+    "tags": [
+      "fintech",
+      "crypto"
+    ]
+  },
+  {
+    "name": "Instacart",
+    "ats": "greenhouse",
+    "slug": "instacart",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "DoorDash",
+    "ats": "greenhouse",
+    "slug": "doordashusa",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Dropbox",
+    "ats": "greenhouse",
+    "slug": "dropbox",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Cloudflare",
+    "ats": "greenhouse",
+    "slug": "cloudflare",
+    "tags": [
+      "infra",
+      "security"
+    ]
+  },
+  {
+    "name": "Datadog",
+    "ats": "greenhouse",
+    "slug": "datadog",
+    "tags": [
+      "infra",
+      "devtools"
+    ]
+  },
+  {
+    "name": "MongoDB",
+    "ats": "greenhouse",
+    "slug": "mongodb",
+    "tags": [
+      "data",
+      "infra"
+    ]
+  },
+  {
+    "name": "Twilio",
+    "ats": "greenhouse",
+    "slug": "twilio",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Asana",
+    "ats": "greenhouse",
+    "slug": "asana",
+    "tags": [
+      "productivity"
+    ]
+  },
+  {
+    "name": "GitLab",
+    "ats": "greenhouse",
+    "slug": "gitlab",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Elastic",
+    "ats": "greenhouse",
+    "slug": "elastic",
+    "tags": [
+      "data",
+      "infra"
+    ]
+  },
+  {
+    "name": "Okta",
+    "ats": "greenhouse",
+    "slug": "okta",
+    "tags": [
+      "security"
+    ]
+  },
+  {
+    "name": "Samsara",
+    "ats": "greenhouse",
+    "slug": "samsara",
+    "tags": [
+      "iot",
+      "infra"
+    ]
+  },
+  {
+    "name": "Gusto",
+    "ats": "greenhouse",
+    "slug": "gusto",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Brex",
+    "ats": "greenhouse",
+    "slug": "brex",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Chime",
+    "ats": "greenhouse",
+    "slug": "chime",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Affirm",
+    "ats": "greenhouse",
+    "slug": "affirm",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Duolingo",
+    "ats": "greenhouse",
+    "slug": "duolingo",
+    "tags": [
+      "consumer",
+      "education"
+    ]
+  },
+  {
+    "name": "Roblox",
+    "ats": "greenhouse",
+    "slug": "roblox",
+    "tags": [
+      "gaming"
+    ]
+  },
+  {
+    "name": "Riot Games",
+    "ats": "greenhouse",
+    "slug": "riotgames",
+    "tags": [
+      "gaming",
+      "socal"
+    ]
+  },
+  {
+    "name": "Epic Games",
+    "ats": "greenhouse",
+    "slug": "epicgames",
+    "tags": [
+      "gaming"
+    ]
+  },
+  {
+    "name": "Scopely",
+    "ats": "greenhouse",
+    "slug": "scopely",
+    "tags": [
+      "gaming",
+      "socal"
+    ]
+  },
+  {
+    "name": "SpaceX",
+    "ats": "greenhouse",
+    "slug": "spacex",
+    "tags": [
+      "aerospace",
+      "socal"
+    ]
+  },
+  {
+    "name": "Anduril",
+    "ats": "greenhouse",
+    "slug": "andurilindustries",
+    "tags": [
+      "defense",
+      "socal"
+    ]
+  },
+  {
+    "name": "Relativity Space",
+    "ats": "greenhouse",
+    "slug": "relativity",
+    "tags": [
+      "aerospace",
+      "socal"
+    ]
+  },
+  {
+    "name": "Anthropic",
+    "ats": "greenhouse",
+    "slug": "anthropic",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Scale AI",
+    "ats": "greenhouse",
+    "slug": "scaleai",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Vercel",
+    "ats": "greenhouse",
+    "slug": "vercel",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Nuro",
+    "ats": "greenhouse",
+    "slug": "nuro",
+    "tags": [
+      "autonomy"
+    ]
+  },
+  {
+    "name": "Axon",
+    "ats": "greenhouse",
+    "slug": "axon",
+    "tags": [
+      "security"
+    ]
+  },
+  {
+    "name": "Verkada",
+    "ats": "greenhouse",
+    "slug": "verkada",
+    "tags": [
+      "security",
+      "iot"
+    ]
+  },
+  {
+    "name": "Toast",
+    "ats": "greenhouse",
+    "slug": "toast",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Block",
+    "ats": "greenhouse",
+    "slug": "block",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Adyen",
+    "ats": "greenhouse",
+    "slug": "adyen",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Flexport",
+    "ats": "greenhouse",
+    "slug": "flexport",
+    "tags": [
+      "logistics"
+    ]
+  },
+  {
+    "name": "Fivetran",
+    "ats": "greenhouse",
+    "slug": "fivetran",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Grafana Labs",
+    "ats": "greenhouse",
+    "slug": "grafanalabs",
+    "tags": [
+      "infra",
+      "devtools"
+    ]
+  },
+  {
+    "name": "Tailscale",
+    "ats": "greenhouse",
+    "slug": "tailscale",
+    "tags": [
+      "infra",
+      "security"
+    ]
+  },
+  {
+    "name": "Mercury",
+    "ats": "greenhouse",
+    "slug": "mercury",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Carta",
+    "ats": "greenhouse",
+    "slug": "carta",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Faire",
+    "ats": "greenhouse",
+    "slug": "faire",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Oscar Health",
+    "ats": "greenhouse",
+    "slug": "oscar",
+    "tags": [
+      "health"
+    ]
+  },
+  {
+    "name": "New Relic",
+    "ats": "greenhouse",
+    "slug": "newrelic",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "PagerDuty",
+    "ats": "greenhouse",
+    "slug": "pagerduty",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "LaunchDarkly",
+    "ats": "greenhouse",
+    "slug": "launchdarkly",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Mixpanel",
+    "ats": "greenhouse",
+    "slug": "mixpanel",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Smartsheet",
+    "ats": "greenhouse",
+    "slug": "smartsheet",
+    "tags": [
+      "productivity"
+    ]
+  },
+  {
+    "name": "Squarespace",
+    "ats": "greenhouse",
+    "slug": "squarespace",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Nextdoor",
+    "ats": "greenhouse",
+    "slug": "nextdoor",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Peloton",
+    "ats": "greenhouse",
+    "slug": "peloton",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Twitch",
+    "ats": "greenhouse",
+    "slug": "twitch",
+    "tags": [
+      "gaming",
+      "consumer"
+    ]
+  },
+  {
+    "name": "ZipRecruiter",
+    "ats": "greenhouse",
+    "slug": "ziprecruiter",
+    "tags": [
+      "consumer",
+      "socal"
+    ]
+  },
+  {
+    "name": "SoFi",
+    "ats": "greenhouse",
+    "slug": "sofi",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Betterment",
+    "ats": "greenhouse",
+    "slug": "betterment",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Gemini",
+    "ats": "greenhouse",
+    "slug": "gemini",
+    "tags": [
+      "fintech",
+      "crypto"
+    ]
+  },
+  {
+    "name": "Together AI",
+    "ats": "greenhouse",
+    "slug": "togetherai",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Snorkel AI",
+    "ats": "greenhouse",
+    "slug": "snorkelai",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Labelbox",
+    "ats": "greenhouse",
+    "slug": "labelbox",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Contentful",
+    "ats": "greenhouse",
+    "slug": "contentful",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Algolia",
+    "ats": "greenhouse",
+    "slug": "algolia",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Cockroach Labs",
+    "ats": "greenhouse",
+    "slug": "cockroachlabs",
+    "tags": [
+      "data",
+      "infra"
+    ]
+  },
+  {
+    "name": "PlanetScale",
+    "ats": "greenhouse",
+    "slug": "planetscale",
+    "tags": [
+      "data",
+      "infra"
+    ]
+  },
+  {
+    "name": "SingleStore",
+    "ats": "greenhouse",
+    "slug": "singlestore",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "YugabyteDB",
+    "ats": "greenhouse",
+    "slug": "yugabyte",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "JetBrains",
+    "ats": "greenhouse",
+    "slug": "jetbrains",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Bitwarden",
+    "ats": "greenhouse",
+    "slug": "bitwarden",
+    "tags": [
+      "security"
+    ]
+  },
+  {
+    "name": "Netlify",
+    "ats": "greenhouse",
+    "slug": "netlify",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Airtable",
+    "ats": "greenhouse",
+    "slug": "airtable",
+    "tags": [
+      "productivity"
+    ]
+  },
+  {
+    "name": "Calendly",
+    "ats": "greenhouse",
+    "slug": "calendly",
+    "tags": [
+      "productivity"
+    ]
+  },
+  {
+    "name": "Sendbird",
+    "ats": "greenhouse",
+    "slug": "sendbird",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "OpenAI",
+    "ats": "ashby",
+    "slug": "openai",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Perplexity",
+    "ats": "ashby",
+    "slug": "perplexity",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Ramp",
+    "ats": "ashby",
+    "slug": "ramp",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Notion",
+    "ats": "ashby",
+    "slug": "notion",
+    "tags": [
+      "productivity"
+    ]
+  },
+  {
+    "name": "Linear",
+    "ats": "ashby",
+    "slug": "linear",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Supabase",
+    "ats": "ashby",
+    "slug": "supabase",
+    "tags": [
+      "devtools",
+      "data"
+    ]
+  },
+  {
+    "name": "Cursor",
+    "ats": "ashby",
+    "slug": "cursor",
+    "tags": [
+      "ai",
+      "devtools"
+    ]
+  },
+  {
+    "name": "Snowflake",
+    "ats": "ashby",
+    "slug": "snowflake",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Plaid",
+    "ats": "ashby",
+    "slug": "plaid",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Cohere",
+    "ats": "ashby",
+    "slug": "cohere",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "ElevenLabs",
+    "ats": "ashby",
+    "slug": "elevenlabs",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Harvey",
+    "ats": "ashby",
+    "slug": "harvey",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "ClickHouse",
+    "ats": "ashby",
+    "slug": "clickhouse",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Nubank",
+    "ats": "ashby",
+    "slug": "nubank",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Headway",
+    "ats": "ashby",
+    "slug": "headway",
+    "tags": [
+      "health"
+    ]
+  },
+  {
+    "name": "Temporal",
+    "ats": "ashby",
+    "slug": "temporal",
+    "tags": [
+      "devtools",
+      "infra"
+    ]
+  },
+  {
+    "name": "Vanta",
+    "ats": "ashby",
+    "slug": "vanta",
+    "tags": [
+      "security"
+    ]
+  },
+  {
+    "name": "1Password",
+    "ats": "ashby",
+    "slug": "1password",
+    "tags": [
+      "security"
+    ]
+  },
+  {
+    "name": "Amplitude",
+    "ats": "ashby",
+    "slug": "amplitude",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Benchling",
+    "ats": "ashby",
+    "slug": "benchling",
+    "tags": [
+      "health"
+    ]
+  },
+  {
+    "name": "ClickUp",
+    "ats": "ashby",
+    "slug": "clickup",
+    "tags": [
+      "productivity"
+    ]
+  },
+  {
+    "name": "Writer",
+    "ats": "ashby",
+    "slug": "writer",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Modal",
+    "ats": "ashby",
+    "slug": "modal",
+    "tags": [
+      "ai",
+      "infra"
+    ]
+  },
+  {
+    "name": "Sentry",
+    "ats": "ashby",
+    "slug": "sentry",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Thumbtack",
+    "ats": "ashby",
+    "slug": "thumbtack",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Hex",
+    "ats": "ashby",
+    "slug": "hex",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Replit",
+    "ats": "ashby",
+    "slug": "replit",
+    "tags": [
+      "devtools",
+      "ai"
+    ]
+  },
+  {
+    "name": "Render",
+    "ats": "ashby",
+    "slug": "render",
+    "tags": [
+      "infra",
+      "devtools"
+    ]
+  },
+  {
+    "name": "Redis",
+    "ats": "ashby",
+    "slug": "redis",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Sanity",
+    "ats": "ashby",
+    "slug": "sanity",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Strava",
+    "ats": "ashby",
+    "slug": "strava",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Poshmark",
+    "ats": "ashby",
+    "slug": "poshmark",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Webflow",
+    "ats": "ashby",
+    "slug": "webflow",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Miro",
+    "ats": "ashby",
+    "slug": "miro",
+    "tags": [
+      "productivity"
+    ]
+  },
+  {
+    "name": "Astronomer",
+    "ats": "ashby",
+    "slug": "astronomer",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "FullStory",
+    "ats": "ashby",
+    "slug": "fullstory",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Acorns",
+    "ats": "ashby",
+    "slug": "acorns",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Airbyte",
+    "ats": "ashby",
+    "slug": "airbyte",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "LanceDB",
+    "ats": "ashby",
+    "slug": "lancedb",
+    "tags": [
+      "data",
+      "ai"
+    ]
+  },
+  {
+    "name": "Zapier",
+    "ats": "ashby",
+    "slug": "zapier",
+    "tags": [
+      "productivity"
+    ]
+  },
+  {
+    "name": "GoodRx",
+    "ats": "ashby",
+    "slug": "goodrx",
+    "tags": [
+      "health",
+      "socal"
+    ]
+  },
+  {
+    "name": "PostHog",
+    "ats": "ashby",
+    "slug": "posthog",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Railway",
+    "ats": "ashby",
+    "slug": "railway",
+    "tags": [
+      "infra"
+    ]
+  },
+  {
+    "name": "Stream",
+    "ats": "ashby",
+    "slug": "stream",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Pinecone",
+    "ats": "ashby",
+    "slug": "pinecone",
+    "tags": [
+      "ai",
+      "data"
+    ]
+  },
+  {
+    "name": "Prefect",
+    "ats": "ashby",
+    "slug": "prefect",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "MotherDuck",
+    "ats": "ashby",
+    "slug": "motherduck",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Materialize",
+    "ats": "ashby",
+    "slug": "materialize",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Runway",
+    "ats": "ashby",
+    "slug": "runway",
+    "tags": [
+      "ai"
+    ]
+  },
+  {
+    "name": "Mux",
+    "ats": "ashby",
+    "slug": "mux",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Weaviate",
+    "ats": "ashby",
+    "slug": "weaviate",
+    "tags": [
+      "ai",
+      "data"
+    ]
+  },
+  {
+    "name": "Hightouch",
+    "ats": "ashby",
+    "slug": "hightouch",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Neon",
+    "ats": "ashby",
+    "slug": "neon",
+    "tags": [
+      "data",
+      "infra"
+    ]
+  },
+  {
+    "name": "Palantir",
+    "ats": "lever",
+    "slug": "palantir",
+    "tags": [
+      "data",
+      "defense"
+    ]
+  },
+  {
+    "name": "Spotify",
+    "ats": "lever",
+    "slug": "spotify",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Zoox",
+    "ats": "lever",
+    "slug": "zoox",
+    "tags": [
+      "autonomy"
+    ]
+  },
+  {
+    "name": "Wealthfront",
+    "ats": "lever",
+    "slug": "wealthfront",
+    "tags": [
+      "fintech"
+    ]
+  },
+  {
+    "name": "Lyra Health",
+    "ats": "lever",
+    "slug": "lyrahealth",
+    "tags": [
+      "health"
+    ]
+  },
+  {
+    "name": "Gopuff",
+    "ats": "lever",
+    "slug": "gopuff",
+    "tags": [
+      "consumer"
+    ]
+  },
+  {
+    "name": "Jam City",
+    "ats": "lever",
+    "slug": "jamcity",
+    "tags": [
+      "gaming",
+      "socal"
+    ]
+  },
+  {
+    "name": "Kabam",
+    "ats": "lever",
+    "slug": "kabam",
+    "tags": [
+      "gaming"
+    ]
+  },
+  {
+    "name": "Tala",
+    "ats": "lever",
+    "slug": "tala",
+    "tags": [
+      "fintech",
+      "socal"
+    ]
+  },
+  {
+    "name": "Cloudinary",
+    "ats": "lever",
+    "slug": "cloudinary",
+    "tags": [
+      "devtools"
+    ]
+  },
+  {
+    "name": "Fly.io",
+    "ats": "lever",
+    "slug": "fly",
+    "tags": [
+      "infra"
+    ]
+  },
+  {
+    "name": "Tinybird",
+    "ats": "lever",
+    "slug": "tinybird",
+    "tags": [
+      "data"
+    ]
+  },
+  {
+    "name": "Zilliz",
+    "ats": "lever",
+    "slug": "zilliz",
+    "tags": [
+      "ai",
+      "data"
+    ]
+  }
+]

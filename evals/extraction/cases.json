@@ -1,0 +1,245 @@
+{
+  "status": "draft labels by Claude; needs a human check (see LABELING.md)",
+  "cases": [
+    {
+      "id": "greenhouse-5280545007",
+      "source": "greenhouse",
+      "sourceId": "5280545007",
+      "company": "Verkada",
+      "title": "Backend Software Engineer - University Graduate 2027",
+      "expected": {
+        "years_required_min": null,
+        "clearance_required": "unknown",
+        "location_type": "onsite",
+        "degree": "bachelors",
+        "is_new_grad_friendly": "yes"
+      },
+      "why": "New-grad role. Its only '2 year' is a 401(k) vesting period, not experience. BS/MS listed → bachelors."
+    },
+    {
+      "id": "greenhouse-8278991",
+      "source": "greenhouse",
+      "sourceId": "8278991",
+      "company": "Coinbase",
+      "title": "Software Engineer-1",
+      "expected": {
+        "years_required_min": 2,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown"
+      },
+      "why": "Title says 'Software Engineer-1' but the required section asks for 2+ years."
+    },
+    {
+      "id": "greenhouse-8196112003",
+      "source": "greenhouse",
+      "sourceId": "8196112003",
+      "company": "Affirm",
+      "title": "Software Engineer II, Backend",
+      "expected": {
+        "years_required_min": 1.5,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "bachelors",
+        "is_new_grad_friendly": "unknown"
+      },
+      "why": "'1.5+ years' (a careless read gives 5+). Degree OR equivalent experience → bachelors."
+    },
+    {
+      "id": "greenhouse-8325759",
+      "source": "greenhouse",
+      "sourceId": "8325759",
+      "company": "Roblox",
+      "title": "Software Engineer, Engine Productivity",
+      "expected": {
+        "years_required_min": 1,
+        "clearance_required": "unknown",
+        "location_type": "hybrid",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown"
+      },
+      "why": "Range '1–3 years' (internships count) → minimum 1. Onsite Tue–Thu → hybrid."
+    },
+    {
+      "id": "ashby-f65ba1d9-f809-442f-88df-453241e8d509",
+      "source": "ashby",
+      "sourceId": "f65ba1d9-f809-442f-88df-453241e8d509",
+      "company": "Amplitude",
+      "title": "Software Engineer II, Analytics Compute Platform Team",
+      "expected": {
+        "years_required_min": 2,
+        "clearance_required": "unknown",
+        "location_type": "hybrid",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown"
+      },
+      "why": "Range '2–4 years' → 2. 'San Francisco- Hybrid'."
+    },
+    {
+      "id": "greenhouse-8934563002",
+      "source": "greenhouse",
+      "sourceId": "8934563002",
+      "company": "SpaceX",
+      "title": "Full Stack Software Engineer, Internal Platforms",
+      "expected": {
+        "years_required_min": 1,
+        "clearance_required": "unknown",
+        "location_type": "onsite",
+        "degree": "bachelors",
+        "is_new_grad_friendly": "unknown"
+      },
+      "why": "Basic quals: 1+ years full stack; '2+ years' is an alternative to a degree, not a requirement. ITAR citizenship is NOT a security clearance."
+    },
+    {
+      "id": "greenhouse-5290232007",
+      "source": "greenhouse",
+      "sourceId": "5290232007",
+      "company": "Anduril",
+      "title": "Software Engineer, Sentry Software (Manufacturing)",
+      "expected": {
+        "years_required_min": 2,
+        "clearance_required": "ability_to_obtain",
+        "location_type": "unknown",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown"
+      },
+      "why": "'eligibility to obtain and maintain a US security clearance' → ability_to_obtain. No work-mode statement."
+    },
+    {
+      "id": "greenhouse-5286149007",
+      "source": "greenhouse",
+      "sourceId": "5286149007",
+      "company": "Anduril",
+      "title": "Forward Deployed Software Engineer, JBLM (Active Clearance)",
+      "expected": {
+        "years_required_min": 3,
+        "clearance_required": "yes",
+        "location_type": "remote",
+        "degree": "unknown",
+        "is_new_grad_friendly": "no"
+      },
+      "why": "Requires an ACTIVE Secret clearance. '3-10+ years' → 3. Listed location is 'Remote' (10–30% travel)."
+    },
+    {
+      "id": "greenhouse-8347710",
+      "source": "greenhouse",
+      "sourceId": "8347710",
+      "company": "Smartsheet",
+      "title": "Software Engineer I (Remote Eligible)",
+      "expected": {
+        "years_required_min": 1,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "bachelors",
+        "is_new_grad_friendly": "unknown"
+      },
+      "why": "'1+ years'. Its '20 years' is the company's age. Title level I, but 1+ years required → unknown."
+    },
+    {
+      "id": "lever-67982bee-811b-453b-8596-b53c13f7a78d",
+      "source": "lever",
+      "sourceId": "67982bee-811b-453b-8596-b53c13f7a78d",
+      "company": "Zoox",
+      "title": "Contract Student Worker - Software Engineer (40 hrs/wk)",
+      "expected": {
+        "years_required_min": 0,
+        "clearance_required": "unknown",
+        "location_type": "onsite",
+        "degree": "bachelors",
+        "is_new_grad_friendly": "yes"
+      },
+      "why": "'0-2 years' → 0. Student/recent-grad contract role, on-site."
+    },
+    {
+      "id": "greenhouse-8917377002",
+      "source": "greenhouse",
+      "sourceId": "8917377002",
+      "company": "Twitch",
+      "title": "Software Engineer I - Engagement Growth",
+      "expected": {
+        "years_required_min": null,
+        "clearance_required": "unknown",
+        "location_type": "unknown",
+        "degree": "bachelors",
+        "is_new_grad_friendly": "yes"
+      },
+      "why": "No years stated at all. Level I title with no experience requirement → yes."
+    },
+    {
+      "id": "ashby-06c2599d-4dd5-4f97-843f-7194b546f042",
+      "source": "ashby",
+      "sourceId": "06c2599d-4dd5-4f97-843f-7194b546f042",
+      "company": "Notion",
+      "title": "Software Engineer, Web Infrastructure",
+      "expected": {
+        "years_required_min": null,
+        "clearance_required": "unknown",
+        "location_type": "hybrid",
+        "degree": "unknown",
+        "is_new_grad_friendly": "yes"
+      },
+      "why": "'As a junior engineer'. No years. Office Mon/Tue/Thu → hybrid."
+    },
+    {
+      "id": "greenhouse-6242561004",
+      "source": "greenhouse",
+      "sourceId": "6242561004",
+      "company": "Figma",
+      "title": "Software Engineer - Application Platform",
+      "expected": {
+        "years_required_min": 5,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "unknown",
+        "is_new_grad_friendly": "no"
+      },
+      "why": "'5+ years ... including 3+ years with Ruby' → 5. Hub OR remote in the US → remote."
+    },
+    {
+      "id": "ashby-373a16fe-81e1-4cf9-8966-43bc16d921fa",
+      "source": "ashby",
+      "sourceId": "373a16fe-81e1-4cf9-8966-43bc16d921fa",
+      "company": "Headway",
+      "title": "Security Engineer (Detection & Response)",
+      "expected": {
+        "years_required_min": 4,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "unknown",
+        "is_new_grad_friendly": "no"
+      },
+      "why": "Two required bullets: '1-2+ years' security AND '4-5+ years' related areas → 4. Hard case."
+    },
+    {
+      "id": "greenhouse-8332676",
+      "source": "greenhouse",
+      "sourceId": "8332676",
+      "company": "Stripe",
+      "title": "Software Engineer - Full stack",
+      "expected": {
+        "years_required_min": 2,
+        "clearance_required": "unknown",
+        "location_type": "unknown",
+        "degree": "bachelors",
+        "is_new_grad_friendly": "unknown"
+      },
+      "why": "Bachelor's plus 2 years. No work-mode statement."
+    },
+    {
+      "id": "ashby-2111a9b4-8dab-4562-9692-ad7cb2c7b968",
+      "source": "ashby",
+      "sourceId": "2111a9b4-8dab-4562-9692-ad7cb2c7b968",
+      "company": "Writer",
+      "title": "AI deployment engineer (East)",
+      "expected": {
+        "years_required_min": 5,
+        "clearance_required": "unknown",
+        "location_type": "hybrid",
+        "degree": "unknown",
+        "is_new_grad_friendly": "no"
+      },
+      "why": "'Over 5 years' in SaaS roles → 5. Hybrid role. Not a new-grad role despite matching the title filter."
+    }
+  ]
+}
