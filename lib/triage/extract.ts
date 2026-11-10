@@ -1,7 +1,8 @@
 import type { ResponseInputItem } from "openai/resources/responses/responses";
 import type { CreateResponse } from "@/lib/llm/openai";
 import type { ExtractionPrompt } from "@/prompts/types";
-import { EXTRACTION_JSON_SCHEMA, extractionSchema, groundingProblems, type Extraction } from "./schema";
+import { EXTRACTION_JSON_SCHEMA, extractionSchema, groundingProblems, type Extraction, type SourceParts } from "./schema";
+import { groundedSkills } from "./skills";
 
 /** Longest description sent to the model. Requirements sections fit well within this. */
 export const MAX_DESCRIPTION_CHARS = 12_000;
@@ -25,18 +26,22 @@ export type ExtractDeps = {
   maxAttempts?: number;
 };
 
-/** The exact text the model sees, and the text evidence quotes are checked against. */
-export function formatPosting(posting: PostingText): { text: string; truncated: boolean } {
+/** Removes our own delimiter from untrusted text, so a description can't close the <posting> block early. */
+function neutralizeDelimiters(text: string): string {
+  return text.replace(/<\s*\/?\s*posting\s*>/gi, "[posting]");
+}
+
+/**
+ * The exact text the model sees, plus its two parts: the header lines (title, company, listed
+ * locations) and the description. Evidence quotes are checked against these parts.
+ */
+export function formatPosting(posting: PostingText): { text: string; parts: SourceParts; truncated: boolean } {
   const truncated = posting.description.length > MAX_DESCRIPTION_CHARS;
-  const description = truncated ? posting.description.slice(0, MAX_DESCRIPTION_CHARS) : posting.description;
-  const text = [
-    `Title: ${posting.title}`,
-    `Company: ${posting.company}`,
-    `Listed locations: ${posting.locations.join("; ") || "(none listed)"}`,
-    "",
-    description,
-  ].join("\n");
-  return { text, truncated };
+  const description = neutralizeDelimiters(truncated ? posting.description.slice(0, MAX_DESCRIPTION_CHARS) : posting.description);
+  const header = neutralizeDelimiters(
+    [`Title: ${posting.title}`, `Company: ${posting.company}`, `Listed locations: ${posting.locations.join("; ") || "(none listed)"}`].join("\n"),
+  );
+  return { text: `${header}\n\n${description}`, parts: { header, description }, truncated };
 }
 
 function wrap(text: string): string {
@@ -51,8 +56,11 @@ function exampleTurns(prompt: ExtractionPrompt): ResponseInputItem[] {
   ]);
 }
 
-/** Parses and validates one model answer. Returns the extraction or a list of problems. */
-export function checkAnswer(raw: string, sourceText: string): { extraction: Extraction } | { problems: string[] } {
+/**
+ * Parses and validates one model answer against the posting it came from. Returns the extraction
+ * (with skill lists reduced to skills the description really mentions) or a list of problems.
+ */
+export function checkAnswer(raw: string, source: SourceParts): { extraction: Extraction } | { problems: string[] } {
   let json: unknown;
   try {
     json = JSON.parse(raw);
@@ -63,8 +71,15 @@ export function checkAnswer(raw: string, sourceText: string): { extraction: Extr
   if (!parsed.success) {
     return { problems: parsed.error.issues.map((issue) => `${issue.path.join(".") || "answer"}: ${issue.message}`) };
   }
-  const problems = groundingProblems(parsed.data, sourceText);
-  return problems.length ? { problems } : { extraction: parsed.data };
+  const problems = groundingProblems(parsed.data, source);
+  if (problems.length) return { problems };
+  return {
+    extraction: {
+      ...parsed.data,
+      skills_required: groundedSkills(parsed.data.skills_required, source.description),
+      skills_preferred: groundedSkills(parsed.data.skills_preferred, source.description),
+    },
+  };
 }
 
 /**
@@ -73,7 +88,7 @@ export function checkAnswer(raw: string, sourceText: string): { extraction: Extr
  * limits, quota, outages) are thrown to the caller; they are not the posting's fault.
  */
 export async function extractPosting(posting: PostingText, deps: ExtractDeps): Promise<ExtractionOutcome> {
-  const { text, truncated } = formatPosting(posting);
+  const { text, parts, truncated } = formatPosting(posting);
   const maxAttempts = deps.maxAttempts ?? 2;
   const input: ResponseInputItem[] = [...exampleTurns(deps.prompt), { role: "user", content: wrap(text) }];
   let lastProblems: string[] = [];
@@ -89,7 +104,7 @@ export async function extractPosting(posting: PostingText, deps: ExtractDeps): P
       store: false,
     });
 
-    const result = checkAnswer(response.output_text, text);
+    const result = checkAnswer(response.output_text, parts);
     if ("extraction" in result) return { status: "ok", extraction: result.extraction, attempts: attempt, truncated };
 
     lastProblems = result.problems;

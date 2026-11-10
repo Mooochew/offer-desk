@@ -1,7 +1,6 @@
 import type { Profile } from "@/lib/profile/types";
 import type { BoardJob } from "@/lib/sources/types";
-import type { ExtractDeps } from "./extract";
-import { extractMany, type ExtractionStore } from "./extraction-cache";
+import { extractMany, type ExtractManyDeps } from "./extraction-cache";
 import { requirementDropReason, type DropReason, type RequirementFilters } from "./filter";
 import { preRank } from "./prerank";
 import type { Extraction } from "./schema";
@@ -13,7 +12,7 @@ export const DEFAULT_MAX_EXTRACT = 25;
 export type TriagedJob = { job: BoardJob; extraction: Extraction; score: JobScore; why: string };
 export type DroppedJob = { job: BoardJob; extraction: Extraction; reason: DropReason; evidence: string | null };
 /** Postings whose requirements couldn't be read: kept visible, never silently dropped. */
-export type UnreadJob = { job: BoardJob; reason: "no description" | "extraction failed" | "AI unavailable"; detail: string | null };
+export type UnreadJob = { job: BoardJob; reason: "no description" | "extraction failed" | "AI unavailable" | "time limit"; detail: string | null };
 
 /** Counts for the UI ("… → 25 checked → 12 left"), continuing the search breakdown. */
 export type TriageBreakdown = {
@@ -28,6 +27,8 @@ export type TriageBreakdown = {
 
 export type TriageResult = {
   ranked: TriagedJob[];
+  /** Jobs past the extraction limit: returned (not just counted) so the UI can list them unchecked. */
+  notChecked: BoardJob[];
   dropped: DroppedJob[];
   unread: UnreadJob[];
   breakdown: TriageBreakdown;
@@ -35,13 +36,12 @@ export type TriageResult = {
   modelCalls: number;
 };
 
-export type TriageDeps = ExtractDeps & {
-  store: ExtractionStore;
+export type TriageDeps = ExtractManyDeps & {
   /** Loads full descriptions by posting id (lib/search/descriptions.ts in production). */
   loadDescriptions: (postingIds: string[]) => Promise<Map<string, string | null>>;
   maxExtract?: number;
-  concurrency?: number;
-  now?: () => Date;
+  /** Clock for scoring and recency (defaults to now). */
+  clock?: () => Date;
 };
 
 /**
@@ -50,7 +50,7 @@ export type TriageDeps = ExtractDeps & {
  * and score the rest. Only extraction uses the LLM; every decision and number is code.
  */
 export async function triageJobs(jobs: readonly BoardJob[], profile: Profile, filters: RequirementFilters, deps: TriageDeps): Promise<TriageResult> {
-  const now = deps.now?.() ?? new Date();
+  const now = deps.clock?.() ?? new Date();
   const chosen = preRank(jobs, profile, deps.maxExtract ?? DEFAULT_MAX_EXTRACT, now);
   const descriptions = await deps.loadDescriptions(chosen.map((job) => job.postingId));
 
@@ -70,6 +70,9 @@ export async function triageJobs(jobs: readonly BoardJob[], profile: Profile, fi
   );
   for (const { id, error } of extracted.apiErrors) {
     unread.push({ job: readable.find((job) => job.postingId === id)!, reason: "AI unavailable", detail: error });
+  }
+  for (const id of extracted.outOfTime) {
+    unread.push({ job: readable.find((job) => job.postingId === id)!, reason: "time limit", detail: null });
   }
 
   const ranked: TriagedJob[] = [];
@@ -93,8 +96,10 @@ export async function triageJobs(jobs: readonly BoardJob[], profile: Profile, fi
 
   ranked.sort((a, b) => b.score.total - a.score.total);
 
+  const chosenIds = new Set(chosen.map((job) => job.postingId));
   return {
     ranked,
+    notChecked: jobs.filter((job) => !chosenIds.has(job.postingId)),
     dropped,
     unread,
     breakdown: {

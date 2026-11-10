@@ -1,0 +1,217 @@
+{
+  "status": "held-out: selected with a fixed random seed from companies not in cases.json; never used to tune prompts",
+  "seed": 4680,
+  "cases": [
+    {
+      "id": "greenhouse-4733115005",
+      "source": "greenhouse",
+      "sourceId": "4733115005",
+      "company": "Tailscale",
+      "title": "Security Software Engineer",
+      "expected": {
+        "years_required_min": null,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown",
+        "why": "Listed location 'Remote (United States)'; 'Remote first company'. No years, degree, clearance or early-career targeting stated.",
+        "ambiguous": []
+      }
+    },
+    {
+      "id": "greenhouse-8338246",
+      "source": "greenhouse",
+      "sourceId": "8338246",
+      "company": "ZipRecruiter",
+      "title": "Software Engineer, Big Data, Tech Enablement",
+      "expected": {
+        "years_required_min": 2,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown",
+        "why": "Minimum Qualifications: '2+ years of professional software development experience' (4+ is only preferred). 'We offer a hybrid work environment. Most US-based positions can also be performed remotely (any exceptions will be noted in the Minimum Qualifications)', none noted, plus #LI-Remote, so remote is an allowed option. 'BS/MS/PhD' appears only under Preferred.",
+        "ambiguous": [
+          "location_type"
+        ]
+      }
+    },
+    {
+      "id": "ashby-d7dfc19d-e508-4522-91fa-e31c3b612a47",
+      "source": "ashby",
+      "sourceId": "d7dfc19d-e508-4522-91fa-e31c3b612a47",
+      "company": "OpenAI",
+      "title": "Full-Stack Software Engineer, Child Safety Tools & Systems",
+      "expected": {
+        "years_required_min": 7,
+        "clearance_required": "unknown",
+        "location_type": "unknown",
+        "degree": "unknown",
+        "is_new_grad_friendly": "no",
+        "why": "'7+ years of experience as a software engineer' (placed in the 'In this role, you will' list, but it is the only requirement-style bullet). Locations SF/NYC with no work-mode statement; no degree or clearance.",
+        "ambiguous": [
+          "years_required_min"
+        ]
+      }
+    },
+    {
+      "id": "greenhouse-8026199",
+      "source": "greenhouse",
+      "sourceId": "8026199",
+      "company": "Twilio",
+      "title": "Software Engineer (L3) Email",
+      "expected": {
+        "years_required_min": 4,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "unknown",
+        "is_new_grad_friendly": "no",
+        "why": "Required: '4+ years of professional software engineering experience'. 'This role will be remote'; listed 'Remote - US' (occasional travel/ad-hoc in-person doesn't change mode). Generic 'if your career is just starting' boilerplate does not override 4+ years.",
+        "ambiguous": []
+      }
+    },
+    {
+      "id": "greenhouse-8334794",
+      "source": "greenhouse",
+      "sourceId": "8334794",
+      "company": "Toast",
+      "title": "Software Engineer II, Backend",
+      "expected": {
+        "years_required_min": 2,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown",
+        "why": "Requirements: '2+ years of experience in designing and implementing robust backend services using Kotlin'. Listed location 'Remote US'; generic 'Our Approach to Hybrid Working' boilerplate is company-wide, not role-specific.",
+        "ambiguous": [
+          "location_type"
+        ]
+      }
+    },
+    {
+      "id": "ashby-46912896-5a97-4955-ae27-1b110b3487ec",
+      "source": "ashby",
+      "sourceId": "46912896-5a97-4955-ae27-1b110b3487ec",
+      "company": "Harvey",
+      "title": "Research Engineer / Scientist, Data & Evals",
+      "expected": {
+        "years_required_min": null,
+        "clearance_required": "unknown",
+        "location_type": "unknown",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown",
+        "why": "No years, degree, clearance or work-mode stated (location 'New York' only); 'hiring for this role across multiple levels' is not explicit new-grad targeting.",
+        "ambiguous": []
+      }
+    },
+    {
+      "id": "ashby-d8925f84-562f-470c-a5bd-4f6c20009361",
+      "source": "ashby",
+      "sourceId": "d8925f84-562f-470c-a5bd-4f6c20009361",
+      "company": "Ramp",
+      "title": "Research Engineer, Benchmarks & Evaluation",
+      "expected": {
+        "years_required_min": null,
+        "clearance_required": "unknown",
+        "location_type": "unknown",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown",
+        "why": "'What you need' lists skills with no years or degree. Locations NYC (HQ)/SF; only 'In-office perks' and relocation benefits, no explicit work-mode statement.",
+        "ambiguous": [
+          "location_type"
+        ]
+      }
+    },
+    {
+      "id": "greenhouse-8360497",
+      "source": "greenhouse",
+      "sourceId": "8360497",
+      "company": "Gusto",
+      "title": "Software Engineer, Financial Data & Payments",
+      "expected": {
+        "years_required_min": 10,
+        "clearance_required": "unknown",
+        "location_type": "remote",
+        "degree": "unknown",
+        "is_new_grad_friendly": "no",
+        "why": "'Successful applicants have at least 10+ years of experience'; 'hiring seasoned engineers'. Listed locations include 'Seattle, WA - Remote' alongside Hybrid offices (2-3 days/week), so fully remote is an allowed option.",
+        "ambiguous": [
+          "location_type"
+        ]
+      }
+    },
+    {
+      "id": "lever-9aadca04-df88-4b46-95d8-c3b2628b30b0",
+      "source": "lever",
+      "sourceId": "9aadca04-df88-4b46-95d8-c3b2628b30b0",
+      "company": "Palantir",
+      "title": "Backend Software Engineer - Data Connectors",
+      "expected": {
+        "years_required_min": 4,
+        "clearance_required": "unknown",
+        "location_type": "unknown",
+        "degree": "unknown",
+        "is_new_grad_friendly": "no",
+        "why": "What We Require: '4+ years of professional software engineering experience developing external system connectors'. Work-mode text is generic company policy ('Many teams do offer hybrid options'; 'If the posting is specified as Onsite...') and this posting specifies none; location 'New York, NY'.",
+        "ambiguous": [
+          "location_type"
+        ]
+      }
+    },
+    {
+      "id": "ashby-6f74767c-0e7a-446b-84bf-5c04c270cb13",
+      "source": "ashby",
+      "sourceId": "6f74767c-0e7a-446b-84bf-5c04c270cb13",
+      "company": "Benchling",
+      "title": "Research Engineer, Model Evaluation and Improvement",
+      "expected": {
+        "years_required_min": 2,
+        "clearance_required": "unknown",
+        "location_type": "onsite",
+        "degree": "unknown",
+        "is_new_grad_friendly": "unknown",
+        "why": "Qualifications: '2+ years at the intersection of biology and AI'. 'Employees are expected to be on-site 5 days per week (Monday - Friday).' No degree or clearance.",
+        "ambiguous": []
+      }
+    },
+    {
+      "id": "ashby-5b744208-cb2c-4c31-9217-e0cbbf8ad7af",
+      "source": "ashby",
+      "sourceId": "5b744208-cb2c-4c31-9217-e0cbbf8ad7af",
+      "company": "Cursor",
+      "title": "Software Engineer, ML Platform",
+      "expected": {
+        "years_required_min": 5,
+        "clearance_required": "unknown",
+        "location_type": "onsite",
+        "degree": "bachelors",
+        "is_new_grad_friendly": "no",
+        "why": "Basic Qualifications: \"Bachelor's, Master's, or PhD ... OR equivalent work experience\" and '5+ years of industry experience working with production distributed systems'. 'We're in-person with cozy offices in ... Palo Alto ...'.",
+        "ambiguous": []
+      }
+    },
+    {
+      "id": "greenhouse-8357913",
+      "source": "greenhouse",
+      "sourceId": "8357913",
+      "company": "Mixpanel",
+      "title": "Security Engineer",
+      "expected": {
+        "years_required_min": 3,
+        "clearance_required": "unknown",
+        "location_type": "unknown",
+        "degree": "unknown",
+        "is_new_grad_friendly": "no",
+        "why": "'3-5 years of experience in security engineering...' -> 3. Says 'an engineer early to mid-way in their career' (yes signal) but requires 3+ years (no signal); tie-breaker: no wins. Location 'San Francisco' with no work-mode statement.",
+        "ambiguous": [
+          "is_new_grad_friendly"
+        ]
+      }
+    }
+  ],
+  "labeledBy": "independent AI labeler, blind to prompts, tuning set and model outputs",
+  "labeledAt": "2026-11-09",
+  "notes": [
+    "Cursor (ashby 5b744208…): Cursor's live Ashby board serves SpaceX text in all 95 postings (checked 2026-11-10). The case is kept as-is: extraction must work from whatever text the source really serves."
+  ]
+}

@@ -2,7 +2,7 @@ import type { Extraction } from "./schema";
 import type { JobScore } from "./score";
 
 function yearsPhrase(years: number | null): string {
-  if (years === null) return "no years required";
+  if (years === null) return "years not stated";
   if (years === 0) return "0 years required";
   return `${years}+ yr${years === 1 ? "" : "s"}`;
 }

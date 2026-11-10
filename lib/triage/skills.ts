@@ -37,8 +37,30 @@ export function matchingSkills(profileSkills: readonly string[], postingSkills: 
   return profileSkills.filter((skill) => posting.has(normalizeSkill(skill)));
 }
 
-/** True if the skill's name appears as a word in the text (used on titles for the pre-rank). */
+/** Every spelling of a skill: as given, its normalized name, and each alias of that name. */
+function spellings(skill: string): string[] {
+  const normalized = normalizeSkill(skill);
+  const aliases = Object.entries(ALIASES).filter(([, name]) => name === normalized).map(([alias]) => alias);
+  return [...new Set([skill.toLowerCase().trim(), normalized, ...aliases])];
+}
+
+/**
+ * True if any spelling of the skill appears as a whole word in the text ("Postgres" finds
+ * "PostgreSQL" and "postgres"; "Go" doesn't match "Google"). Used on titles (pre-rank) and on
+ * descriptions (to ground the model's skill lists).
+ */
 export function skillInText(skill: string, text: string): boolean {
-  const name = normalizeSkill(skill).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`(^|[^a-z0-9])${name}([^a-z0-9]|$)`, "i").test(text);
+  return spellings(skill).some((spelling) => {
+    const name = spelling.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`(^|[^a-z0-9+#])${name}([^a-z0-9+#]|$)`, "i").test(text);
+  });
+}
+
+/**
+ * Keeps only the skills that actually appear in the text. Skills drive half the score, so they
+ * must be grounded like every other field (Phase 3 review S4: the model's skill lists varied
+ * between runs on the same posting).
+ */
+export function groundedSkills(skills: readonly string[], text: string): string[] {
+  return skills.filter((skill) => skillInText(skill, text));
 }

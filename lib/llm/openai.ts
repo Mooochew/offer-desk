@@ -12,6 +12,13 @@ export class QuotaExceededError extends Error {
   }
 }
 
+/** The quota counter couldn't be read. Fails closed (no model call) and is not retried. */
+export class QuotaCounterError extends Error {
+  constructor(detail: string) {
+    super(`quota counter failed: ${detail}`);
+  }
+}
+
 /** The part of a Responses API result the app uses. */
 export type LlmResponse = { output_text: string; status?: string | null; usage?: { input_tokens: number; output_tokens: number } | null };
 
@@ -23,7 +30,8 @@ let client: OpenAI | null = null;
 function getClient(): OpenAI {
   // SDK retries are off: retries go through withRetry so every API call shares one policy
   // (429/5xx, Retry-After, jitter) and one place to count quota.
-  client ??= new OpenAI({ apiKey: getServerEnv().openaiApiKey, maxRetries: 0, timeout: 45_000 });
+  // 20 s per attempt x 2 attempts keeps one slow extraction from eating a whole request (review S6).
+  client ??= new OpenAI({ apiKey: getServerEnv().openaiApiKey, maxRetries: 0, timeout: 20_000 });
   return client;
 }
 
@@ -59,6 +67,10 @@ export function createResponder(options: CreateResponseOptions = {}): CreateResp
           throw toHttpError(error);
         }
       },
-      { ...options, shouldRetry: (error) => !(error instanceof QuotaExceededError) },
+      {
+        attempts: 2,
+        ...options,
+        shouldRetry: (error) => !(error instanceof QuotaExceededError || error instanceof QuotaCounterError),
+      },
     );
 }

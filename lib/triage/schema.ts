@@ -8,8 +8,10 @@ import { z } from "zod";
  * Version of the checks below. Part of the extraction cache key, so changing how answers are
  * validated re-runs extraction instead of serving results judged by old rules.
  * check-2: long quotes are trimmed instead of rejected; bullet markers ignored when matching quotes.
+ * check-3: quotes must support the answer (number in the years quote, non-negated clearance,
+ *          description-only except location, min length, grounded years text, new-grad evidence).
  */
-export const EXTRACTION_CHECK_VERSION = "check-2";
+export const EXTRACTION_CHECK_VERSION = "check-3";
 
 const MAX_QUOTE = 300;
 // A long quote is trimmed, not rejected: a prefix of a verified quote is still a verified quote.
@@ -80,33 +82,94 @@ function canonical(text: string): string {
     .toLowerCase()
     .replace(/[‘’]/g, "'")
     .replace(/[“”]/g, '"')
-    .replace(/[–—]/g, "-")
+    .replace(/[‐‑‒–—−]/g, "-")
+    .replace(/…/g, "...")
     .replace(/\s+/g, " ")
     .trim();
 }
 
-/**
- * Grounding check: every evidence quote must appear in the source text, and every non-default
- * answer must cite one. Returns human-readable problems (empty = grounded). This is what turns
- * "don't make things up" from a request into a rule the code enforces.
- */
-export function groundingProblems(extraction: Extraction, sourceText: string): string[] {
-  const source = canonical(sourceText);
-  const problems: string[] = [];
+/** The two parts of what the model saw: the header lines (title/company/locations) and the description. */
+export type SourceParts = { header: string; description: string };
 
-  for (const [field, value] of Object.entries(extraction.evidence)) {
-    if (value && !source.includes(canonical(value))) {
-      problems.push(`evidence.${field} is not an exact quote from the posting: "${value.slice(0, 80)}"`);
+const MIN_QUOTE = 8;
+const NUMBER_WORDS: Record<number, string> = { 0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten" };
+// Year counts that are about the company or benefits, not the candidate's experience.
+const NOT_EXPERIENCE = /vest|anniversary|founded|for over \d+ years|holiday|401\(?k\)?|pto|paid time off/;
+const NEGATION = /\b(no|not|without|never|nor)\b|n't\b/;
+
+/** Index of the quote in the canonical text, or -1. */
+function findQuote(quote: string, text: string): number {
+  return canonical(text).indexOf(canonical(quote));
+}
+
+function mentionsNumber(quote: string, value: number): boolean {
+  const digits = String(value).replace(".", "\\.");
+  if (new RegExp(`(^|[^\\d.])${digits}([^\\d]|$)`).test(quote)) return true;
+  const word = NUMBER_WORDS[value];
+  if (word !== undefined && new RegExp(`\\b${word}\\b`, "i").test(quote)) return true;
+  return value === 0 && /\bno (professional |prior |previous )?experience\b/i.test(quote);
+}
+
+/**
+ * Grounding check (check-3). A quote must not only exist in the posting, it must support the
+ * answer: the years quote contains that number and is about experience; a clearance quote
+ * mentions clearance and isn't negated ("No security clearance required"); only location
+ * evidence may come from the header lines. Returns human-readable problems (empty = grounded).
+ * This turns "don't make things up" from a request into rules the code enforces.
+ */
+export function groundingProblems(extraction: Extraction, source: SourceParts): string[] {
+  const problems: string[] = [];
+  const { evidence } = extraction;
+
+  const quoteProblem = (field: string, quote: string, allowHeader: boolean): string | null => {
+    if (canonical(quote).length < MIN_QUOTE) return `${field} is too short to be evidence: "${quote}"`;
+    if (findQuote(quote, source.description) >= 0) return null;
+    if (allowHeader && findQuote(quote, source.header) >= 0) return null;
+    return `${field} is not an exact quote from the ${allowHeader ? "posting" : "description"}: "${quote.slice(0, 80)}"`;
+  };
+
+  for (const [field, value] of Object.entries(evidence)) {
+    if (!value) continue;
+    const problem = quoteProblem(`evidence.${field}`, value, field === "location");
+    if (problem) problems.push(problem);
+  }
+  if (extraction.years_required_text) {
+    const problem = quoteProblem("years_required_text", extraction.years_required_text, false);
+    if (problem) problems.push(problem);
+  }
+
+  // Years: quote required, must contain the number, must be about experience.
+  if (extraction.years_required_min !== null) {
+    const quote = evidence.years;
+    if (!quote) problems.push("years_required_min is set but evidence.years is null; quote the sentence that states it");
+    else {
+      if (!mentionsNumber(quote, extraction.years_required_min)) {
+        problems.push(`evidence.years doesn't contain ${extraction.years_required_min}: "${quote.slice(0, 80)}"`);
+      }
+      if (!/\b(year|yr)s?\b/i.test(quote)) problems.push("evidence.years doesn't mention years");
+      if (NOT_EXPERIENCE.test(canonical(quote))) problems.push("evidence.years is about benefits or the company, not the candidate's experience");
     }
   }
-  if (extraction.years_required_min !== null && !extraction.evidence.years) {
-    problems.push("years_required_min is set but evidence.years is null; quote the sentence that states it");
+
+  // Clearance: quote required, must mention clearance; "yes"/"ability" must not be negated.
+  if (extraction.clearance_required !== "unknown") {
+    const quote = evidence.clearance;
+    if (!quote) problems.push(`clearance_required is "${extraction.clearance_required}" but evidence.clearance is null`);
+    else if (!/clearance/i.test(quote)) problems.push("evidence.clearance doesn't mention a clearance");
+    else if (extraction.clearance_required !== "no") {
+      const at = findQuote(quote, source.description);
+      const before = at >= 0 ? canonical(source.description).slice(Math.max(0, at - 40), at) : "";
+      if (NEGATION.test(canonical(quote)) || NEGATION.test(before)) {
+        problems.push(`evidence.clearance is negated ("${quote.slice(0, 60)}"), so it doesn't support "${extraction.clearance_required}"`);
+      }
+    }
   }
-  if (extraction.clearance_required !== "unknown" && !extraction.evidence.clearance) {
-    problems.push(`clearance_required is "${extraction.clearance_required}" but evidence.clearance is null`);
-  }
-  if (extraction.location_type !== "unknown" && !extraction.evidence.location) {
+
+  if (extraction.location_type !== "unknown" && !evidence.location) {
     problems.push(`location_type is "${extraction.location_type}" but evidence.location is null`);
+  }
+  if (extraction.is_new_grad_friendly !== "unknown" && !evidence.new_grad) {
+    problems.push(`is_new_grad_friendly is "${extraction.is_new_grad_friendly}" but evidence.new_grad is null`);
   }
   return problems;
 }

@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { APIError } from "openai";
 import { describe, expect, it } from "vitest";
 import { HttpError } from "@/lib/http/retry";
-import { createResponder, QuotaExceededError, toHttpError } from "@/lib/llm/openai";
+import { createResponder, QuotaCounterError, QuotaExceededError, toHttpError } from "@/lib/llm/openai";
 import { createDailyQuota } from "@/lib/llm/quota";
 
 const params = { model: "m", input: "hi" };
@@ -96,6 +96,15 @@ describe("createDailyQuota", () => {
 
   it("fails closed when the counter can't be read", async () => {
     const { admin } = fakeAdmin({ error: { message: "db down" } });
-    await expect(createDailyQuota(admin, 500)()).rejects.toThrow("quota counter failed: db down");
+    await expect(createDailyQuota(admin, 500)()).rejects.toBeInstanceOf(QuotaCounterError);
+  });
+
+  it("does not retry a counter failure (no model call, one counter attempt)", async () => {
+    const { admin, calls } = fakeAdmin({ error: { message: "db down" } });
+    let sends = 0;
+    const create = createResponder({ ...noSleep, countRequest: createDailyQuota(admin, 500), send: async () => (sends++, { output_text: "" }) });
+    await expect(create(params)).rejects.toBeInstanceOf(QuotaCounterError);
+    expect(calls).toHaveLength(1);
+    expect(sends).toBe(0);
   });
 });

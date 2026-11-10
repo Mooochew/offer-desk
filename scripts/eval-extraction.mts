@@ -1,12 +1,17 @@
-// Scores an extraction prompt against the hand-checked labels in evals/extraction/cases.json.
-// Run: npm run eval -- extract-v1 [runs=3]
-// Prints per-field accuracy next to the trivial "most common label" baseline (LABELING.md),
-// lists every mismatch, and saves the raw results to evals/extraction/results/.
-// Calls the model directly (no cache, no app quota): each run measures the prompt fresh.
+// Scores an extraction prompt against labeled postings.
+// Run: npm run eval -- <version> [runs=3] [set=tuning|holdout]
+//   tuning:  evals/extraction/cases.json   (16 cases; v2's rules were written after seeing v1 fail here)
+//   holdout: evals/extraction/holdout.json (12 cases from other companies, labeled blind, never used to tune)
+// Prints per-field accuracy next to the trivial "most common label" baseline (LABELING.md), lists
+// every mismatch, and saves a NEW timestamped result file (never overwrites) tagged with the git
+// commit and answer-check version. Calls the model directly (no cache, no app quota).
 
+import { execSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
-import cases from "@/evals/extraction/cases.json";
+import holdoutCases from "@/evals/extraction/holdout.json";
+import tuningCases from "@/evals/extraction/cases.json";
 import snapshot from "@/data/sample_postings.json";
+import { EXTRACTION_CHECK_VERSION } from "@/lib/triage/schema";
 import { createResponder } from "@/lib/llm/openai";
 import { extractPosting } from "@/lib/triage/extract";
 import type { Extraction } from "@/lib/triage/schema";
@@ -18,6 +23,10 @@ type Field = (typeof FIELDS)[number];
 
 const version = process.argv[2] ?? "extract-v1";
 const runs = Number(process.argv[3] ?? 3);
+const set = process.argv[4] ?? "tuning";
+if (set !== "tuning" && set !== "holdout") throw new Error(`set must be tuning or holdout, got ${set}`);
+type Case = { id: string; source: string; sourceId: string; company: string; expected: Record<Field, unknown> };
+const cases = { cases: (set === "holdout" ? holdoutCases.cases : tuningCases.cases) as unknown as Case[] };
 const prompt = EXTRACTION_PROMPTS[version];
 if (!prompt) throw new Error(`Unknown prompt version ${version}. Known: ${Object.keys(EXTRACTION_PROMPTS).join(", ")}`);
 const model = process.env.OPENAI_EXTRACT_MODEL || "gpt-6-luna";
@@ -79,7 +88,7 @@ for (const results of allRuns) {
 const mean = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / values.length;
 const pct = (value: number) => `${(value * 100).toFixed(1)}%`;
 
-console.log(`\n${version} on ${model}, ${cases.cases.length} cases × ${runs} runs\n`);
+console.log(`\n${version} on ${model}, ${set} set: ${cases.cases.length} cases × ${runs} runs, ${EXTRACTION_CHECK_VERSION}\n`);
 console.log("field                  accuracy   (min–max)       baseline");
 for (const field of FIELDS) {
   const values = perField[field];
@@ -101,16 +110,22 @@ for (const [key, entry] of mismatches) {
 }
 for (const result of flat.filter((item) => item.error)) console.log(`  error ${result.id}: ${result.error?.slice(0, 200)}`);
 
+const ranAt = new Date().toISOString();
+const sha = execSync("git rev-parse --short HEAD").toString().trim();
+const dirty = execSync("git status --porcelain -- lib prompts").toString().trim() !== "";
 mkdirSync("evals/extraction/results", { recursive: true });
-const file = `evals/extraction/results/${version}.json`;
+const file = `evals/extraction/results/${version}__${set}__${EXTRACTION_CHECK_VERSION}__${ranAt.slice(0, 16).replace(/:/g, "")}.json`;
 writeFileSync(
   file,
   JSON.stringify(
     {
       version,
+      set,
+      checkVersion: EXTRACTION_CHECK_VERSION,
+      gitCommit: dirty ? `${sha} + uncommitted changes in lib/ or prompts/` : sha,
       model,
       runs,
-      ranAt: new Date().toISOString(),
+      ranAt,
       accuracy: Object.fromEntries(FIELDS.map((field) => [field, { mean: mean(perField[field]), perRun: perField[field], baseline: baseline(field) }])),
       overall,
       retried,

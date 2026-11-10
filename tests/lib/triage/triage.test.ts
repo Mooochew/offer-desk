@@ -23,6 +23,12 @@ describe("skills", () => {
     expect(matchingSkills(["JS", "Postgres", "Rust"], ["JavaScript", "PostgreSQL"])).toEqual(["JS", "Postgres"]);
   });
 
+  it("finds any spelling of a skill (regression: 'Postgres' used to miss the text 'Postgres')", () => {
+    expect(skillInText("Postgres", "Experience with Postgres and Redis")).toBe(true);
+    expect(skillInText("PostgreSQL", "Experience with Postgres")).toBe(true);
+    expect(skillInText("C++", "Strong C++ skills")).toBe(true);
+  });
+
   it("finds a skill as a whole word in a title", () => {
     expect(skillInText("Go", "Backend Engineer (Go)")).toBe(true);
     expect(skillInText("Go", "Google Cloud Engineer")).toBe(false);
@@ -93,7 +99,7 @@ describe("scoreJob and whyMatched", () => {
     );
     const remote = boardJob({ locations: ["Remote (US)"], remote: "remote" });
     const none = extraction({ years_required_min: null, skills_required: [], skills_preferred: [] });
-    expect(whyMatched(none, scoreJob(remote, none, profile, NOW))).toBe("no years required · remote (US)");
+    expect(whyMatched(none, scoreJob(remote, none, profile, NOW))).toBe("years not stated · remote (US)");
   });
 
   it("caps the listed skills at four", () => {
@@ -131,6 +137,41 @@ describe("extractMany", () => {
     expect(down.rows.size).toBe(0);
   });
 
+  it("starts no new model calls after the deadline and reports those postings", async () => {
+    const model = fakeModel([extraction()]);
+    const result = await extractMany([posting, { id: "p2", text: postingText(`${POSTING_DESCRIPTION}\nmore`) }], {
+      create: model.create,
+      model: "m",
+      prompt: EXTRACT_V2,
+      store: memoryExtractionStore().store,
+      deadline: 1000,
+      now: () => 2000,
+    });
+    expect(result.outOfTime).toEqual(["p1", "p2"]);
+    expect(model.requests).toHaveLength(0);
+  });
+
+  it("still returns a paid-for extraction when the cache write fails", async () => {
+    const { store } = memoryExtractionStore();
+    store.save = async () => {
+      throw new Error("db down");
+    };
+    const result = await extractMany([posting], { create: fakeModel([extraction()]).create, model: "m", prompt: EXTRACT_V2, store });
+    expect(result.results.get("p1")?.status).toBe("ok");
+    expect(result.saveErrors).toBe(1);
+  });
+
+  // Phase 3 review S5: same description, different listed locations → the cached location quote no longer grounds.
+  it("re-extracts a cache hit whose evidence doesn't ground in the current posting", async () => {
+    const cachedFromOtherPosting = extraction({ location_type: "remote", evidence: { ...extraction().evidence, location: "Listed locations: Remote (US)" } });
+    const { store } = memoryExtractionStore({ [key]: { status: "ok", extraction: cachedFromOtherPosting, error: null, truncated: false } });
+    const model = fakeModel([extraction()]);
+    const result = await extractMany([posting], { create: model.create, model: "m", prompt: EXTRACT_V2, store });
+    expect(result.cacheHits).toBe(0);
+    expect(model.requests).toHaveLength(1);
+    expect(result.results.get("p1")?.extraction?.location_type).toBe("hybrid");
+  });
+
   it("keys the cache by prompt version and answer-check version", () => {
     expect(extractionCacheVersion("extract-v2")).toMatch(/^extract-v2\/check-\d+$/);
   });
@@ -146,13 +187,22 @@ describe("triageJobs", () => {
       boardJob({ postingId: "bad", title: "Software Engineer" }),
       boardJob({ postingId: "skipped", title: "Software Engineer", postedAt: "2025-01-01T00:00:00Z" }),
     ];
-    const descriptions = new Map<string, string | null>(jobs.map((job) => [job.postingId, `${POSTING_DESCRIPTION}\nposting ${job.postingId}`]));
+    const extraLines: Record<string, string> = {
+      keep: "New grads welcome to apply.",
+      senior: "Also requires 5+ years of backend experience.",
+      clearance: "Requires an active Secret clearance.",
+    };
+    const descriptions = new Map<string, string | null>(
+      jobs.map((job) => [job.postingId, `${POSTING_DESCRIPTION}\n${extraLines[job.postingId] ?? ""}\nposting ${job.postingId}`]),
+    );
     descriptions.set("nodesc", null);
 
     const answers: Record<string, string> = {
-      keep: JSON.stringify(extraction({ is_new_grad_friendly: "yes" })),
-      senior: JSON.stringify(extraction({ years_required_min: 1 })).replace('"years_required_min":1', '"years_required_min":5'),
-      clearance: JSON.stringify(extraction({ clearance_required: "yes", evidence: { ...extraction().evidence, clearance: "posting clearance" } })),
+      keep: JSON.stringify(extraction({ is_new_grad_friendly: "yes", evidence: { ...extraction().evidence, new_grad: "New grads welcome to apply." } })),
+      senior: JSON.stringify(
+        extraction({ years_required_min: 5, years_required_text: "5+ years of backend experience", evidence: { ...extraction().evidence, years: "5+ years of backend experience" } }),
+      ),
+      clearance: JSON.stringify(extraction({ clearance_required: "yes", evidence: { ...extraction().evidence, clearance: "Requires an active Secret clearance." } })),
       bad: "not json",
     };
     const create: Parameters<typeof triageJobs>[3]["create"] = async (params) => {
@@ -168,7 +218,7 @@ describe("triageJobs", () => {
       store: memoryExtractionStore().store,
       loadDescriptions: async () => descriptions,
       maxExtract: 5,
-      now: () => NOW,
+      clock: () => NOW,
     });
 
     expect(result.ranked.map((item) => item.job.postingId)).toEqual(["keep"]);
@@ -177,7 +227,8 @@ describe("triageJobs", () => {
       ["senior", "years"],
       ["clearance", "clearance"],
     ]);
-    expect(result.dropped[0].evidence).toBe("1+ years of professional experience");
+    expect(result.dropped[0].evidence).toBe("5+ years of backend experience");
+    expect(result.notChecked.map((job) => job.postingId)).toEqual(["skipped"]);
     expect(result.unread.map((item) => [item.job.postingId, item.reason]).sort()).toEqual([
       ["bad", "extraction failed"],
       ["nodesc", "no description"],
@@ -201,7 +252,7 @@ describe("triageJobs", () => {
       prompt: EXTRACT_V2,
       store: memoryExtractionStore().store,
       loadDescriptions: async () => new Map([["p", POSTING_DESCRIPTION]]),
-      now: () => NOW,
+      clock: () => NOW,
     });
     expect(result.unread).toEqual([{ job, reason: "AI unavailable", detail: "Daily AI request limit (500) reached." }]);
     expect(result.ranked).toEqual([]);
