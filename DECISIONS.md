@@ -61,3 +61,7 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 011. Vercel function duration
 - **What:** Set `maxDuration` on `/api/agent` to 60 s, well under the Hobby maximum.
 - **Why:** Vercel's docs list Hobby at 300 s (default and maximum) with Fluid compute; some older pages say 60 s. Staying at 60 s works under either, and a turn that needs more than a minute is a bad demo anyway.
+
+## 012. Supabase publishable/secret keys
+- **What:** Use Supabase's new API keys: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_...`, browser) and `SUPABASE_SECRET_KEY` (`sb_secret_...`, server only).
+- **Why:** The project dashboard issues these by default; they replace the legacy `anon` / `service_role` JWT keys. Naming the env vars after them avoids mixing them up.
