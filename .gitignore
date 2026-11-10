@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# env files (secrets) - only the example is committed
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# testing
+coverage/
+playwright-report/
+test-results/
+
+# local probe output (raw API responses)
+scripts/.out/
+
+# misc
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+npm-debug.log*
+
+# course handout (not part of the project)
+CS4680 Assignment 4 - AI Agent Project.txt
