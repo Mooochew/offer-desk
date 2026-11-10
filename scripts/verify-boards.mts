@@ -3,6 +3,7 @@
 //                       npm run boards:verify -- --write (also removes dead boards from the file)
 
 import { writeFileSync } from "node:fs";
+import { HttpError } from "@/lib/http/retry";
 import { ALL_BOARDS } from "@/lib/sources/boards";
 import { fetchBoard } from "@/lib/sources";
 import { boardKey } from "@/lib/sources/types";
@@ -15,12 +16,16 @@ const results = await mapWithConcurrency(ALL_BOARDS, 8, async (board) => {
   return jobs.length;
 });
 
+// Only boards that are really gone (404) or empty are removed. Timeouts and 5xx are often
+// temporary (Anduril timed out for a few minutes during Phase 2, then answered in 160 ms),
+// so they're reported but kept.
 const dead: string[] = [];
 results.forEach((result, index) => {
   const board = ALL_BOARDS[index];
   if (!result.ok) {
-    dead.push(boardKey(board));
-    console.log(`✗ ${boardKey(board).padEnd(34)} ${(result.error as Error).message}`);
+    const isGone = result.error instanceof HttpError && result.error.status === 404;
+    if (isGone) dead.push(boardKey(board));
+    console.log(`${isGone ? "✗" : "?"} ${boardKey(board).padEnd(34)} ${(result.error as Error).message}${isGone ? "" : " (kept: may be temporary)"}`);
   } else if (result.value === 0) {
     dead.push(boardKey(board));
     console.log(`✗ ${boardKey(board).padEnd(34)} no open jobs`);

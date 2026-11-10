@@ -132,3 +132,7 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 
 ## 028. Scripts run with `tsx --conditions=react-server`, as `.mts`
 - **What:** Scripts that import app code use `tsx` (handles the `@/` path alias and JSON imports) with the `react-server` condition, under which the `server-only` package is a no-op (same as Next.js on the server). They use the `.mts` extension so top-level `await` works without setting `"type": "module"` for the whole Next.js project.
+
+## 029. Transient board failures are expected; only 404s remove a board
+- **What:** `boards:verify --write` removes a board only on 404 or zero open jobs; timeouts and 5xx are reported as "kept: may be temporary".
+- **Why:** During the Phase 2 gate, Anduril's Greenhouse board (the biggest SoCal board for the demo) timed out for several minutes from Node (15 s × 3 attempts), then answered in about 160 ms. The old script would have deleted it. The search path already handles this case by design: a failed refresh serves stale cached jobs and backs off for 10 minutes (DECISIONS 023).
