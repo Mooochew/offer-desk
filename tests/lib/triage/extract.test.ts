@@ -116,9 +116,38 @@ We are an equal opportunity employer.`);
       expect(groundingProblems(tiny, tricky)).toContainEqual(expect.stringContaining("too short"));
     });
 
-    it("rejects an invented years_required_text", () => {
-      const invented = extraction({ years_required_text: "at least 1 year in fintech" });
-      expect(groundingProblems(invented, tricky)).toContainEqual(expect.stringContaining("years_required_text is not an exact quote"));
+    // Regression from the live check-5 run (SpaceX): two real bullets joined with "; " in one quote.
+    it("accepts exact quotes joined with '; ', but not when any part is invented (check-6)", () => {
+      const twoBullets = withText("- 1+ years of professional experience administering Linux systems\n- 1+ years of experience writing Python scripts");
+      const joined = (years: string) => extraction({ location_type: "unknown", evidence: { years, clearance: null, location: null, new_grad: null } });
+      expect(groundingProblems(joined("1+ years of professional experience administering Linux systems; 1+ years of experience writing Python scripts"), twoBullets)).toEqual([]);
+      expect(groundingProblems(joined("1+ years of professional experience administering Linux systems; 3+ years leading teams"), twoBullets)).toContainEqual(
+        expect.stringContaining("not an exact quote"),
+      );
+      expect(groundingProblems(joined("1+ years of professional experience administering Linux systems; Linux"), twoBullets)).toContainEqual(
+        expect.stringContaining("not an exact quote"),
+      );
+    });
+
+    // check-5: the summary text isn't evidence; an invented one is dropped, never shown, and doesn't fail the answer.
+    it("drops an invented years_required_text instead of failing the answer", () => {
+      const invented = extraction({ years_required_text: "1+ years of experience; 1+ years writing Python" });
+      expect(groundingProblems(invented, tricky)).toEqual([]);
+      const result = checkAnswer(JSON.stringify(invented), tricky);
+      expect(result).toMatchObject({ extraction: { years_required_text: null, years_required_min: 1 } });
+    });
+
+    // Regression from the live check-4 run (ElevenLabs).
+    it("accepts years = 0 stated in words ('We do not require any formal experience')", () => {
+      const words = withText("We do not require any formal experience. Show us what you have built.");
+      const zero = extraction({
+        years_required_min: 0,
+        years_required_text: null,
+        location_type: "unknown",
+        evidence: { years: "We do not require any formal experience", clearance: null, location: null, new_grad: null },
+      });
+      expect(groundingProblems(zero, words)).toEqual([]);
+      expect(groundingProblems({ ...zero, years_required_min: 1 }, words)).not.toEqual([]);
     });
 
     it("accepts number words and '0' in a range", () => {

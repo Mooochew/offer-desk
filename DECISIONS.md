@@ -178,3 +178,29 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 038. Code pre-rank chooses the ≤25 postings to extract; LLM client owns retries and quota
 - **What:** `preRank` scores titles for new-grad wording, profile skills, preferred place and recency, and extracts the top 25 (DECISIONS 030). The OpenAI SDK's own retries are off (`maxRetries: 0`); `createResponder` applies the shared retry policy (429/5xx, Retry-After, jitter) and counts every attempt against the global daily quota (500/day, `createDailyQuota`), which is never retried once exceeded and fails closed if the counter can't be read.
 - **Why:** One retry policy and one place to count cost. Measured live: 25 extractions in about 20 s on first run; the cached rerun took 0.4 s with 0 model calls.
+
+## 039. Phase 3 review fixes (reviews/phase-3.md)
+- **S1 (in-sample score):** added a 12-case held-out set from companies not in the tuning set (fixed seed 4680), labeled blind by a separate agent from the rule sections only, never used for tuning. v1 90.6% → v2 98.3% held-out (3 runs each). Eval results are now timestamped files tagged with commit and check version, never overwritten.
+- **S2 (quotes only had to exist):** check-3 makes quotes support the answer (number in the years quote, about experience; non-negated clearance quote that mentions clearance; description-only except location; min length; grounded `years_required_text`; new-grad evidence). Each reviewer bypass is a test.
+- **S3 (overstated claims):** PROMPTS.md rewritten: held-out vs in-sample stated, evidence rules stated exactly, retry counts compared under the same checks, labels described as AI-made and AI-audited, v1/v2 commit order admitted as unprovable from git. The leakage test compares 8-word shingles against both eval sets.
+- **S4 (ungrounded skills):** only skills the description mentions are kept; `skillInText` now matches every common spelling (it had missed "Postgres" in text when the profile said "Postgres").
+- **S5 (cross-posting cache reuse):** cache hits are re-checked against the current posting's text.
+- **S6 (latency/cost, partly):** OpenAI timeout 20 s × 2 attempts; an extraction deadline (no new model call after it; those postings show as "time limit"); a failed cache write keeps the paid result; quota counter errors fail closed without retries. Per-session/IP extraction budgets and the request deadline wiring are Phase 4 (DECISIONS 040).
+- **Smaller:** "years not stated" instead of "no years required"; `<posting>` tags inside descriptions neutralized; jobs past the 25-extraction cap returned as `notChecked`; unicode hyphens/ellipses normalized in quote matching.
+
+## 040. Carried into Phase 4 from the Phase 3 review
+- **Deadline:** each agent turn gets a deadline passed to search and triage (partial results instead of a timeout); `maxDuration` 300 s on `/api/agent` (Hobby maximum) with the deadline well inside it.
+- **Cost:** per-session and per-IP budgets for extractions, and part of the 500/day cap reserved for agent (routing) calls, so one visitor can't drain the shared quota.
+- **Second-order injection:** posting text, quotes and skills never go back into the tool-using agent's context; the agent gets ids, enums, counts and scores, and the UI fetches quotes for display.
+
+## 041. The eval caught a validator bug (check-4)
+- **What:** check-3's benefits filter matched "pto" inside "crypto" and rejected Coinbase's real requirement in all 3 runs. Fixed with whole-word matching; check version bumped to check-4 so nothing judged by the bug is reused; check-3 result files were discarded as invalid.
+- **Why it matters:** stricter checks can create false rejections. The per-case failure list made this visible in one run; it's now a regression test.
+
+## 042. Grounding check-5 and check-6: fix false rejections found in live triage
+- **What (check-5):** `years_required_text` is a display summary, not evidence, so an ungrounded one is dropped (set to null) instead of failing the answer (SpaceX "Software Engineer, Full Stack (Data & Video Analysis)"). Explicit no-experience wording ("We do not require any formal experience") supports `years_required_min = 0` without a number or the word "years" (ElevenLabs Payments).
+- **What (check-6):** the check-5 live triage still left 2 of 25 SpaceX postings unread: the model joined two real requirement bullets with "; " in one years quote, and the joined string isn't in the text. A quote now counts if every "; "-separated part is an exact quote of at least 8 characters. Nothing invented can pass: each part must be found on its own, and the number/"years"/negation rules still apply to the whole quote.
+- **Why:** The end goal is that every posting the user sees was actually read. These were false rejections of correct answers (the right years value with real quotes), not fabrications. They turned postings into "couldn't read requirements" for no reason. The check version is part of the cache key, so nothing judged by the old rules is reused.
+- **Result:** live triage 25/25 read, 0 unread. Evals re-run under check-6 (3 runs each): held-out v1 89.4% → v2 98.9%; tuning v1 86.3% → v2 97.9%; 0 answers failed after the retry in any set. check-5 result files are kept for history, but they aren't comparable.
+- **Known limitation left as-is:** whether Anduril's "Active US Secret clearance, or a previously granted Secret clearance eligible for reactivation" is answered `yes` or `ability_to_obtain` varies between runs and postings. The job is then flagged "needs clearance eligibility" instead of being dropped. This is a model judgment, so fixing it fairly needs a v3 prompt and a fresh held-out set (PROMPTS.md, Limits).
+- **Alternatives:** accepting the flaky unread postings (the retry usually fixes them, but not always); telling the model never to join quotes (a prompt change would need a fresh held-out set to evaluate fairly).

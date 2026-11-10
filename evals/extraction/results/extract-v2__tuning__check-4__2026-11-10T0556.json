@@ -1,0 +1,1558 @@
+{
+ "version": "extract-v2",
+ "set": "tuning",
+ "checkVersion": "check-4",
+ "gitCommit": "065581a",
+ "model": "gpt-6-luna",
+ "runs": 3,
+ "ranAt": "2026-11-10T05:56:26.887Z",
+ "accuracy": {
+  "years_required_min": {
+   "mean": 1,
+   "perRun": [
+    1,
+    1,
+    1
+   ],
+   "baseline": 0.25
+  },
+  "clearance_required": {
+   "mean": 1,
+   "perRun": [
+    1,
+    1,
+    1
+   ],
+   "baseline": 0.875
+  },
+  "location_type": {
+   "mean": 0.9583333333333334,
+   "perRun": [
+    1,
+    1,
+    0.875
+   ],
+   "baseline": 0.375
+  },
+  "degree": {
+   "mean": 1,
+   "perRun": [
+    1,
+    1,
+    1
+   ],
+   "baseline": 0.5625
+  },
+  "is_new_grad_friendly": {
+   "mean": 0.9166666666666666,
+   "perRun": [
+    1,
+    0.875,
+    0.875
+   ],
+   "baseline": 0.5625
+  }
+ },
+ "overall": 0.975,
+ "retried": 10,
+ "failed": 0,
+ "outputs": [
+  [
+   {
+    "id": "greenhouse-5280545007",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "yes",
+     "skills_required": [
+      "Python",
+      "Go"
+     ],
+     "skills_preferred": [
+      "REST APIs"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "This role requires that you be on-site at our HQ in San Mateo, CA.",
+      "new_grad": "Internship experience developing and launching products"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8278991",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years of software engineering experience building and operating backend systems, ideally in fintech, payments, or crypto.",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Go",
+      "Java",
+      "AWS",
+      "GCP",
+      "Distributed systems",
+      "APIs",
+      "Blockchain",
+      "Stablecoins",
+      "Ethereum",
+      "Solana",
+      "Base",
+      "Generative AI"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2+ years of software engineering experience building and operating backend systems, ideally in fintech, payments, or crypto.",
+      "clearance": null,
+      "location": "Coinbase is a remote-first, but not remote-only company. Expect to get together quarterly for intense in-person working sessions called “surges.”",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8196112003",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1.5,
+     "years_required_text": "1.5+ years of experience as a software engineer",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Python",
+      "Kotlin",
+      "AWS",
+      "MySQL",
+      "Kubernetes"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "1.5+ years of experience as a software engineer",
+      "clearance": null,
+      "location": "Affirm is proud to be a remote-first company.",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8325759",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1,
+     "years_required_text": "1–3 years of experience building software systems (internships or industry experience)",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "C/C++",
+      "Python"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "1–3 years of experience building software systems (internships or industry experience)",
+      "clearance": null,
+      "location": "Roles that are based in an office are onsite Tuesday, Wednesday, and Thursday, with optional presence on Monday and Friday (unless otherwise noted).",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-f65ba1d9-f809-442f-88df-453241e8d509",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2–4 years of experience building and running production services",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Backend engineering",
+      "production services",
+      "AI-assisted engineering"
+     ],
+     "skills_preferred": [
+      "query engines",
+      "analytical databases",
+      "large-scale data processing",
+      "observability",
+      "SLOs",
+      "oncall"
+     ],
+     "evidence": {
+      "years": "2–4 years of experience building and running production services",
+      "clearance": null,
+      "location": "San Francisco- Hybrid",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8934563002",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1,
+     "years_required_text": "1+ years of experience in full stack development",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [],
+     "skills_preferred": [
+      "Python",
+      "C#.NET",
+      "Go",
+      "Scala",
+      "Java",
+      "Make",
+      "Bazel",
+      "Pants",
+      "Buck",
+      "Gradle",
+      "pip",
+      "npm",
+      "UNIX-like operating systems",
+      "Terraform",
+      "Ansible",
+      "Puppet",
+      "Apache Kafka",
+      "RabbitMQ",
+      "ActiveMQ",
+      "Docker",
+      "Kubernetes",
+      "Angular",
+      "React",
+      "PostgreSQL",
+      "SQL Server"
+     ],
+     "evidence": {
+      "years": "1+ years of experience in full stack development",
+      "clearance": null,
+      "location": "This role requires you to be onsite. Remote and/or hybrid work will not be considered",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-5290232007",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years in Rust or C++",
+     "degree": "unknown",
+     "clearance_required": "ability_to_obtain",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Python",
+      "Rust or C++",
+      "CAN",
+      "Ethernet",
+      "Wireshark",
+      "CANoe"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2+ years in Rust or C++",
+      "clearance": "eligibility to obtain and maintain a US security clearance",
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-5286149007",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": 3,
+     "years_required_text": "At least 3-10+ years working with a variety of programming languages such as Go, Python, Java, C++, Rust, etc.",
+     "degree": "unknown",
+     "clearance_required": "yes",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Go",
+      "Python",
+      "Java",
+      "C++",
+      "Rust"
+     ],
+     "skills_preferred": [
+      "AWS",
+      "Azure"
+     ],
+     "evidence": {
+      "years": "At least 3-10+ years working with a variety of programming languages such as Go, Python, Java, C++, Rust, etc.",
+      "clearance": "Currently possesses and is able to maintain an active U.S. Secret Clearance",
+      "location": "Listed locations: Remote",
+      "new_grad": "At least 3-10+ years working with a variety of programming languages"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8347710",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1,
+     "years_required_text": "1+ years software development experience building highly scalable, highly available applications",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Java",
+      "Kotlin",
+      "Python",
+      "TypeScript",
+      "AWS",
+      "Azure",
+      "REST APIs"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "1+ years software development experience building highly scalable, highly available applications",
+      "clearance": null,
+      "location": "-REMOTE, USA-",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "lever-67982bee-811b-453b-8596-b53c13f7a78d",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 0,
+     "years_required_text": "0-2 years of professional or internship experience in software engineering",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Python",
+      "JavaScript",
+      "TypeScript",
+      "React",
+      "REST APIs",
+      "Git"
+     ],
+     "skills_preferred": [
+      "React"
+     ],
+     "evidence": {
+      "years": "0-2 years of professional or internship experience in software engineering",
+      "clearance": null,
+      "location": "Able to work on-site at one of our office locations.",
+      "new_grad": "Currently enrolled in a B.S. or M.S. program in a relevant discipline."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8917377002",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Go",
+      "React",
+      "Kotlin",
+      "Swift",
+      "Objective-C"
+     ],
+     "skills_preferred": [
+      "TypeScript",
+      "AWS",
+      "ECS",
+      "DynamoDB",
+      "Lambda",
+      "SQS",
+      "Step Functions"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-06c2599d-4dd5-4f97-843f-7194b546f042",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "yes",
+     "skills_required": [
+      "JavaScript",
+      "TypeScript"
+     ],
+     "skills_preferred": [
+      "React"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "We work from our offices on Mondays, Tuesdays and Thursdays (our Anchor Days)",
+      "new_grad": "As a junior engineer on the team"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-6242561004",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 5,
+     "years_required_text": "5+ years of professional software engineering experience, including 3+ years building production systems with Ruby",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Ruby"
+     ],
+     "skills_preferred": [
+      "AWS",
+      "Kubernetes",
+      "Terraform",
+      "Temporal"
+     ],
+     "evidence": {
+      "years": "5+ years of professional software engineering experience, including 3+ years building production systems with Ruby",
+      "clearance": null,
+      "location": "one of our US hubs or remotely in the United States",
+      "new_grad": "5+ years of professional software engineering experience"
+     }
+    }
+   },
+   {
+    "id": "ashby-373a16fe-81e1-4cf9-8966-43bc16d921fa",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 4,
+     "years_required_text": "4-5+ years in related areas — DevOps, IT, software engineering, or similar with concrete security responsibilities or overlap.",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Security response",
+      "Automation",
+      "Scripting",
+      "Coding",
+      "SIEM",
+      "Observability",
+      "Logging",
+      "Detection"
+     ],
+     "skills_preferred": [
+      "SOAR",
+      "Detection-as-Code",
+      "Infrastructure-as-Code"
+     ],
+     "evidence": {
+      "years": "4-5+ years in related areas — DevOps, IT, software engineering, or similar with concrete security responsibilities or overlap.",
+      "clearance": null,
+      "location": "Listed locations: Remote",
+      "new_grad": "4-5+ years in related areas"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8332676",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "plus 2 years of experience in Software Engineering.",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Ruby",
+      "React",
+      "Typescript",
+      "Java",
+      "Golang",
+      "SQL"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "plus 2 years of experience in Software Engineering.",
+      "clearance": null,
+      "location": "50% Telecommuting permitted.",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-2111a9b4-8dab-4562-9692-ad7cb2c7b968",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 5,
+     "years_required_text": "Over 5 years of hands-on experience in technical SaaS roles, with at least 3 years specifically in solutions architecture, technical consulting, or technical account management",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Python",
+      "APIs"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "Over 5 years of hands-on experience in technical SaaS roles, with at least 3 years specifically in solutions architecture, technical consulting, or technical account management",
+      "clearance": null,
+      "location": "This is a hybrid role based out of our San Francisco, Chicago, Austin, New York City, Seattle, and London hubs.",
+      "new_grad": "Over 5 years of hands-on experience in technical SaaS roles"
+     }
+    }
+   }
+  ],
+  [
+   {
+    "id": "greenhouse-5280545007",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "yes",
+     "skills_required": [
+      "Python",
+      "Go",
+      "Redis",
+      "DynamoDB",
+      "Postgres",
+      "Kafka",
+      "SQS",
+      "Terraform",
+      "Kubernetes"
+     ],
+     "skills_preferred": [
+      "REST APIs"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "This role requires that you be on-site at our HQ in San Mateo, CA.",
+      "new_grad": "Internship experience developing and launching products"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8278991",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years of software engineering experience building and operating backend systems, ideally in fintech, payments, or crypto.",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Go",
+      "Java",
+      "AWS",
+      "GCP",
+      "distributed systems",
+      "APIs",
+      "blockchain",
+      "crypto",
+      "stablecoins",
+      "on-chain payments",
+      "smart contract platforms",
+      "Ethereum",
+      "Solana",
+      "Base",
+      "generative AI"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2+ years of software engineering experience building and operating backend systems, ideally in fintech, payments, or crypto.",
+      "clearance": null,
+      "location": "Coinbase is a remote-first, but not remote-only company.",
+      "new_grad": "2+ years of software engineering experience building and operating backend systems"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8196112003",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1.5,
+     "years_required_text": "1.5+ years of experience as a software engineer",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Python",
+      "Kotlin",
+      "AWS",
+      "MySQL",
+      "Kubernetes"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "1.5+ years of experience as a software engineer",
+      "clearance": null,
+      "location": "Affirm is proud to be a remote-first company.",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8325759",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1,
+     "years_required_text": "1–3 years of experience building software systems (internships or industry experience)",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "C/C++",
+      "Python"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "1–3 years of experience building software systems (internships or industry experience)",
+      "clearance": null,
+      "location": "The starting base pay for this position is as shown below.",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-f65ba1d9-f809-442f-88df-453241e8d509",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2–4 years of experience building and running production services",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "no",
+     "skills_required": [],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2–4 years of experience building and running production services",
+      "clearance": null,
+      "location": "San Francisco- Hybrid",
+      "new_grad": "2–4 years of experience building and running production services"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8934563002",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1,
+     "years_required_text": "1+ years of experience in full stack development",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [],
+     "skills_preferred": [
+      "Python",
+      "C#.NET",
+      "Go",
+      "Scala",
+      "Java",
+      "version control",
+      "continuous integration",
+      "continuous delivery",
+      "Make",
+      "Bazel",
+      "Pants",
+      "Buck",
+      "Gradle",
+      "pip",
+      "npm",
+      "UNIX-like operating systems",
+      "Terraform",
+      "Ansible",
+      "Puppet",
+      "Apache Kafka",
+      "RabbitMQ",
+      "ActiveMQ",
+      "Docker",
+      "Kubernetes",
+      "Angular",
+      "React",
+      "PostgreSQL",
+      "SQL Server"
+     ],
+     "evidence": {
+      "years": "1+ years of experience in full stack development",
+      "clearance": null,
+      "location": "This role requires you to be onsite. Remote and/or hybrid work will not be considered",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-5290232007",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years in Rust or C++",
+     "degree": "unknown",
+     "clearance_required": "ability_to_obtain",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Python",
+      "Rust",
+      "C++",
+      "CAN",
+      "Ethernet",
+      "Wireshark",
+      "CANoe",
+      "hardware interfacing",
+      "cybersecurity"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2+ years in Rust or C++",
+      "clearance": "eligibility to obtain and maintain a US security clearance",
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-5286149007",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": 3,
+     "years_required_text": "At least 3-10+ years working with a variety of programming languages such as Go, Python, Java, C++, Rust, etc.",
+     "degree": "unknown",
+     "clearance_required": "yes",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Go",
+      "Python",
+      "Java",
+      "C++",
+      "Rust"
+     ],
+     "skills_preferred": [
+      "AWS",
+      "Azure",
+      "version control",
+      "CICD systems"
+     ],
+     "evidence": {
+      "years": "At least 3-10+ years working with a variety of programming languages such as Go, Python, Java, C++, Rust, etc.",
+      "clearance": "Currently possesses and is able to maintain an active U.S. Secret Clearance",
+      "location": "Listed locations: Remote",
+      "new_grad": "At least 3-10+ years working with a variety of programming languages such as Go, Python, Java, C++, Rust, etc."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8347710",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": 1,
+     "years_required_text": "1+ years software development experience building highly scalable, highly available applications",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Kotlin",
+      "Java",
+      "TypeScript",
+      "Python",
+      "React",
+      "AWS",
+      "Azure",
+      "Kubernetes",
+      "REST APIs",
+      "AI tools"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "1+ years software development experience building highly scalable, highly available applications",
+      "clearance": null,
+      "location": "-REMOTE, USA-",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "lever-67982bee-811b-453b-8596-b53c13f7a78d",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 0,
+     "years_required_text": "0-2 years of professional or internship experience in software engineering",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Python",
+      "JavaScript",
+      "TypeScript",
+      "REST APIs",
+      "Git"
+     ],
+     "skills_preferred": [
+      "React"
+     ],
+     "evidence": {
+      "years": "0-2 years of professional or internship experience in software engineering",
+      "clearance": null,
+      "location": "Able to work on-site at one of our office locations.",
+      "new_grad": "Currently enrolled in a B.S. or M.S. program in a relevant discipline."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8917377002",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Go",
+      "React",
+      "Kotlin",
+      "Swift",
+      "Objective-C"
+     ],
+     "skills_preferred": [
+      "React",
+      "TypeScript",
+      "Golang",
+      "AWS",
+      "ECS",
+      "DynamoDB",
+      "Lambda",
+      "SQS",
+      "Step Functions"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-06c2599d-4dd5-4f97-843f-7194b546f042",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "yes",
+     "skills_required": [
+      "JavaScript",
+      "TypeScript"
+     ],
+     "skills_preferred": [
+      "React"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "We work from our offices on Mondays, Tuesdays and Thursdays (our Anchor Days)",
+      "new_grad": "As a junior engineer on the team"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-6242561004",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 5,
+     "years_required_text": "5+ years of professional software engineering experience, including 3+ years building production systems with Ruby",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Ruby"
+     ],
+     "skills_preferred": [
+      "AWS",
+      "Kubernetes",
+      "Terraform",
+      "Temporal"
+     ],
+     "evidence": {
+      "years": "5+ years of professional software engineering experience, including 3+ years building production systems with Ruby",
+      "clearance": null,
+      "location": "one of our US hubs or remotely in the United States",
+      "new_grad": "5+ years of professional software engineering experience"
+     }
+    }
+   },
+   {
+    "id": "ashby-373a16fe-81e1-4cf9-8966-43bc16d921fa",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 4,
+     "years_required_text": "4-5+ years in related areas — DevOps, IT, software engineering, or similar with concrete security responsibilities or overlap.",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "SIEM",
+      "observability",
+      "Python",
+      "TypeScript",
+      "AWS",
+      "PostgreSQL",
+      "Snowflake",
+      "Datadog",
+      "PagerDuty",
+      "GitHub",
+      "Wiz",
+      "Semgrep",
+      "Tines"
+     ],
+     "skills_preferred": [
+      "SOAR",
+      "Detection-as-Code",
+      "Infrastructure-as-Code"
+     ],
+     "evidence": {
+      "years": "4-5+ years in related areas — DevOps, IT, software engineering, or similar with concrete security responsibilities or overlap.",
+      "clearance": null,
+      "location": "Listed locations: Remote",
+      "new_grad": "4-5+ years in related areas — DevOps, IT, software engineering, or similar with concrete security responsibilities or overlap."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8332676",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "Must have a Bachelor's degree or foreign equivalent in Computer Science, Human-computer interaction or a related field, plus 2 years of experience in Software Engineering.",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Ruby",
+      "React",
+      "Typescript",
+      "Java",
+      "Golang",
+      "SQL"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "plus 2 years of experience in Software Engineering.",
+      "clearance": null,
+      "location": "50% Telecommuting permitted.",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-2111a9b4-8dab-4562-9692-ad7cb2c7b968",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 5,
+     "years_required_text": "Over 5 years of hands-on experience in technical SaaS roles, with at least 3 years specifically in solutions architecture, technical consulting, or technical account management",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Python",
+      "APIs"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "Over 5 years of hands-on experience in technical SaaS roles, with at least 3 years specifically in solutions architecture, technical consulting, or technical account management",
+      "clearance": null,
+      "location": "This is a hybrid role based out of our San Francisco, Chicago, Austin, New York City, Seattle, and London hubs.",
+      "new_grad": "Over 5 years of hands-on experience in technical SaaS roles, with at least 3 years specifically in solutions architecture, technical consulting, or technical account management"
+     }
+    }
+   }
+  ],
+  [
+   {
+    "id": "greenhouse-5280545007",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "yes",
+     "skills_required": [
+      "Python",
+      "Go"
+     ],
+     "skills_preferred": [
+      "REST APIs"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "This role requires that you be on-site at our HQ in San Mateo, CA.",
+      "new_grad": "Internship experience developing and launching products"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8278991",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years of software engineering experience building and operating backend systems, ideally in fintech, payments, or crypto.",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Backend systems",
+      "Go",
+      "Java",
+      "AWS",
+      "GCP",
+      "Distributed systems",
+      "APIs",
+      "Blockchain",
+      "Crypto",
+      "Stablecoins",
+      "On-chain payments",
+      "Smart contract platforms",
+      "Ethereum",
+      "Solana",
+      "Base",
+      "Generative AI"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2+ years of software engineering experience building and operating backend systems, ideally in fintech, payments, or crypto.",
+      "clearance": null,
+      "location": "Coinbase is a remote-first, but not remote-only company.",
+      "new_grad": "2+ years of software engineering experience building and operating backend systems, ideally in fintech, payments, or crypto."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8196112003",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1.5,
+     "years_required_text": "1.5+ years of experience as a software engineer",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Python",
+      "Kotlin",
+      "AWS",
+      "MySQL",
+      "Kubernetes"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "You have a total of 1.5+ years of experience as a software engineer.",
+      "clearance": null,
+      "location": "Affirm is proud to be a remote-first company.",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8325759",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1,
+     "years_required_text": "1–3 years of experience building software systems (internships or industry experience)",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "C/C++",
+      "Python",
+      "buck2"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "1–3 years of experience building software systems (internships or industry experience)",
+      "clearance": null,
+      "location": "Roles that are based in an office are onsite Tuesday, Wednesday, and Thursday, with optional presence on Monday and Friday (unless otherwise noted).",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-f65ba1d9-f809-442f-88df-453241e8d509",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2–4 years of experience building and running production services",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Backend engineering",
+      "Production services"
+     ],
+     "skills_preferred": [
+      "Query engines",
+      "Analytical databases",
+      "Large-scale data processing",
+      "Observability",
+      "SLOs"
+     ],
+     "evidence": {
+      "years": "2–4 years of experience building and running production services",
+      "clearance": null,
+      "location": "San Francisco- Hybrid",
+      "new_grad": "2–4 years of experience building and running production services"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8934563002",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1,
+     "years_required_text": "1+ years of experience in full stack development",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [],
+     "skills_preferred": [
+      "Python",
+      "C#.NET",
+      "Go",
+      "Scala",
+      "Java",
+      "Make",
+      "Bazel",
+      "Pants",
+      "Buck",
+      "Gradle",
+      "pip",
+      "npm",
+      "Terraform",
+      "Ansible",
+      "Puppet",
+      "Apache Kafka",
+      "RabbitMQ",
+      "ActiveMQ",
+      "Docker",
+      "Kubernetes",
+      "Angular",
+      "React",
+      "PostgreSQL",
+      "SQL Server"
+     ],
+     "evidence": {
+      "years": "1+ years of experience in full stack development",
+      "clearance": null,
+      "location": "This role requires you to be onsite. Remote and/or hybrid work will not be considered",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-5290232007",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years in Rust or C++",
+     "degree": "unknown",
+     "clearance_required": "ability_to_obtain",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Python",
+      "Rust",
+      "C++",
+      "CAN",
+      "Ethernet",
+      "Wireshark",
+      "CANoe",
+      "hardware interfacing",
+      "cybersecurity"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2+ years in Rust or C++",
+      "clearance": "eligibility to obtain and maintain a US security clearance",
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-5286149007",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": 3,
+     "years_required_text": "At least 3-10+ years working with a variety of programming languages",
+     "degree": "unknown",
+     "clearance_required": "yes",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Go",
+      "Python",
+      "Java",
+      "C++",
+      "Rust"
+     ],
+     "skills_preferred": [
+      "AWS",
+      "Azure",
+      "version control",
+      "CICD"
+     ],
+     "evidence": {
+      "years": "At least 3-10+ years working with a variety of programming languages",
+      "clearance": "Currently possesses and is able to maintain an active U.S. Secret Clearance",
+      "location": "Listed locations: Remote",
+      "new_grad": "At least 3-10+ years working with a variety of programming languages"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8347710",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 1,
+     "years_required_text": "1+ years software development experience building highly scalable, highly available applications",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Kotlin",
+      "Java",
+      "TypeScript",
+      "Python",
+      "AWS",
+      "Azure",
+      "Kubernetes",
+      "React",
+      "REST APIs",
+      "AI tools"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "1+ years software development experience building highly scalable, highly available applications",
+      "clearance": null,
+      "location": "-REMOTE, USA-",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "lever-67982bee-811b-453b-8596-b53c13f7a78d",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 0,
+     "years_required_text": "0-2 years of professional or internship experience in software engineering",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Python",
+      "JavaScript",
+      "TypeScript",
+      "REST APIs",
+      "Git"
+     ],
+     "skills_preferred": [
+      "React"
+     ],
+     "evidence": {
+      "years": "0-2 years of professional or internship experience in software engineering",
+      "clearance": null,
+      "location": "Able to work on-site at one of our office locations.",
+      "new_grad": "Currently enrolled in a B.S. or M.S. program in a relevant discipline."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8917377002",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Go",
+      "React",
+      "Kotlin",
+      "Swift",
+      "Objective-C"
+     ],
+     "skills_preferred": [
+      "TypeScript",
+      "Golang",
+      "AWS",
+      "ECS",
+      "DynamoDB",
+      "Lambda",
+      "SQS",
+      "Step Functions"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-06c2599d-4dd5-4f97-843f-7194b546f042",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "yes",
+     "skills_required": [
+      "JavaScript",
+      "TypeScript"
+     ],
+     "skills_preferred": [
+      "React"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "We work from our offices on Mondays, Tuesdays and Thursdays (our Anchor Days)",
+      "new_grad": "As a junior engineer on the team"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-6242561004",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 5,
+     "years_required_text": "5+ years of professional software engineering experience, including 3+ years building production systems with Ruby",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Ruby"
+     ],
+     "skills_preferred": [
+      "AWS",
+      "Kubernetes",
+      "Terraform",
+      "Temporal"
+     ],
+     "evidence": {
+      "years": "5+ years of professional software engineering experience, including 3+ years building production systems with Ruby",
+      "clearance": null,
+      "location": "This is a full time role that can be held from one of our US hubs or remotely in the United States.",
+      "new_grad": "5+ years of professional software engineering experience, including 3+ years building production systems with Ruby"
+     }
+    }
+   },
+   {
+    "id": "ashby-373a16fe-81e1-4cf9-8966-43bc16d921fa",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 4,
+     "years_required_text": "4-5+ years in related areas — DevOps, IT, software engineering, or similar with concrete security responsibilities or overlap.",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Python",
+      "TypeScript",
+      "AWS",
+      "PostgreSQL",
+      "Snowflake",
+      "Datadog",
+      "PagerDuty",
+      "GitHub",
+      "Anthropic",
+      "Wiz",
+      "Semgrep",
+      "Tines",
+      "SIEM",
+      "observability",
+      "logging",
+      "detection",
+      "security response",
+      "automation",
+      "scripting/coding"
+     ],
+     "skills_preferred": [
+      "SOAR",
+      "Detection-as-Code",
+      "Infrastructure-as-Code",
+      "threat modeling",
+      "alert pipelines"
+     ],
+     "evidence": {
+      "years": "4-5+ years in related areas — DevOps, IT, software engineering, or similar with concrete security responsibilities or overlap.",
+      "clearance": null,
+      "location": "Listed locations: Remote",
+      "new_grad": "4-5+ years in related areas — DevOps, IT, software engineering, or similar with concrete security responsibilities or overlap."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8332676",
+    "status": "ok",
+    "attempts": 2,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "Must have a Bachelor's degree or foreign equivalent in Computer Science, Human-computer interaction or a related field, plus 2 years of experience in Software Engineering.\n\nMust also have 2 years of experience in each of the following:",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Ruby",
+      "React",
+      "Typescript",
+      "Java",
+      "Golang",
+      "SQL",
+      "API development",
+      "latency analysis",
+      "architecture and system design",
+      "user-facing documentation",
+      "technical integration guides",
+      "industry standard design patterns"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "Must also have 2 years of experience in each of the following:",
+      "clearance": null,
+      "location": "50% Telecommuting permitted.",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-2111a9b4-8dab-4562-9692-ad7cb2c7b968",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 5,
+     "years_required_text": "Over 5 years of hands-on experience in technical SaaS roles, with at least 3 years specifically in solutions architecture, technical consulting, or technical account management",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Python",
+      "APIs"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "Over 5 years of hands-on experience in technical SaaS roles, with at least 3 years specifically in solutions architecture, technical consulting, or technical account management",
+      "clearance": null,
+      "location": "This is a hybrid role based out of our San Francisco, Chicago, Austin, New York City, Seattle, and London hubs.",
+      "new_grad": "Over 5 years of hands-on experience in technical SaaS roles"
+     }
+    }
+   }
+  ]
+ ]
+}

@@ -1,7 +1,7 @@
 import type { ResponseInputItem } from "openai/resources/responses/responses";
 import type { CreateResponse } from "@/lib/llm/openai";
 import type { ExtractionPrompt } from "@/prompts/types";
-import { EXTRACTION_JSON_SCHEMA, extractionSchema, groundingProblems, type Extraction, type SourceParts } from "./schema";
+import { EXTRACTION_JSON_SCHEMA, extractionSchema, groundedYearsText, groundingProblems, type Extraction, type SourceParts } from "./schema";
 import { groundedSkills } from "./skills";
 
 /** Longest description sent to the model. Requirements sections fit well within this. */
@@ -76,6 +76,7 @@ export function checkAnswer(raw: string, source: SourceParts): { extraction: Ext
   return {
     extraction: {
       ...parsed.data,
+      years_required_text: groundedYearsText(parsed.data.years_required_text, source),
       skills_required: groundedSkills(parsed.data.skills_required, source.description),
       skills_preferred: groundedSkills(parsed.data.skills_preferred, source.description),
     },

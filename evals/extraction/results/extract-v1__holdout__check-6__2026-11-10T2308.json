@@ -1,0 +1,1384 @@
+{
+ "version": "extract-v1",
+ "set": "holdout",
+ "checkVersion": "check-6",
+ "gitCommit": "e1b2b39 + uncommitted changes in lib/ or prompts/",
+ "model": "gpt-6-luna",
+ "runs": 3,
+ "ranAt": "2026-11-10T23:08:56.320Z",
+ "accuracy": {
+  "years_required_min": {
+   "mean": 1,
+   "perRun": [
+    1,
+    1,
+    1
+   ],
+   "baseline": 0.25
+  },
+  "clearance_required": {
+   "mean": 1,
+   "perRun": [
+    1,
+    1,
+    1
+   ],
+   "baseline": 1
+  },
+  "location_type": {
+   "mean": 0.8333333333333334,
+   "perRun": [
+    0.8333333333333334,
+    0.8333333333333334,
+    0.8333333333333334
+   ],
+   "baseline": 0.4166666666666667
+  },
+  "degree": {
+   "mean": 0.8888888888888888,
+   "perRun": [
+    0.8333333333333334,
+    0.9166666666666666,
+    0.9166666666666666
+   ],
+   "baseline": 0.9166666666666666
+  },
+  "is_new_grad_friendly": {
+   "mean": 0.75,
+   "perRun": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "baseline": 0.5
+  }
+ },
+ "overall": 0.8944444444444445,
+ "retried": 0,
+ "failed": 0,
+ "outputs": [
+  [
+   {
+    "id": "greenhouse-4733115005",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Programming",
+      "Go",
+      "Application security",
+      "Application platform security",
+      "Penetration testing",
+      "Threat modeling",
+      "OWASP Top 10",
+      "Client-side security",
+      "API security",
+      "Secure coding",
+      "Networking protocols"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "Listed locations: Remote (United States)",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8338246",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years of professional software development experience",
+     "degree": "none",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Apache Spark",
+      "data pipelines",
+      "containerized services",
+      "streaming",
+      "data structures",
+      "algorithms",
+      "distributed systems",
+      "testing"
+     ],
+     "skills_preferred": [
+      "AWS",
+      "S3",
+      "IAM",
+      "EC2",
+      "MSK",
+      "metrics",
+      "logs",
+      "alerts",
+      "Parquet",
+      "AWS Glue",
+      "Apache Iceberg",
+      "Delta Lake",
+      "Kafka",
+      "Apache Flink",
+      "Spark Structured Streaming",
+      "Apache Airflow",
+      "Kubernetes",
+      "Docker",
+      "ETL"
+     ],
+     "evidence": {
+      "years": "2+ years of professional software development experience, including building and operating data pipelines that feed into a customer facing product",
+      "clearance": null,
+      "location": "We offer a hybrid work environment. Most US-based positions can also be performed remotely (any exceptions will be noted in the Minimum Qualifications below.)",
+      "new_grad": "2+ years of professional software development experience, including building and operating data pipelines that feed into a customer facing product"
+     }
+    }
+   },
+   {
+    "id": "ashby-d7dfc19d-e508-4522-91fa-e31c3b612a47",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 7,
+     "years_required_text": "7+ years of experience as a software engineer",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Python",
+      "TypeScript",
+      "Spark",
+      "Kafka",
+      "Flink",
+      "data warehouses",
+      "SQL",
+      "large-scale data pipelines"
+     ],
+     "skills_preferred": [
+      "secure handling of quarantined content"
+     ],
+     "evidence": {
+      "years": "7+ years of experience as a software engineer",
+      "clearance": null,
+      "location": null,
+      "new_grad": "7+ years of experience as a software engineer"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8026199",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 4,
+     "years_required_text": "4+ years of professional software engineering experience",
+     "degree": "none",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "AI-assisted development tools",
+      "Go",
+      "Java",
+      "Python",
+      "AWS",
+      "Microsoft Azure",
+      "Terraform",
+      "Distributed datastores",
+      "Caching",
+      "Kafka",
+      "Distributed systems",
+      "Data structures",
+      "Self-healing cloud architectures"
+     ],
+     "skills_preferred": [
+      "Docker",
+      "Kubernetes",
+      "OpenTelemetry",
+      "Distributed tracing",
+      "Network topology",
+      "Proxy layers",
+      "Mail transfer agent (MTA) protocols"
+     ],
+     "evidence": {
+      "years": "Experience: 4+ years of professional software engineering experience building and operating resilient backend services at scale.",
+      "clearance": null,
+      "location": "This role will be remote, but is not eligible to be hired in CA, CT, NJ, NY, PA, WA.",
+      "new_grad": "Experience: 4+ years of professional software engineering experience building and operating resilient backend services at scale."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8334794",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years of experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Kotlin",
+      "backend services",
+      "API lifecycle management",
+      "microservices",
+      "containerization"
+     ],
+     "skills_preferred": [
+      "DynamoDB",
+      "Java",
+      "Kotlin-specific frameworks and libraries"
+     ],
+     "evidence": {
+      "years": "2+ years of experience in designing and implementing robust backend services using Kotlin.",
+      "clearance": null,
+      "location": "Listed locations: Remote US",
+      "new_grad": "2+ years of experience in designing and implementing robust backend services using Kotlin."
+     }
+    }
+   },
+   {
+    "id": "ashby-46912896-5a97-4955-ae27-1b110b3487ec",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Python",
+      "data pipelines",
+      "ML evaluation systems",
+      "experimentation tooling",
+      "statistical reasoning",
+      "experimental design",
+      "production-quality code"
+     ],
+     "skills_preferred": [
+      "synthetic data",
+      "LLM evaluations",
+      "automated raters",
+      "preference data",
+      "data and measurement engineering",
+      "ML model development"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-d8925f84-562f-470c-a5bd-4f6c20009361",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "LLM benchmarks",
+      "Python",
+      "software engineering",
+      "post-training",
+      "SFT",
+      "SQL",
+      "large datasets"
+     ],
+     "skills_preferred": [
+      "RL environments",
+      "verifiers",
+      "lm-evaluation-harness",
+      "HELM",
+      "accounting",
+      "finance"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8360497",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 10,
+     "years_required_text": "at least 10+ years of experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "distributed systems",
+      "general-purpose programming languages"
+     ],
+     "skills_preferred": [
+      "financial reconciliation",
+      "accounting systems",
+      "payments infrastructure",
+      "double-entry accounting",
+      "bank account verification",
+      "ACH",
+      "RTP",
+      "Ruby on Rails",
+      "TypeScript",
+      "React"
+     ],
+     "evidence": {
+      "years": "Successful applicants have at least 10+ years of experience and the enthusiasm for a collaborative, test-driven environment",
+      "clearance": null,
+      "location": "Listed locations: Denver, CO - Hybrid; New York, NY - Hybrid; San Francisco, CA - Hybrid; Seattle, WA - Remote",
+      "new_grad": "We’re hiring seasoned engineers"
+     }
+    }
+   },
+   {
+    "id": "lever-9aadca04-df88-4b46-95d8-c3b2628b30b0",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 4,
+     "years_required_text": "4+ years of professional software engineering experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "external system connectors",
+      "streaming data ingestion",
+      "monorepo and asset distribution frameworks",
+      "Gradle",
+      "multi-project builds"
+     ],
+     "skills_preferred": [
+      "Java",
+      "Python",
+      "Kafka",
+      "Kubernetes",
+      "Flink",
+      "Debezium",
+      "Iceberg",
+      "GitHub"
+     ],
+     "evidence": {
+      "years": "4+ years of professional software engineering experience developing external system connectors, with depth in areas such as developing batch and streaming data ingestion systems, third-party integration development, or monorepo and asset distribution frameworks.",
+      "clearance": null,
+      "location": "Listed locations: New York, NY",
+      "new_grad": "4+ years of professional software engineering experience developing external system connectors, with depth in areas such as developing batch and streaming data ingestion systems, third-party integration development, or monorepo and asset distribution frameworks."
+     }
+    }
+   },
+   {
+    "id": "ashby-6f74767c-0e7a-446b-84bf-5c04c270cb13",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years at the intersection of biology and AI",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Biology",
+      "AI",
+      "LLMs",
+      "Data infrastructure"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2+ years at the intersection of biology and AI, with academic or industry experience evaluating and improving scientific models or LLMs for biological applications.",
+      "clearance": null,
+      "location": "Employees are expected to be on-site 5 days per week (Monday - Friday).",
+      "new_grad": "2+ years at the intersection of biology and AI"
+     }
+    }
+   },
+   {
+    "id": "ashby-5b744208-cb2c-4c31-9217-e0cbbf8ad7af",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 5,
+     "years_required_text": "5+ years of industry experience",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "distributed systems"
+     ],
+     "skills_preferred": [
+      "event ingestion",
+      "product analytics pipelines",
+      "OpenTelemetry",
+      "tracing",
+      "reliable data APIs",
+      "Spark",
+      "Flink",
+      "Ray",
+      "training-data infrastructure",
+      "run monitoring",
+      "cluster scheduling",
+      "job queues",
+      "node health"
+     ],
+     "evidence": {
+      "years": "5+ years of industry experience working with production distributed systems (e.g., infrastructure, ingestion, data pipelines, or scheduling/orchestration, etc.)",
+      "clearance": null,
+      "location": "We're in-person with cozy offices in North Beach, San Francisco, Palo Alto, and Manhattan, New York, complete with well-stocked libraries",
+      "new_grad": "5+ years of industry experience working with production distributed systems (e.g., infrastructure, ingestion, data pipelines, or scheduling/orchestration, etc.)"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8357913",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 3,
+     "years_required_text": "3-5 years of experience in security engineering, security operations, detection and response, or a related role",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Vulnerability management",
+      "SIEM",
+      "MITRE ATT&CK",
+      "GCP",
+      "AWS",
+      "IAM",
+      "Python",
+      "Go"
+     ],
+     "skills_preferred": [
+      "Detection-as-code",
+      "Sigma",
+      "EDR",
+      "CrowdStrike",
+      "SentinelOne",
+      "SOAR",
+      "Tines",
+      "Torq",
+      "Kubernetes",
+      "Container security",
+      "Bug bounty",
+      "GCIH",
+      "GCIA",
+      "GCFA",
+      "OSCP"
+     ],
+     "evidence": {
+      "years": "3-5 years of experience in security engineering, security operations, detection and response, or a related role",
+      "clearance": null,
+      "location": "Listed locations: San Francisco",
+      "new_grad": "This is a hands-on role for an engineer early to mid-way in their career, with a defined path to Senior Security Engineer."
+     }
+    }
+   }
+  ],
+  [
+   {
+    "id": "greenhouse-4733115005",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Programming",
+      "Application security",
+      "Penetration testing",
+      "Threat modeling",
+      "OWASP Top 10",
+      "Client-side security",
+      "API security",
+      "Secure coding practices",
+      "Networking protocols"
+     ],
+     "skills_preferred": [
+      "Go"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "Listed locations: Remote (United States)",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8338246",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years of professional software development experience",
+     "degree": "none",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Apache Spark",
+      "data pipelines",
+      "containerized services",
+      "streaming",
+      "data structures",
+      "algorithms",
+      "distributed systems",
+      "testing"
+     ],
+     "skills_preferred": [
+      "AWS",
+      "S3",
+      "IAM",
+      "EC2",
+      "MSK",
+      "metrics",
+      "Parquet",
+      "AWS Glue",
+      "Apache Iceberg",
+      "Delta Lake",
+      "Kafka",
+      "Apache Flink",
+      "Spark Structured Streaming",
+      "Apache Airflow",
+      "Kubernetes",
+      "Docker",
+      "ETL"
+     ],
+     "evidence": {
+      "years": "2+ years of professional software development experience, including building and operating data pipelines that feed into a customer facing product",
+      "clearance": null,
+      "location": "We offer a hybrid work environment.",
+      "new_grad": "2+ years of professional software development experience, including building and operating data pipelines that feed into a customer facing product"
+     }
+    }
+   },
+   {
+    "id": "ashby-d7dfc19d-e508-4522-91fa-e31c3b612a47",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 7,
+     "years_required_text": "7+ years of experience as a software engineer",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "software engineering",
+      "Python",
+      "TypeScript",
+      "large-scale data pipelines",
+      "search/retrieval systems",
+      "SQL"
+     ],
+     "skills_preferred": [
+      "Spark",
+      "Kafka",
+      "Flink",
+      "data warehouses",
+      "child safety",
+      "secure handling of quarantined content"
+     ],
+     "evidence": {
+      "years": "7+ years of experience as a software engineer",
+      "clearance": null,
+      "location": "Listed locations: San Francisco; New York City",
+      "new_grad": "7+ years of experience as a software engineer"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8026199",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 4,
+     "years_required_text": "4+ years of professional software engineering experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "AI-assisted development tools",
+      "Go",
+      "Java",
+      "Python",
+      "AWS",
+      "Microsoft Azure",
+      "Terraform",
+      "Distributed datastores",
+      "Caching",
+      "Kafka",
+      "Event streaming",
+      "Computer science fundamentals",
+      "Data structures",
+      "Self-healing cloud architectures"
+     ],
+     "skills_preferred": [
+      "Docker",
+      "Kubernetes",
+      "AWS Aurora",
+      "OpenTelemetry",
+      "Distributed tracing",
+      "Network topology",
+      "Proxy layers"
+     ],
+     "evidence": {
+      "years": "- Experience: 4+ years of professional software engineering experience building and operating resilient backend services at scale.",
+      "clearance": null,
+      "location": "This role will be remote, but is not eligible to be hired in CA, CT, NJ, NY, PA, WA.",
+      "new_grad": "- Experience: 4+ years of professional software engineering experience building and operating resilient backend services at scale."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8334794",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years of experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Kotlin",
+      "backend services",
+      "API lifecycle management",
+      "microservices",
+      "containerization"
+     ],
+     "skills_preferred": [
+      "DynamoDB",
+      "Java",
+      "Kotlin-specific frameworks and libraries"
+     ],
+     "evidence": {
+      "years": "2+ years of experience in designing and implementing robust backend services using Kotlin.",
+      "clearance": null,
+      "location": "Listed locations: Remote US",
+      "new_grad": "2+ years of experience in designing and implementing robust backend services using Kotlin."
+     }
+    }
+   },
+   {
+    "id": "ashby-46912896-5a97-4955-ae27-1b110b3487ec",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Python",
+      "data pipelines",
+      "ML evaluation systems",
+      "experimentation tooling",
+      "statistical reasoning",
+      "experimental design",
+      "measurement",
+      "production-quality code"
+     ],
+     "skills_preferred": [
+      "synthetic data",
+      "LLM evaluations",
+      "automated raters",
+      "preference data"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "Listed locations: New York",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-d8925f84-562f-470c-a5bd-4f6c20009361",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "LLM benchmarks",
+      "Python",
+      "software engineering",
+      "post-training",
+      "SFT",
+      "RL with verifiable rewards",
+      "SQL",
+      "large datasets"
+     ],
+     "skills_preferred": [
+      "RL environments",
+      "verifiers",
+      "eval frameworks",
+      "lm-evaluation-harness",
+      "HELM",
+      "accounting",
+      "finance"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8360497",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 10,
+     "years_required_text": "at least 10+ years of experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "distributed systems",
+      "general-purpose programming languages"
+     ],
+     "skills_preferred": [
+      "financial reconciliation",
+      "accounting systems",
+      "payments infrastructure",
+      "double-entry accounting",
+      "bank account verification",
+      "ACH",
+      "RTP",
+      "Ruby on Rails",
+      "TypeScript",
+      "React"
+     ],
+     "evidence": {
+      "years": "Successful applicants have at least 10+ years of experience and the enthusiasm for a collaborative, test-driven environment",
+      "clearance": null,
+      "location": "Listed locations: Denver, CO - Hybrid; New York, NY - Hybrid; San Francisco, CA - Hybrid; Seattle, WA - Remote",
+      "new_grad": "Successful applicants have at least 10+ years of experience and the enthusiasm for a collaborative, test-driven environment"
+     }
+    }
+   },
+   {
+    "id": "lever-9aadca04-df88-4b46-95d8-c3b2628b30b0",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 4,
+     "years_required_text": "4+ years of professional software engineering experience developing external system connectors",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Gradle",
+      "Multi-project builds"
+     ],
+     "skills_preferred": [
+      "Java",
+      "Python",
+      "Kafka",
+      "Kubernetes",
+      "Flink",
+      "Debezium",
+      "Iceberg",
+      "GitHub",
+      "Streaming data ingestion",
+      "Monorepo and asset distribution frameworks"
+     ],
+     "evidence": {
+      "years": "4+ years of professional software engineering experience developing external system connectors, with depth in areas such as developing batch and streaming data ingestion systems, third-party integration development, or monorepo and asset distribution frameworks.",
+      "clearance": null,
+      "location": "Listed locations: New York, NY",
+      "new_grad": "4+ years of professional software engineering experience developing external system connectors"
+     }
+    }
+   },
+   {
+    "id": "ashby-6f74767c-0e7a-446b-84bf-5c04c270cb13",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years at the intersection of biology and AI",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Biology",
+      "AI",
+      "LLMs"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2+ years at the intersection of biology and AI, with academic or industry experience evaluating and improving scientific models or LLMs for biological applications.",
+      "clearance": null,
+      "location": "Employees are expected to be on-site 5 days per week (Monday - Friday).",
+      "new_grad": "2+ years at the intersection of biology and AI, with academic or industry experience evaluating and improving scientific models or LLMs for biological applications."
+     }
+    }
+   },
+   {
+    "id": "ashby-5b744208-cb2c-4c31-9217-e0cbbf8ad7af",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 5,
+     "years_required_text": "5+ years of industry experience",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "distributed systems",
+      "infrastructure",
+      "data pipelines",
+      "scheduling",
+      "orchestration"
+     ],
+     "skills_preferred": [
+      "event ingestion",
+      "product analytics pipelines",
+      "OpenTelemetry",
+      "tracing",
+      "reliable data APIs",
+      "Spark",
+      "Flink",
+      "Ray",
+      "training-data infrastructure",
+      "run monitoring",
+      "cluster scheduling",
+      "job queues",
+      "node health"
+     ],
+     "evidence": {
+      "years": "5+ years of industry experience working with production distributed systems (e.g., infrastructure, ingestion, data pipelines, or scheduling/orchestration, etc.)",
+      "clearance": null,
+      "location": "We're in-person with cozy offices in North Beach, San Francisco, Palo Alto, and Manhattan, New York, complete with well-stocked libraries",
+      "new_grad": "5+ years of industry experience working with production distributed systems (e.g., infrastructure, ingestion, data pipelines, or scheduling/orchestration, etc.)"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8357913",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 3,
+     "years_required_text": "3-5 years of experience in security engineering, security operations, detection and response, or a related role",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "vulnerability management",
+      "SIEM",
+      "MITRE ATT&CK",
+      "GCP",
+      "AWS",
+      "IAM",
+      "Python",
+      "Go"
+     ],
+     "skills_preferred": [
+      "Sigma",
+      "CrowdStrike",
+      "SentinelOne",
+      "Tines",
+      "Torq",
+      "Kubernetes",
+      "container security",
+      "bug bounty",
+      "GCIH",
+      "GCIA",
+      "GCFA",
+      "OSCP"
+     ],
+     "evidence": {
+      "years": "3-5 years of experience in security engineering, security operations, detection and response, or a related role",
+      "clearance": null,
+      "location": "Listed locations: San Francisco",
+      "new_grad": "This is a hands-on role for an engineer early to mid-way in their career, with a defined path to Senior Security Engineer."
+     }
+    }
+   }
+  ],
+  [
+   {
+    "id": "greenhouse-4733115005",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Application security",
+      "Application platform security",
+      "Penetration testing",
+      "Threat modeling",
+      "Client-side security",
+      "API security",
+      "Secure coding practices",
+      "Cryptographic primitives and protocols",
+      "Networking protocols"
+     ],
+     "skills_preferred": [
+      "Go"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": "Listed locations: Remote (United States)",
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8338246",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years of professional software development experience",
+     "degree": "none",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "software development",
+      "data pipelines",
+      "Apache Spark",
+      "containerized services",
+      "batch jobs",
+      "data structures",
+      "algorithms",
+      "distributed systems",
+      "testing"
+     ],
+     "skills_preferred": [
+      "AWS",
+      "S3",
+      "IAM",
+      "EC2",
+      "MSK",
+      "metrics",
+      "logs",
+      "alerts",
+      "Parquet",
+      "AWS Glue",
+      "Apache Iceberg",
+      "Delta Lake",
+      "Kafka",
+      "Apache Flink",
+      "Spark Structured Streaming",
+      "Apache Airflow",
+      "Kubernetes",
+      "Docker",
+      "ETL",
+      "data permissions management",
+      "data discovery"
+     ],
+     "evidence": {
+      "years": "2+ years of professional software development experience, including building and operating data pipelines that feed into a customer facing product",
+      "clearance": null,
+      "location": "We offer a hybrid work environment. Most US-based positions can also be performed remotely (any exceptions will be noted in the Minimum Qualifications below.)",
+      "new_grad": "2+ years of professional software development experience, including building and operating data pipelines that feed into a customer facing product"
+     }
+    }
+   },
+   {
+    "id": "ashby-d7dfc19d-e508-4522-91fa-e31c3b612a47",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 7,
+     "years_required_text": "7+ years of experience as a software engineer",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "software engineering",
+      "Python",
+      "TypeScript",
+      "large-scale data pipelines",
+      "Spark",
+      "Kafka",
+      "Flink",
+      "data warehouses",
+      "SQL"
+     ],
+     "skills_preferred": [
+      "secure handling of quarantined content"
+     ],
+     "evidence": {
+      "years": "7+ years of experience as a software engineer",
+      "clearance": null,
+      "location": null,
+      "new_grad": "7+ years of experience as a software engineer"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8026199",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 4,
+     "years_required_text": "4+ years of professional software engineering experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Go",
+      "Java",
+      "Python",
+      "AI-assisted development tools",
+      "AWS",
+      "Microsoft Azure",
+      "Terraform",
+      "distributed datastores",
+      "caching",
+      "Kafka",
+      "distributed systems",
+      "data structures"
+     ],
+     "skills_preferred": [
+      "Docker",
+      "Kubernetes",
+      "OpenTelemetry",
+      "distributed tracing",
+      "network topology",
+      "proxy layers"
+     ],
+     "evidence": {
+      "years": "4+ years of professional software engineering experience building and operating resilient backend services at scale.",
+      "clearance": null,
+      "location": "This role will be remote, but is not eligible to be hired in CA, CT, NJ, NY, PA, WA.",
+      "new_grad": "4+ years of professional software engineering experience building and operating resilient backend services at scale."
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8334794",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years of experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "remote",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Kotlin",
+      "backend services",
+      "API lifecycle management",
+      "microservices",
+      "containerization"
+     ],
+     "skills_preferred": [
+      "DynamoDB",
+      "Java"
+     ],
+     "evidence": {
+      "years": "2+ years of experience in designing and implementing robust backend services using Kotlin.",
+      "clearance": null,
+      "location": "Listed locations: Remote US",
+      "new_grad": "2+ years of experience in designing and implementing robust backend services using Kotlin."
+     }
+    }
+   },
+   {
+    "id": "ashby-46912896-5a97-4955-ae27-1b110b3487ec",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "Python",
+      "data pipelines",
+      "ML evaluation systems",
+      "experimentation tooling",
+      "statistical reasoning",
+      "experimental design"
+     ],
+     "skills_preferred": [
+      "synthetic data",
+      "LLM evaluations",
+      "automated raters",
+      "preference data"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "ashby-d8925f84-562f-470c-a5bd-4f6c20009361",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": null,
+     "years_required_text": null,
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "unknown",
+     "skills_required": [
+      "LLM benchmarks",
+      "Python",
+      "software engineering",
+      "post-training",
+      "SFT",
+      "RL with verifiable rewards",
+      "SQL",
+      "large datasets"
+     ],
+     "skills_preferred": [
+      "RL environments",
+      "verifiers",
+      "lm-evaluation-harness",
+      "HELM",
+      "accounting",
+      "finance"
+     ],
+     "evidence": {
+      "years": null,
+      "clearance": null,
+      "location": null,
+      "new_grad": null
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8360497",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 10,
+     "years_required_text": "at least 10+ years of experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "hybrid",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "distributed systems",
+      "multiple general-purpose programming languages",
+      "double-entry accounting",
+      "financial data systems"
+     ],
+     "skills_preferred": [
+      "financial reconciliation",
+      "accounting systems",
+      "payments infrastructure",
+      "bank account verification",
+      "ACH",
+      "RTP",
+      "Ruby on Rails",
+      "TypeScript",
+      "React"
+     ],
+     "evidence": {
+      "years": "Successful applicants have at least 10+ years of experience and the enthusiasm for a collaborative, test-driven environment",
+      "clearance": null,
+      "location": "Listed locations: Denver, CO - Hybrid; New York, NY - Hybrid; San Francisco, CA - Hybrid; Seattle, WA - Remote",
+      "new_grad": "Successful applicants have at least 10+ years of experience"
+     }
+    }
+   },
+   {
+    "id": "lever-9aadca04-df88-4b46-95d8-c3b2628b30b0",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 4,
+     "years_required_text": "4+ years of professional software engineering experience",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "External system connectors",
+      "Streaming data ingestion",
+      "Gradle",
+      "Multi-project builds"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "4+ years of professional software engineering experience developing external system connectors, with depth in areas such as developing batch and streaming data ingestion systems, third-party integration development, or monorepo and asset distribution frameworks.",
+      "clearance": null,
+      "location": null,
+      "new_grad": "4+ years of professional software engineering experience developing external system connectors"
+     }
+    }
+   },
+   {
+    "id": "ashby-6f74767c-0e7a-446b-84bf-5c04c270cb13",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 2,
+     "years_required_text": "2+ years",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "Biology",
+      "AI",
+      "LLMs"
+     ],
+     "skills_preferred": [],
+     "evidence": {
+      "years": "2+ years at the intersection of biology and AI, with academic or industry experience evaluating and improving scientific models or LLMs for biological applications.",
+      "clearance": null,
+      "location": "Employees are expected to be on-site 5 days per week (Monday - Friday).",
+      "new_grad": "2+ years at the intersection of biology and AI, with academic or industry experience evaluating and improving scientific models or LLMs for biological applications."
+     }
+    }
+   },
+   {
+    "id": "ashby-5b744208-cb2c-4c31-9217-e0cbbf8ad7af",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 5,
+     "years_required_text": "5+ years of industry experience working with production distributed systems",
+     "degree": "bachelors",
+     "clearance_required": "unknown",
+     "location_type": "onsite",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "production distributed systems"
+     ],
+     "skills_preferred": [
+      "event ingestion",
+      "product analytics pipelines",
+      "OpenTelemetry",
+      "tracing",
+      "reliable data APIs",
+      "data frameworks",
+      "Spark",
+      "Flink",
+      "Ray",
+      "training-data infrastructure",
+      "run monitoring",
+      "cluster scheduling",
+      "job queues",
+      "node health"
+     ],
+     "evidence": {
+      "years": "5+ years of industry experience working with production distributed systems (e.g., infrastructure, ingestion, data pipelines, or scheduling/orchestration, etc.)",
+      "clearance": null,
+      "location": "We're in-person with cozy offices in North Beach, San Francisco, Palo Alto, and Manhattan, New York, complete with well-stocked libraries",
+      "new_grad": "5+ years of industry experience working with production distributed systems (e.g., infrastructure, ingestion, data pipelines, or scheduling/orchestration, etc.)"
+     }
+    }
+   },
+   {
+    "id": "greenhouse-8357913",
+    "status": "ok",
+    "attempts": 1,
+    "output": {
+     "years_required_min": 3,
+     "years_required_text": "3-5 years of experience in security engineering, security operations, detection and response, or a related role",
+     "degree": "unknown",
+     "clearance_required": "unknown",
+     "location_type": "unknown",
+     "is_new_grad_friendly": "no",
+     "skills_required": [
+      "vulnerability management",
+      "SIEM",
+      "incident response",
+      "MITRE ATT&CK",
+      "GCP",
+      "AWS",
+      "IAM",
+      "Python",
+      "Go",
+      "AI-assisted security operations"
+     ],
+     "skills_preferred": [
+      "detection-as-code",
+      "Sigma",
+      "EDR",
+      "CrowdStrike",
+      "SentinelOne",
+      "SOAR",
+      "Tines",
+      "Torq",
+      "Kubernetes",
+      "container security",
+      "bug bounty",
+      "GCIH",
+      "GCIA",
+      "GCFA",
+      "OSCP"
+     ],
+     "evidence": {
+      "years": "3-5 years of experience in security engineering, security operations, detection and response, or a related role",
+      "clearance": null,
+      "location": "Listed locations: San Francisco",
+      "new_grad": "This is a hands-on role for an engineer early to mid-way in their career, with a defined path to Senior Security Engineer."
+     }
+    }
+   }
+  ]
+ ]
+}

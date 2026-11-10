@@ -8,11 +8,14 @@ import { z } from "zod";
  * Version of the checks below. Part of the extraction cache key, so changing how answers are
  * validated re-runs extraction instead of serving results judged by old rules.
  * check-2: long quotes are trimmed instead of rejected; bullet markers ignored when matching quotes.
+ * check-6: a quote made of exact quotes joined with "; " (two bullets in one quote) is accepted.
+ * check-5: an ungrounded years_required_text is dropped (not a failure); "no/not require any experience"
+ *          supports years = 0 without the word "years".
  * check-4: same as check-3, but the benefits filter matches whole words (crypto ≠ PTO).
  * check-3: quotes must support the answer (number in the years quote, non-negated clearance,
  *          description-only except location, min length, grounded years text, new-grad evidence).
  */
-export const EXTRACTION_CHECK_VERSION = "check-4";
+export const EXTRACTION_CHECK_VERSION = "check-6";
 
 const MAX_QUOTE = 300;
 // A long quote is trimmed, not rejected: a prefix of a verified quote is still a verified quote.
@@ -104,16 +107,36 @@ function findQuote(quote: string, text: string): number {
   return canonical(text).indexOf(canonical(quote));
 }
 
+/**
+ * True if the quote is in the text, or (check-6) every "; "-separated part of it is. The model
+ * sometimes joins two requirement bullets with "; ". Each part is still copied word for word, so
+ * nothing is invented; every part must be long enough to be evidence on its own.
+ */
+function isQuoted(quote: string, text: string): boolean {
+  if (findQuote(quote, text) >= 0) return true;
+  const parts = quote.split(/;\s+/);
+  return parts.length > 1 && parts.every((part) => canonical(part).length >= MIN_QUOTE && findQuote(part, text) >= 0);
+}
+
 function mentionsNumber(quote: string, value: number): boolean {
   const digits = String(value).replace(".", "\\.");
   if (new RegExp(`(^|[^\\d.])${digits}([^\\d]|$)`).test(quote)) return true;
   const word = NUMBER_WORDS[value];
   if (word !== undefined && new RegExp(`\\b${word}\\b`, "i").test(quote)) return true;
-  return value === 0 && /\bno (professional |prior |previous )?experience\b/i.test(quote);
+  return value === 0 && NO_EXPERIENCE_NEEDED.test(quote);
+}
+
+// Explicit "zero experience" wording, which supports years = 0 without a number or the word "years":
+// "no professional experience required", "We do not require any formal experience".
+const NO_EXPERIENCE_NEEDED = /\b(no|not require( any)?|without( any)?)\s+(\w+\s+){0,2}experience\b/i;
+
+/** Keeps `years_required_text` only if it is an exact quote from the description; otherwise null. */
+export function groundedYearsText(text: string | null, source: SourceParts): string | null {
+  return text && canonical(text).length >= MIN_QUOTE && isQuoted(text, source.description) ? text : null;
 }
 
 /**
- * Grounding check (check-3). A quote must not only exist in the posting, it must support the
+ * Grounding check (check-6). A quote must not only exist in the posting, it must support the
  * answer: the years quote contains that number and is about experience; a clearance quote
  * mentions clearance and isn't negated ("No security clearance required"); only location
  * evidence may come from the header lines. Returns human-readable problems (empty = grounded).
@@ -125,8 +148,8 @@ export function groundingProblems(extraction: Extraction, source: SourceParts): 
 
   const quoteProblem = (field: string, quote: string, allowHeader: boolean): string | null => {
     if (canonical(quote).length < MIN_QUOTE) return `${field} is too short to be evidence: "${quote}"`;
-    if (findQuote(quote, source.description) >= 0) return null;
-    if (allowHeader && findQuote(quote, source.header) >= 0) return null;
+    if (isQuoted(quote, source.description)) return null;
+    if (allowHeader && isQuoted(quote, source.header)) return null;
     return `${field} is not an exact quote from the ${allowHeader ? "posting" : "description"}: "${quote.slice(0, 80)}"`;
   };
 
@@ -135,10 +158,8 @@ export function groundingProblems(extraction: Extraction, source: SourceParts): 
     const problem = quoteProblem(`evidence.${field}`, value, field === "location");
     if (problem) problems.push(problem);
   }
-  if (extraction.years_required_text) {
-    const problem = quoteProblem("years_required_text", extraction.years_required_text, false);
-    if (problem) problems.push(problem);
-  }
+  // years_required_text is a display summary, not evidence: an ungrounded one is dropped by
+  // groundedYearsText (check-5) instead of failing the whole answer.
 
   // Years: quote required, must contain the number, must be about experience.
   if (extraction.years_required_min !== null) {
@@ -148,7 +169,8 @@ export function groundingProblems(extraction: Extraction, source: SourceParts): 
       if (!mentionsNumber(quote, extraction.years_required_min)) {
         problems.push(`evidence.years doesn't contain ${extraction.years_required_min}: "${quote.slice(0, 80)}"`);
       }
-      if (!/\b(year|yr)s?\b/i.test(quote)) problems.push("evidence.years doesn't mention years");
+      const zeroStatedInWords = extraction.years_required_min === 0 && NO_EXPERIENCE_NEEDED.test(quote);
+      if (!zeroStatedInWords && !/\b(year|yr)s?\b/i.test(quote)) problems.push("evidence.years doesn't mention years");
       if (NOT_EXPERIENCE.test(canonical(quote))) problems.push("evidence.years is about benefits or the company, not the candidate's experience");
     }
   }

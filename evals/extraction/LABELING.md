@@ -2,7 +2,7 @@
 
 `cases.json` holds 16 real postings from `data/sample_postings.json` (matched by `source` + `sourceId`) with the **correct** values the extraction step should return. The eval in Phase 3 scores each prompt version against these labels. The labels are the spec: if the guide and the prompt disagree, the guide wins.
 
-**Status:** draft labels written by Claude; three were corrected after the Phase 2 independent review (Stripe, Twitch, Zoox). **A person must check them** before Phase 3 uses them. For each case, open the posting's text in `data/sample_postings.json`, read the `why` note, and confirm or fix each field. This takes about 20 minutes.
+**Status:** draft labels written by Claude; three were corrected after the Phase 2 independent review (Stripe, Twitch, Zoox). **No person has checked them**: the project owner chose an independent AI check instead (a blind relabel agreed on 80/80 fields, see `LABEL_AUDIT.md`). A human spot-check is still recommended. The separate held-out set (`holdout.json`) was labeled by another agent that could read only the rule sections below.
 
 ## Fields and rules
 

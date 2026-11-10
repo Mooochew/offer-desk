@@ -1,6 +1,6 @@
 # Offer Desk: Build Plan
 
-> CS4680 Assignment 4, AI Agent Project. Status: **confirmed**; Phases 0–3 done (Phase 3 pending its gate review), Phase 4 next. Decisions: see [Decisions](#decisions) and [DECISIONS.md](DECISIONS.md).
+> CS4680 Assignment 4, AI Agent Project. Status: **confirmed**; Phases 0–3 done (Phase 3 reviewed, fixes applied), Phase 4 next. Decisions: see [Decisions](#decisions) and [DECISIONS.md](DECISIONS.md).
 
 ## 1. What we're building
 
@@ -364,7 +364,7 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 **Checkpoint:** eval scores v1 vs v2 + a real triaged shortlist.
 
 ### Phase 4: Agent, tools, and safety (≈4 h, day 2)
-**Carried in from the Phase 2 review:** apply migration 0004 before any code writes `refs`/`files`/`messages`; short refs use `increment_counter` with a 10-year TTL (DECISIONS 032); truncate profile/notes in the state builder (S5); serve expired cache entries immediately and refresh within a deadline-bound budget; `maxDuration` 60 (DECISIONS 031).
+**Carried in from the Phase 3 review (DECISIONS 040):** per-turn deadline through search and triage with partial results, `maxDuration` 300; per-session/IP extraction budgets and a reserved share of the daily cap for agent calls; the agent never sees posting text, quotes or skills (ids/enums/scores only). **Carried in from the Phase 2 review:** apply migration 0004 before any code writes `refs`/`files`/`messages`; short refs use `increment_counter` with a 10-year TTL (DECISIONS 032); truncate profile/notes in the state builder (S5); serve expired cache entries immediately and refresh within a deadline-bound budget; `maxDuration` 60 (DECISIONS 031).
 **Goal:** natural language in, real actions out, every step validated and logged, with destructive actions held for confirmation.
 1. Tool registry + refs resolver + executor (validate → resolve → ownership check → log → run or hold).
 2. All tools from section 4.8, including file builders (CSV, Markdown, `.ics`) + Storage + signed URLs.
