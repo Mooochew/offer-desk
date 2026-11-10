@@ -1,0 +1,45 @@
+# Testing Standards
+
+Every phase ends at a **gate** (see [PLAN.md](PLAN.md#phase-gate)). A phase is not done until every step of its gate passes.
+
+## The layers
+
+| Layer | What it covers | Command | Runs where |
+|---|---|---|---|
+| **Static** | Lint + types | `npm run lint`, `npm run typecheck` | Local + CI |
+| **Unit** | Deterministic code (normalizers, dedupe, filters, scoring, validators, tool executor, confirmation flow, file builders) | `npm test` | Local + CI |
+| **Coverage** | Floors on `lib/**`: 80% lines, 80% functions, 75% branches | `npm run test:coverage` | Local + CI |
+| **Build** | Production build succeeds | `npm run build` | Local + CI |
+| **Live checks** | Real Supabase and the deployed URL: RLS isolation, session flow | `npm run check:rls`, `npm run check:live` | Local, at each gate |
+| **Prompt evals** | LLM extraction accuracy against hand-labeled postings (from Phase 3) | `npm run eval` | Local, when a prompt changes |
+| **Independent review** | Architecture, test quality, assignment alignment | Phase reviewer agent | At each gate |
+
+`npm run check` runs static + unit + coverage + build in one command. CI (`.github/workflows/ci.yml`) runs the same steps on every push to `main`.
+
+## Rules
+
+1. **Unit tests never touch the network or real services.** Supabase, OpenAI and job APIs are faked. Source normalizers are tested against small **recorded fixtures** saved from real responses (`tests/fixtures/`), so a test proves we handle what the API actually returns.
+2. **Test behavior, not implementation.** Test names say what must be true ("rejects a token Supabase does not accept"), so a failing test explains itself.
+3. **Every safety rule has a test that tries to break it.** For example: a destructive tool can't run without a confirmation record, an unknown ref is rejected, another session's ref is rejected, a secret key in a public variable fails config validation.
+4. **Every bug fix adds a test** that would have caught it. (Example: the missing `service_role` grants are now covered by `check:rls`.)
+5. **The LLM's output is untrusted input.** Validators are tested with malformed, partial and hostile LLM output, not just happy paths.
+6. **Live checks clean up after themselves.** Test users and rows they create are deleted at the end.
+7. **Prompt changes need numbers.** A change to an extraction or system prompt is run through the eval, and before/after scores go in PROMPTS.md.
+8. **No skipped or `.only` tests are committed**, and coverage floors are never lowered to make a gate pass.
+
+## Layout
+
+```
+tests/
+  lib/        unit tests mirroring lib/ (e.g. lib/triage/filter.ts → tests/lib/triage/filter.test.ts)
+  api/        route handler tests with faked dependencies
+  fixtures/   trimmed real API responses
+  stubs/      stand-ins for modules that can't load in tests (e.g. server-only)
+scripts/      live checks (check-*.ts, smoke-live.ts) and one-off tools
+evals/        labeled data for prompt evals
+```
+
+## Known quirks
+
+- **Vitest 5 + rejecting `vi.fn()` in a mocked module.** A `vi.fn()` that rejects inside a `vi.mock(...)` factory fails the test even when the code under test catches the error. For "this dependency fails" cases, use a plain function with a settable implementation (see `tests/api/health.test.ts`).
+- **`npm` optional dependency bug.** If Vitest says "Cannot find native binding" (rolldown), delete `node_modules` and `package-lock.json` and run `npm install` again. Don't add the platform binary as a direct dependency, because CI runs on Linux.

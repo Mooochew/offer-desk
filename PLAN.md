@@ -311,7 +311,16 @@ All tools: zod schema, `destructive` flag, ownership-checked refs, logged. Unkno
 
 ## 6. Phases
 
-Estimates assume working with Claude Code. Total is about 20 focused hours over 2 days. **Each phase ends with a checkpoint where you review before we move on.**
+Estimates assume working with Claude Code. Total is about 20 focused hours over 2 days. **Each phase ends with a gate, then a checkpoint where you review before we move on.**
+
+### Phase gate
+
+Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.md)):
+1. **Tests for the phase's work** are written to TESTING.md's rules (behavior-focused, failure paths, safety rules attacked, fixtures from real responses).
+2. **`npm run check` passes** (lint, types, unit tests with coverage floors, build), and **CI is green** on GitHub.
+3. **Live checks pass** after deploying: `npm run check:rls` and `npm run check:live`, plus any phase-specific live check.
+4. **Independent review:** the `phase-reviewer` agent (`.claude/agents/phase-reviewer.md`) starts with no context from the build, re-reads the assignment, PLAN, DECISIONS and TESTING, runs the checks itself, and writes `reviews/phase-N.md` with a verdict. **BLOCK** findings get fixed before moving on. Other findings are fixed or recorded in DECISIONS.md with a reason.
+5. **Your checkpoint:** you review the summary and say go.
 
 ### Phase 0: Verify and set up (≈1.5 h, day 1)
 **Goal:** no surprises from external services, and all accounts ready.
