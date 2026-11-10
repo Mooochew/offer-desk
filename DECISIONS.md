@@ -66,3 +66,12 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 012. Supabase publishable/secret keys
 - **What:** Use Supabase's new API keys: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_...`, browser) and `SUPABASE_SECRET_KEY` (`sb_secret_...`, server only).
 - **Why:** The project dashboard issues these by default; they replace the legacy `anon` / `service_role` JWT keys. Naming the env vars after them avoids mixing them up.
+
+## 013. Bearer-token auth instead of cookie sessions
+- **What:** The browser keeps the Supabase session (supabase-js default, localStorage) and sends `Authorization: Bearer <access token>` to our API routes. Each route verifies the token with `auth.getUser` and creates a Supabase client scoped to that token, so Row Level Security still applies. No `@supabase/ssr`, no `proxy.ts`.
+- **Why:** The app is one page that talks to API routes; server components never need the user. Next.js 16 renamed middleware to `proxy.ts`, and with `cacheComponents` on, reading cookies in pages forces Suspense boundaries. Tokens in headers avoid both, and POST route handlers always run per request. Tested locally: valid token → 200, missing or fake token → 401.
+- **Alternatives:** `@supabase/ssr` cookie sessions with a `proxy.ts` refresh (more moving parts, no benefit for a single-page app).
+
+## 014. Next.js 16 + `@types/node` 24
+- **What:** Scaffolded with create-next-app (Next 16.4, React 19.3, Tailwind 4, Turbopack). Bumped `@types/node` from 20 to 24 to match the local Node 24 and satisfy vitest 5's peer dependency.
+- **Why:** Forcing the install (`--legacy-peer-deps`) would hide a real version mismatch.

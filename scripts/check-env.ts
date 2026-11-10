@@ -30,6 +30,8 @@ async function check(label: string, url: string, headers: Record<string, string>
   }
 }
 
+export {}; // makes this file a module so top-level await type-checks
+
 const base = supabaseUrl.replace(/\/$/, "");
 const publishable = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
 

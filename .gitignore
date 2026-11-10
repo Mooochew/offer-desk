@@ -30,3 +30,6 @@ npm-debug.log*
 
 # course handout (not part of the project)
 CS4680 Assignment 4 - AI Agent Project.txt
+
+# keys/certs
+*.pem
