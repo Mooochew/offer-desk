@@ -8,10 +8,11 @@ import { z } from "zod";
  * Version of the checks below. Part of the extraction cache key, so changing how answers are
  * validated re-runs extraction instead of serving results judged by old rules.
  * check-2: long quotes are trimmed instead of rejected; bullet markers ignored when matching quotes.
+ * check-4: same as check-3, but the benefits filter matches whole words (crypto ≠ PTO).
  * check-3: quotes must support the answer (number in the years quote, non-negated clearance,
  *          description-only except location, min length, grounded years text, new-grad evidence).
  */
-export const EXTRACTION_CHECK_VERSION = "check-3";
+export const EXTRACTION_CHECK_VERSION = "check-4";
 
 const MAX_QUOTE = 300;
 // A long quote is trimmed, not rejected: a prefix of a verified quote is still a verified quote.
@@ -94,7 +95,8 @@ export type SourceParts = { header: string; description: string };
 const MIN_QUOTE = 8;
 const NUMBER_WORDS: Record<number, string> = { 0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten" };
 // Year counts that are about the company or benefits, not the candidate's experience.
-const NOT_EXPERIENCE = /vest|anniversary|founded|for over \d+ years|holiday|401\(?k\)?|pto|paid time off/;
+// Whole words only: "pto" once matched inside "crypto" and rejected Coinbase's real requirement.
+const NOT_EXPERIENCE = /\b(vest(s|ed|ing)?|anniversary|founded|holidays?|401\(?k\)?|pto|paid time off)\b|for over \d+ years/;
 const NEGATION = /\b(no|not|without|never|nor)\b|n't\b/;
 
 /** Index of the quote in the canonical text, or -1. */

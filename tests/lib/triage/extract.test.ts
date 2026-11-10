@@ -77,6 +77,18 @@ We are an equal opportunity employer.`);
       expect(groundingProblems(vesting, tricky)).toContainEqual(expect.stringContaining("benefits or the company"));
     });
 
+    // Regression from the check-3 eval: "pto" matched inside "crypto" and rejected Coinbase's real requirement.
+    it("accepts an experience quote that merely contains benefit-like letters (crypto ≠ PTO)", () => {
+      const coinbase = withText("2+ years of software engineering experience building backend systems, ideally in fintech, payments, or crypto.");
+      const ok = extraction({
+        years_required_min: 2,
+        years_required_text: null,
+        location_type: "unknown",
+        evidence: { years: "2+ years of software engineering experience building backend systems, ideally in fintech, payments, or crypto.", clearance: null, location: null, new_grad: null },
+      });
+      expect(groundingProblems(ok, coinbase)).toEqual([]);
+    });
+
     it("rejects clearance=yes cut out of a negated sentence", () => {
       const negated = extraction({ clearance_required: "yes", evidence: { ...extraction().evidence, clearance: "security clearance required" } });
       expect(groundingProblems(negated, tricky)).toContainEqual(expect.stringContaining("is negated"));
