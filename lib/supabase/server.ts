@@ -1,7 +1,8 @@
 import "server-only";
 
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
-import { getServerEnv, publicEnv } from "@/lib/env";
+import { publicEnv } from "@/lib/env/public";
+import { getServerEnv } from "@/lib/env/server";
 
 const noSessionStorage = { persistSession: false, autoRefreshToken: false };
 
@@ -17,8 +18,10 @@ export function createUserSupabase(accessToken: string): SupabaseClient {
 }
 
 /**
- * Privileged client that bypasses Row Level Security. Only for shared tables
- * (postings, extractions, caches, quotas). Never use it for user-owned data.
+ * Privileged client that bypasses Row Level Security. Use it for shared tables (postings,
+ * extractions, caches, counters) and for server-written user rows that users may only read
+ * (action_log, refs, files, result_sets, messages). Every user-row write must set user_id from
+ * a session verified by requireUser, never from client input.
  */
 export function createAdminSupabase(): SupabaseClient {
   return createClient(publicEnv.supabaseUrl, getServerEnv().supabaseSecretKey, {

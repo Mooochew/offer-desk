@@ -1,16 +1,6 @@
+import "server-only";
+
 import { z } from "zod";
-
-// Public values are inlined into the browser bundle, so they must be read with literal
-// `process.env.NEXT_PUBLIC_*` access (Next.js replaces these at build time).
-const publicSchema = z.object({
-  supabaseUrl: z.url(),
-  supabasePublishableKey: z.string().startsWith("sb_publishable_"),
-});
-
-export const publicEnv = publicSchema.parse({
-  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  supabasePublishableKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-});
 
 const serverSchema = z.object({
   openaiApiKey: z.string().min(1),
@@ -25,7 +15,7 @@ export type ServerEnv = z.infer<typeof serverSchema>;
 
 let cachedServerEnv: ServerEnv | null = null;
 
-/** Reads and validates server-only env vars. Call only from server code. */
+/** Reads and validates server-only env vars. The `server-only` import keeps this out of browser bundles. */
 export function getServerEnv(): ServerEnv {
   if (cachedServerEnv) return cachedServerEnv;
 

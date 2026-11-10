@@ -79,3 +79,31 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 015. Explicit grants for every role
 - **What:** Migrations grant table access explicitly: `authenticated` on user tables (RLS still applies), `service_role` on everything (0003), nothing for `anon`.
 - **Why:** This Supabase project doesn't auto-grant new tables to its roles. The RLS check script caught it: the server got "permission denied for table counters". Explicit grants make the access rules readable in one place instead of depending on project defaults.
+
+## 016. One `counters` table and a versioned extraction cache (schema drift recorded)
+- **What:** The planned `quota` and `rate_limits` tables became one `counters` table (`key`, `count`, `expires_at`) with an atomic `increment_counter` function. The `extractions` cache key is `(description_hash, prompt_version, model)` instead of `description_hash` alone.
+- **Why:** Rate limits and quotas are the same operation (count within a time bucket), so one table and one atomic function cover per-session, per-IP, OpenAI and Adzuna limits. Versioning the extraction cache keeps the prompt v1→v2 eval honest: changing the prompt or model never serves stale results. Flagged as undocumented drift by the Phase 1 review (S5).
+
+## 017. Adzuna deferred
+- **What:** Adzuna stays optional and is not built in Phase 2. Its Phase 0 item (confirm description truncation) is closed as "not tested; no key".
+- **Why:** No key yet, and it may be a short trial that expires during grading. The three ATS sources need no key, give full descriptions, and cover 153 verified company boards. If a key shows up, the source interface makes it a small add. Recorded per Phase 1 review N7.
+
+## 018. Rate limit per session and per IP
+- **What:** In Phase 4, chat requests are limited per session (15/hour) **and** per IP (hashed, e.g. 30/hour), on top of the global 500 OpenAI requests/day.
+- **Why:** Anyone can mint new anonymous sessions, so a per-session limit alone is easy to bypass (Phase 1 review N5). The per-IP limit protects the shared daily cap, which is what keeps the demo usable for graders. The IP is hashed before storage.
+
+## 019. Server-written user tables; race-safe confirm and refs (Phase 1 review S1, S4, N8)
+- **What:** `refs`, `files`, `result_sets`, `messages` and `action_log` are read-only for users; the server writes them with the admin client, always taking `user_id` from a session verified by `requireUser`. File `storage_path` must start with the owner's id (database check). In Phase 4, confirming an action is one conditional update (`… where id = $1 and user_id = $2 and status = 'awaiting_confirmation' and expires_at > now() returning *`), so a double click can't execute twice; short refs are numbered with `increment_counter('ref:<user>:<kind>')`.
+- **Why:** The review showed users could insert a `files` row pointing at another user's file, which the server would sign with its secret key. Making the server the only writer closes that and fake refs/system messages. Users still write `profiles` and `applications` directly; RLS keeps those to their own rows and they hold nothing the server trusts blindly.
+
+## 020. shadcn/ui deferred to Phase 5
+- **What:** shadcn/ui (plan D8) was not installed in Phase 1; it is installed in Phase 5 with the real UI.
+- **Why:** Phase 1's shell is three placeholder panels; adding a component library before any component exists is setup with no payoff. Tailwind is installed. Recorded per review S6.
+
+## 021. Start the extraction eval during Phase 2
+- **What:** Phase 2 collects about 15 real postings for the extraction eval (from the snapshot) and drafts their labels. The user checks the labels before Phase 3 uses them.
+- **Why:** The Phase 1 review warned that day 2 (Phases 3–6, about 13 hours) holds all of the prompt engineering (20%), UI (10%) and demo (30%) points. Labeling is the one Phase 3 task that only needs Phase 2's data, so moving it earlier takes about an hour off day 2.
+
+## 022. Split env config into public and server modules
+- **What:** `lib/env/public.ts` (browser-safe) and `lib/env/server.ts` (imports `server-only`).
+- **Why:** The Phase 1 review found the server env schema (variable names, no values) in the browser bundle, because the browser client imported the shared module. Now the build fails if server config is ever imported from client code.

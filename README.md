@@ -12,4 +12,9 @@ Next.js (App Router, TypeScript) on Vercel · Supabase (Postgres, anonymous auth
 
 ## Setup
 
-Coming in Phase 1. Environment variables are listed in [.env.example](.env.example).
+1. `npm install`
+2. Copy `.env.example` to `.env.local` and fill in the values.
+3. Apply the SQL files in `supabase/migrations/` in order (Supabase Dashboard → SQL Editor).
+4. `npm run dev`, then open http://localhost:3000.
+
+Checks: `npm run check` (lint, types, tests, build), `npm run check:rls` (database security against your Supabase project), `npm run check:live` (the deployed site). See [TESTING.md](TESTING.md).

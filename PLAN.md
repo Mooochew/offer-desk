@@ -1,6 +1,6 @@
 # Offer Desk: Build Plan
 
-> CS4680 Assignment 4, AI Agent Project. Status: **draft, waiting for confirmation** (see [Decisions to confirm](#decisions-to-confirm)).
+> CS4680 Assignment 4, AI Agent Project. Status: **confirmed**; Phases 0–1 done, Phase 2 in progress. Decisions: see [Decisions](#decisions) and [DECISIONS.md](DECISIONS.md).
 
 ## 1. What we're building
 
@@ -142,7 +142,7 @@ DECISIONS.md  PROMPTS.md  README.md  .env.example
 | `extractions` | posting_id, description_hash (unique), extracted jsonb, status (`ok`/`failed`), confidence (`full`/`truncated`), model, prompt_version |
 | `board_cache` | key (`ats:slug`), jobs jsonb (normalized light list), fetched_at, expires_at, status |
 | `search_cache` | key (hash of source + normalized query + location + page), posting_ids[], status jsonb, expires_at (Adzuna only) |
-| `quota` | key (e.g. `adzuna:2026-11-09`, `openai:2026-11-09`), count |
+| `counters` | key (e.g. `adzuna:2026-11-09`, `openai:2026-11-09`, `user:<id>:<hour>`, `ip:<hash>:<hour>`), count, expires_at. Replaces the planned `quota` and `rate_limits` tables (DECISIONS 016) |
 
 **User-owned** (Row Level Security: `user_id = auth.uid()` on every table):
 
@@ -155,7 +155,6 @@ DECISIONS.md  PROMPTS.md  README.md  .env.example
 | `files` | id, user_id, kind (`csv/checklist/ics`), storage_path, supersedes_id, created_at |
 | `messages` | id, user_id, turn_id, role, content (only the final text, used for the last-3-turns context) |
 | `action_log` | id, user_id, turn_id, tool, args jsonb, resolved_args jsonb, preview jsonb, status, result_summary, error, duration_ms, created_at, expires_at |
-| `rate_limits` | user_id, window_start, count |
 
 `action_log.status` moves through: `proposed → invalid | executed | failed | awaiting_confirmation → (confirmed → executed | failed) | rejected | expired`.
 
@@ -226,7 +225,7 @@ prefilter in code (title seniority words,       ├─ "why matched" line from f
 - **Greenhouse two-pass fetch:** a board with `content=true` can be several MB (Stripe: 5.9 MB, 12.5x the list). Fetch the list first, match titles in code, then fetch content only for the matches.
 - **Cache per board (DECISIONS 005):** each board's normalized job list is cached about 6 hours and the query filter runs in code over the cache, because Lever and Ashby boards can be several MB with no light list mode. The per-query `search_cache` is kept only for Adzuna.
 - **Lever descriptions (DECISIONS 007):** requirements live in `lists[]`, so the description is built from intro + lists + additional.
-- **Adzuna:** used only when `ADZUNA_APP_ID`/`ADZUNA_APP_KEY` are set and the daily global budget (e.g. 150 calls/day in `quota`) isn't used up. If descriptions are truncated (to verify in Phase 0), extraction is marked `confidence: truncated`, and fields not found stay `unknown`. Never guessed.
+- **Adzuna:** used only when `ADZUNA_APP_ID`/`ADZUNA_APP_KEY` are set and the daily global budget (100 calls/day in `counters`) isn't used up. **Deferred:** no key yet (DECISIONS 017). If descriptions are truncated (to verify in Phase 0), extraction is marked `confidence: truncated`, and fields not found stay `unknown`. Never guessed.
 - **Snapshot fallback:** `data/sample_postings.json` (a real snapshot taken with a script before deploy) is used by "Seed sample pipeline", and by search **only if every live source fails**. The UI marks those results as a snapshot.
 
 ### 4.7 Extraction (the main prompt-engineering piece)
@@ -280,7 +279,7 @@ All tools: zod schema, `destructive` flag, ownership-checked refs, logged. Unkno
 | Tool calls per turn | 6 |
 | Postings extracted per triage | 25 |
 | Bulk operation size | 100 records |
-| Global OpenAI requests / day | 500 (`quota` table), plus a **$5–10 monthly spend limit set in the OpenAI dashboard** |
+| Global OpenAI requests / day | 500 (`counters` table), plus a **$5–10 monthly spend limit set in the OpenAI dashboard** |
 | Global Adzuna calls / day | 100 |
 | Retries | 3 attempts with growing waits + jitter for 429/5xx, honors `Retry-After` |
 | Search cache TTL | 6 hours; extraction cache permanent (by description hash) |
@@ -345,7 +344,7 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 **Goal:** `searchJobs()` returns normalized, deduped postings from all sources, with caching and per-source status.
 1. `Posting` type + per-source clients and normalizers (HTML decode and strip for Greenhouse, millisecond timestamps for Lever, etc.).
 2. Fan-out with concurrency limit, per-call timeout, `withRetry`, and per-source status.
-3. `search_cache` read/write, the `quota` guard for Adzuna.
+3. `board_cache` read/write (per board, 6 h), `search_cache` + daily `counters` guard for Adzuna (when enabled).
 4. Dedupe + prefilter in code.
 5. `data/ats_boards.json` seed (about 150 tech companies, with tags) + `scripts/verify-boards.ts` to drop dead slugs.
 6. `scripts/snapshot-postings.ts` → `data/sample_postings.json`.
@@ -370,7 +369,7 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 3. `prompts/system.v1.md` (role, grounding rules, clarifying questions, smallest-action rule, confirmation rule).
 4. Agent loop with the state summary, last 3 turns, a 6-call cap, and turn events.
 5. Confirm/reject endpoints, expiry, system note after the outcome.
-6. Rate limits + global OpenAI quota + `maxDuration`.
+6. Rate limits (per session **and per IP**, DECISIONS 018) + global OpenAI quota + `maxDuration`. Confirm is one atomic conditional update; refs numbered with an atomic counter (DECISIONS 019).
 7. Tests: confirmation flow (can't run without a record, stored args are used, expired actions refused), `.ics` dates/timezone, ref ownership.
 8. Run the demo script's prompts from a script; save any failures to PROMPTS.md (e.g. the model claiming "deleted" before confirmation → rule added).
 

@@ -29,7 +29,19 @@ describe("POST /api/health", () => {
     fakeRequireUser = async () => ({ user: { id: "abc", is_anonymous: true } });
     const response = await callHealth();
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ ok: true, userId: "abc", isAnonymous: true });
+    expect(await response.json()).toEqual({ ok: true, userId: "abc", isAnonymous: true, serverEnvOk: true });
+  });
+
+  it("reports serverEnvOk false (without values) when a server secret is missing", async () => {
+    vi.stubEnv("SUPABASE_SECRET_KEY", "");
+    vi.resetModules();
+    const { POST: freshPost } = await import("@/app/api/health/route");
+    fakeRequireUser = async () => ({ user: { id: "abc" } });
+
+    const body = await (await freshPost(new Request("http://localhost/api/health", { method: "POST" }))).json();
+    expect(body.serverEnvOk).toBe(false);
+    expect(JSON.stringify(body)).not.toContain("sb_secret");
+    vi.unstubAllEnvs();
   });
 
   it("returns 401 for a missing or bad session", async () => {
@@ -47,7 +59,12 @@ describe("POST /api/health", () => {
     fakeRequireUser = async () => {
       throw new Error("supabase down");
     };
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
     const response = await callHealth();
     expect(response.status).toBe(500);
+    // Internal details are logged, not returned to the client.
+    expect(await response.json()).toEqual({ ok: false, error: "Internal error" });
+    expect(consoleError).toHaveBeenCalled();
+    consoleError.mockRestore();
   });
 });

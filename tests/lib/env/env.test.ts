@@ -2,7 +2,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 async function loadEnv() {
   vi.resetModules();
-  return import("@/lib/env");
+  const [publicModule, serverModule] = await Promise.all([
+    import("@/lib/env/public"),
+    import("@/lib/env/server"),
+  ]);
+  return { ...publicModule, ...serverModule };
 }
 
 afterEach(() => {

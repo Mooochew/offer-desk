@@ -22,7 +22,6 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["lib/**/*.ts"],
-      exclude: ["lib/supabase/browser.ts"],
       // Floors for deterministic code; raised as phases add core logic (see TESTING.md).
       thresholds: { lines: 80, functions: 80, branches: 75 },
     },

@@ -34,6 +34,9 @@ for (const label of ["session A", "session B"]) {
   });
   const body = await response.json();
   check(`${label} accepted by live API`, response.ok && body.userId === data.user!.id, `HTTP ${response.status}`);
+  if (label === "session A") {
+    check("server secrets are configured on the deployment", body.serverEnvOk === true);
+  }
 }
 check("sessions are distinct", userIds.length === 2 && userIds[0] !== userIds[1]);
 
