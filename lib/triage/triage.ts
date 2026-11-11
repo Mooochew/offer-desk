@@ -12,7 +12,7 @@ export const DEFAULT_MAX_EXTRACT = 25;
 export type TriagedJob = { job: BoardJob; extraction: Extraction; score: JobScore; why: string };
 export type DroppedJob = { job: BoardJob; extraction: Extraction; reason: DropReason; evidence: string | null };
 /** Postings whose requirements couldn't be read: kept visible, never silently dropped. */
-export type UnreadJob = { job: BoardJob; reason: "no description" | "extraction failed" | "AI unavailable" | "time limit"; detail: string | null };
+export type UnreadJob = { job: BoardJob; reason: "no description" | "extraction failed" | "AI unavailable" | "AI limit reached" | "time limit"; detail: string | null };
 
 /** Counts for the UI ("… → 25 checked → 12 left"), continuing the search breakdown. */
 export type TriageBreakdown = {
@@ -68,8 +68,9 @@ export async function triageJobs(jobs: readonly BoardJob[], profile: Profile, fi
     })),
     deps,
   );
-  for (const { id, error } of extracted.apiErrors) {
-    unread.push({ job: readable.find((job) => job.postingId === id)!, reason: "AI unavailable", detail: error });
+  for (const { id, error, quota } of extracted.apiErrors) {
+    // A used-up budget is its own state, not an outage (Phase 3 review S6).
+    unread.push({ job: readable.find((job) => job.postingId === id)!, reason: quota ? "AI limit reached" : "AI unavailable", detail: error });
   }
   for (const id of extracted.outOfTime) {
     unread.push({ job: readable.find((job) => job.postingId === id)!, reason: "time limit", detail: null });

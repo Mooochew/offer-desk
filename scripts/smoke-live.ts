@@ -43,6 +43,12 @@ check("sessions are distinct", userIds.length === 2 && userIds[0] !== userIds[1]
 const noToken = await fetch(`${liveUrl}/api/health`, { method: "POST" });
 check("request without a session is rejected", noToken.status === 401, `HTTP ${noToken.status}`);
 
+// Phase 4 routes exist on the deployment and refuse anonymous callers (no model call is made).
+for (const path of ["/api/agent", "/api/demo/profile", "/api/demo/seed", "/api/actions/123e4567-e89b-42d3-a456-426614174000/confirm"]) {
+  const response = await fetch(`${liveUrl}${path}`, { method: "POST", body: "{}" });
+  check(`${path} rejects a request without a session`, response.status === 401, `HTTP ${response.status}`);
+}
+
 for (const id of userIds) await admin.auth.admin.deleteUser(id);
 
 console.log(failures === 0 ? "\nLive smoke test passed." : `\n${failures} check(s) FAILED.`);

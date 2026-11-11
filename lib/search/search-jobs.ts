@@ -18,6 +18,8 @@ export type SearchResult = {
   failures: { board: string; error: string }[];
   /** True when every live source failed and the bundled snapshot was used instead. */
   usedSnapshot: boolean;
+  /** Boards served from an expired cache (with `serveStale`); refresh them after responding. */
+  staleBoards: Board[];
 };
 
 export type SearchDeps = Omit<RefreshOptions, "now"> & {
@@ -65,5 +67,6 @@ export async function searchJobs(criteria: SearchCriteria, deps: SearchDeps): Pr
     sources: summarizeSources(results),
     failures: results.filter((result) => result.error).map((result) => ({ board: result.board.name, error: result.error! })),
     usedSnapshot,
+    staleBoards: results.filter((result) => result.needsRefresh).map((result) => result.board),
   };
 }

@@ -1,3 +1,4 @@
+import { QuotaExceededError } from "@/lib/llm/openai";
 import { descriptionHash } from "@/lib/sources/normalize";
 import { mapWithConcurrency } from "@/lib/util/concurrency";
 import { EXTRACTION_CHECK_VERSION, groundingProblems, type Extraction } from "./schema";
@@ -27,7 +28,7 @@ export type ExtractManyResult = {
   cacheHits: number;
   modelCalls: number;
   /** Postings skipped because of API errors (quota, outage); not cached, can be retried later. */
-  apiErrors: { id: string; error: string }[];
+  apiErrors: { id: string; error: string; quota: boolean }[];
   /** Postings not started because the request deadline passed. */
   outOfTime: string[];
   /** Cache writes that failed. The extraction is still returned (it was already paid for). */
@@ -68,7 +69,7 @@ export async function extractMany(postings: { id: string; text: PostingText }[],
 
   let modelCalls = 0;
   let saveErrors = 0;
-  const apiErrors: { id: string; error: string }[] = [];
+  const apiErrors: ExtractManyResult["apiErrors"] = [];
   const outOfTime: string[] = [];
 
   const settled = await mapWithConcurrency(misses, deps.concurrency ?? 6, async (posting): Promise<CachedExtraction | null> => {
@@ -92,7 +93,7 @@ export async function extractMany(postings: { id: string; text: PostingText }[],
 
   settled.forEach((result, index) => {
     const id = misses[index].id;
-    if (!result.ok) apiErrors.push({ id, error: (result.error as Error).message });
+    if (!result.ok) apiErrors.push({ id, error: (result.error as Error).message, quota: result.error instanceof QuotaExceededError });
     else if (result.value) results.set(id, result.value);
   });
 

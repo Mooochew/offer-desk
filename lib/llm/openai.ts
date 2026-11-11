@@ -1,14 +1,26 @@
 import "server-only";
 
 import OpenAI, { APIError } from "openai";
-import type { ResponseCreateParamsNonStreaming } from "openai/resources/responses/responses";
+import type { ResponseCreateParamsNonStreaming, ResponseOutputItem } from "openai/resources/responses/responses";
 import { getServerEnv } from "@/lib/env/server";
 import { HttpError, parseRetryAfter, withRetry, type RetryOptions } from "@/lib/http/retry";
 
-/** The daily OpenAI request cap for the whole app was reached (DECISIONS 003). */
+export type QuotaScope = "daily" | "session" | "ip";
+
+/**
+ * An AI request budget was used up: the app's daily cap (DECISIONS 003), or this session's / this
+ * network's hourly extraction budget (DECISIONS 040).
+ */
 export class QuotaExceededError extends Error {
-  constructor(readonly limit: number) {
-    super(`Daily AI request limit (${limit}) reached. Try again tomorrow.`);
+  constructor(
+    readonly limit: number,
+    readonly scope: QuotaScope = "daily",
+  ) {
+    super(
+      scope === "daily"
+        ? `Daily AI request limit (${limit}) reached. Try again tomorrow.`
+        : `Hourly AI reading limit for this ${scope === "session" ? "session" : "network"} (${limit}) reached. Try again in an hour.`,
+    );
   }
 }
 
@@ -20,7 +32,13 @@ export class QuotaCounterError extends Error {
 }
 
 /** The part of a Responses API result the app uses. */
-export type LlmResponse = { output_text: string; status?: string | null; usage?: { input_tokens: number; output_tokens: number } | null };
+export type LlmResponse = {
+  output_text: string;
+  /** Output items (function calls, messages, reasoning); used by the agent loop. */
+  output?: ResponseOutputItem[];
+  status?: string | null;
+  usage?: { input_tokens: number; output_tokens: number } | null;
+};
 
 /** Calls the model once. Injected so tests and evals can swap it. */
 export type CreateResponse = (params: ResponseCreateParamsNonStreaming) => Promise<LlmResponse>;

@@ -9,3 +9,9 @@ export type ExtractionPrompt = {
   instructions: string;
   examples: ExtractionExample[];
 };
+
+/** A versioned system prompt for the tool-using agent. */
+export type AgentPrompt = {
+  version: string;
+  instructions: string;
+};

@@ -43,6 +43,18 @@ describe("loadBoards", () => {
     expect(live.calls).toEqual([]);
   });
 
+  // DECISIONS 031: graders arrive days after the cache was warmed; don't make them wait for it.
+  it("with serveStale, serves an expired entry at once and marks it for a later refresh", async () => {
+    const expired = entry({ expiresAt: new Date(NOW - HOUR).toISOString() });
+    const { store } = memoryStore({ "greenhouse:a": expired, "greenhouse:b": entry({ expiresAt: new Date(NOW - HOUR).toISOString(), status: "error", jobs: [] }) });
+    const live = fetcher();
+    const [stale, failedBefore] = await loadBoards([board("a"), board("b")], { ...base, store, fetchBoard: live.fetchBoard, serveStale: true });
+    expect(stale).toMatchObject({ outcome: "stale", needsRefresh: true, jobs: expired.jobs });
+    // An entry with nothing to serve is still refreshed inline.
+    expect(failedBefore.outcome).toBe("refreshed");
+    expect(live.calls).toEqual(["b"]);
+  });
+
   it("refreshes an expired entry, keeps only engineering jobs, and stores them", async () => {
     const { store, entries, savedPostings } = memoryStore({ "greenhouse:a": entry({ expiresAt: new Date(NOW - 1).toISOString() }) });
     const live = fetcher([normalizedJob({ title: "Backend Engineer" }), normalizedJob({ title: "Account Executive" })]);

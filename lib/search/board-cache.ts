@@ -28,7 +28,14 @@ export type BoardOutcome =
   | "failed" // refresh failed and nothing cached
   | "skipped"; // over the refresh budget and nothing cached
 
-export type BoardResult = { board: Board; outcome: BoardOutcome; jobs: BoardJob[]; error?: string };
+export type BoardResult = {
+  board: Board;
+  outcome: BoardOutcome;
+  jobs: BoardJob[];
+  error?: string;
+  /** Served from an expired cache entry; the caller should refresh it after responding. */
+  needsRefresh?: boolean;
+};
 
 export type RefreshOptions = {
   store: BoardStore;
@@ -42,6 +49,11 @@ export type RefreshOptions = {
   maxRefreshes?: number;
   /** Stop starting new fetches after this many ms. */
   budgetMs?: number;
+  /**
+   * Serve an expired (but successful) cache entry immediately instead of refreshing it inline;
+   * the result is marked `needsRefresh` (stale-while-revalidate, DECISIONS 031).
+   */
+  serveStale?: boolean;
 };
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -101,6 +113,7 @@ export async function loadBoards(boards: readonly Board[], input: RefreshOptions
     // budget below is what protects the Vercel function limit.
     maxRefreshes: 60,
     budgetMs: 25_000,
+    serveStale: false,
     ...input,
   };
   const started = options.now();
@@ -115,6 +128,9 @@ export async function loadBoards(boards: readonly Board[], input: RefreshOptions
       return cached.status === "ok"
         ? { board, outcome: "cached", jobs: cached.jobs }
         : { board, outcome: cached.jobs.length ? "stale" : "failed", jobs: cached.jobs, error: cached.error ?? undefined };
+    }
+    if (cached && options.serveStale && cached.status === "ok" && cached.jobs.length) {
+      return { board, outcome: "stale", jobs: cached.jobs, needsRefresh: true };
     }
 
     const overBudget = refreshesStarted >= options.maxRefreshes || options.now() - started > options.budgetMs;

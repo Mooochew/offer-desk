@@ -1,6 +1,6 @@
 # Handoff: Offer Desk (CS4680 Assignment 4)
 
-Updated 2026-11-10 after the **Phase 3 review fixes were finished**. Read this first, then `PLAN.md` (phases), `DECISIONS.md` (001–042), `TESTING.md` (gate rules), `PROMPTS.md` (prompt-engineering write-up).
+Updated 2026-11-10 after **Phase 4 was built** (gate review pending). Read this first, then `PLAN.md` (phases), `DECISIONS.md` (001–053), `TESTING.md` (gate rules), `PROMPTS.md` (prompt-engineering write-up).
 
 ## Where we are
 
@@ -10,7 +10,7 @@ Updated 2026-11-10 after the **Phase 3 review fixes were finished**. Read this f
 | 1. Foundation | ✅ Done (review: `reviews/phase-1.md`, fixes applied) |
 | 2. Job data layer | ✅ Done (review: `reviews/phase-2.md`, fixes applied) |
 | 3. Extraction and triage | ✅ Done (review: `reviews/phase-3.md` PASS WITH FIXES; fixes applied, check-6) |
-| **4. Agent, tools, safety** | **Next. Waiting for the user's go.** Carry-ins are listed at the top of Phase 4 in `PLAN.md` and in DECISIONS 040 |
+| **4. Agent, tools, safety** | **Built; live check passes. Next: phase gate (deploy, live checks on the URL, independent review `reviews/phase-4.md`)** |
 | 5. UI | Not started |
 | 6. Ship | Not started |
 
@@ -31,7 +31,15 @@ Updated 2026-11-10 after the **Phase 3 review fixes were finished**. Read this f
 | Held-out (12, never tuned, labeled blind) | 89.4% | **98.9%** |
 | Tuning (16, in-sample) | 86.3% | 97.9% |
 
-Live triage: 25/25 read, 0 unread. `npm run check`: 252 tests.
+Live triage: 25/25 read, 0 unread.
+
+## Phase 4 (agent)
+
+- Code: `lib/agent/` (store interface + Supabase store, refs, executor + confirm flow, state, loop, runtime wiring, 15 tools in `tools/`), `lib/files/` (CSV, checklist, ICS, timezones), `lib/safety/limits.ts`. Routes: `/api/agent`, `/api/actions/[id]/confirm|reject`, `/api/demo/profile|seed`. Decisions 043–053.
+- Agent prompt: `prompts/system-v3.ts` (v1 → v2 → v3 measured by `npm run eval:agent`; tuning v1 16/18 → v3 18/18, held-out 12/12 both).
+- Live: `npm run check:agent` runs the demo script through the HTTP API (local: `npm run build && npm start`; deployed: `BASE_URL=... npm run check:agent`). Each run uses 6 chat turns; the per-IP limit is 30/hour (local runs share one IP key).
+- On Windows, stopping a background `npm start` task can leave the Node process holding port 3000; kill it via `Get-NetTCPConnection -LocalPort 3000`.
+- `npm run check`: 367 tests.
 
 ## Key facts for the next session
 

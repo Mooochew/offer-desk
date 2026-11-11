@@ -1,0 +1,61 @@
+{
+  "version": "system-v1",
+  "set": "holdout",
+  "model": "gpt-6-luna",
+  "runs": 3,
+  "commit": "28b7dab",
+  "results": [
+    {
+      "name": "save two refs",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "Saved J2 (Ramp, Backend Engineer) as A2 and J5 (Stripe, Software Engineer, New Grad) as A3.",
+        "Saved J2 (Ramp) as A2 and J5 (Stripe) as A3.",
+        "Saved J2 (Ramp, Backend Engineer) as A2 and J5 (Stripe, Software Engineer, New Grad) as A3."
+      ]
+    },
+    {
+      "name": "export the pipeline",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "Exported your pipeline as a spreadsheet: **offer-desk-pipeline-2026-11-10.csv** (3 applications). The download is available in the app.",
+        "Exported your pipeline as **offer-desk-pipeline-2026-11-10.csv** (3 rows). The download is ready in the app.",
+        "Exported your pipeline as **offer-desk-pipeline-2026-11-10.csv** (3 rows). The download is available in the app."
+      ]
+    },
+    {
+      "name": "delete by company → proposal for both",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "I found two saved Notion applications: Product Engineer (A3) and Full Stack Engineer (A2). A deletion confirmation is pending; nothing has been deleted yet. Press **Confirm** in the dialog to proceed.",
+        "I found two Notion applications: **Product Engineer** (A3) and **Full Stack Engineer** (A2). Deletion is pending—nothing has been deleted yet. Press **Confirm** in the dialog to delete them.",
+        "I found two saved Notion applications: **Product Engineer** and **Full Stack Engineer**. A deletion request is awaiting your confirmation; nothing has been deleted yet. Please press **Confirm** in the"
+      ]
+    },
+    {
+      "name": "funnel this month",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "This month, you’ve saved 3 jobs and applied to 0. There are 3 saved applications total; none have reached a response or interview stage. All 3 are from Greenhouse.",
+        "This month, you’ve saved **3 jobs** and applied to **0**. Your pipeline currently has 3 saved jobs and no applications, interviews, or offers. All 3 saved jobs came from Greenhouse.",
+        "This month, you’ve saved 3 jobs and applied to 0. Your pipeline has 3 saved, with no applications at later stages yet. All 3 saved jobs came from Greenhouse."
+      ]
+    }
+  ]
+}

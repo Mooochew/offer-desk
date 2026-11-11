@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { QuotaExceededError } from "@/lib/llm/openai";
 import type { Profile } from "@/lib/profile/types";
 import { descriptionHash } from "@/lib/sources/normalize";
 import { extractionCacheVersion, extractMany } from "@/lib/triage/extraction-cache";
@@ -133,7 +134,7 @@ describe("extractMany", () => {
 
     const down = memoryExtractionStore();
     const result = await extractMany([posting], { create: fakeModel([new Error("HTTP 429")]).create, model: "m", prompt: EXTRACT_V2, store: down.store });
-    expect(result.apiErrors).toEqual([{ id: "p1", error: "HTTP 429" }]);
+    expect(result.apiErrors).toEqual([{ id: "p1", error: "HTTP 429", quota: false }]);
     expect(down.rows.size).toBe(0);
   });
 
@@ -256,5 +257,19 @@ describe("triageJobs", () => {
     });
     expect(result.unread).toEqual([{ job, reason: "AI unavailable", detail: "Daily AI request limit (500) reached." }]);
     expect(result.ranked).toEqual([]);
+  });
+
+  // Phase 3 review S6: a used-up budget is its own state, not "AI unavailable".
+  it("marks postings 'AI limit reached' when an AI budget is used up", async () => {
+    const job = boardJob({ postingId: "p" });
+    const result = await triageJobs([job], profile, filters, {
+      create: fakeModel([new QuotaExceededError(75, "session")]).create,
+      model: "m",
+      prompt: EXTRACT_V2,
+      store: memoryExtractionStore().store,
+      loadDescriptions: async () => new Map([["p", POSTING_DESCRIPTION]]),
+      clock: () => NOW,
+    });
+    expect(result.unread).toEqual([{ job, reason: "AI limit reached", detail: expect.stringContaining("Hourly AI reading limit for this session (75)") }]);
   });
 });

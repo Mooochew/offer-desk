@@ -18,7 +18,9 @@
     "boards:verify": "tsx --conditions=react-server scripts/verify-boards.mts",
     "snapshot": "tsx --conditions=react-server --env-file=.env.local scripts/snapshot-postings.mts",
     "eval": "tsx --conditions=react-server --env-file=.env.local scripts/eval-extraction.mts",
-    "check:triage": "tsx --conditions=react-server --env-file=.env.local scripts/check-triage.mts"
+    "check:triage": "tsx --conditions=react-server --env-file=.env.local scripts/check-triage.mts",
+    "check:agent": "tsx --env-file=.env.local scripts/check-agent.mts",
+    "eval:agent": "tsx --conditions=react-server --env-file=.env.local scripts/eval-agent.mts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
