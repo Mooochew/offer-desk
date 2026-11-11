@@ -4,44 +4,52 @@
    status colors follow the validated reference palette (single series: blue; status colors are
    reserved and always paired with an icon + label). */
 :root {
-  --background: #f7f7f5;
+  --background: #f9f9f8;
   --surface: #ffffff;
-  --surface-2: #f1f0ed;
-  --border: #e3e2de;
-  --foreground: #171716;
-  --muted: #5f5e5a;
+  --surface-2: #f3f3f1;
+  --border: #e6e5e2;
+  --border-strong: #d4d3cf;
+  --foreground: #1a1a19;
+  --muted: #64635e;
+  --ink: #1a1a19;
+  --ink-fg: #ffffff;
   --accent: #2a78d6;
   --accent-strong: #1c5cab;
-  --accent-soft: #e6f0fc;
+  --accent-soft: #eaf2fc;
   --good: #0a7d0a;
   --warning: #9a6700;
   --serious: #b4501f;
   --critical: #c22f2f;
-  --good-soft: #e7f5e7;
-  --warning-soft: #fdf3d9;
-  --serious-soft: #fbe9df;
-  --critical-soft: #fbe4e4;
+  --good-soft: #e9f5e9;
+  --warning-soft: #fcf3dc;
+  --serious-soft: #fbebe2;
+  --critical-soft: #fbe7e7;
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #121211;
-    --surface: #1a1a19;
-    --surface-2: #232321;
-    --border: #33332f;
-    --foreground: #f0efec;
-    --muted: #b0afa6;
+    --background: #111110;
+    --surface: #181817;
+    --surface-2: #222220;
+    --border: #2c2c29;
+    --border-strong: #3d3d39;
+    --foreground: #eeede9;
+    --muted: #a3a29b;
+    --ink: #eeede9;
+    --ink-fg: #141413;
     --accent: #3987e5;
-    --accent-strong: #86b6ef;
-    --accent-soft: #1c2b40;
+    --accent-strong: #8dbbf1;
+    --accent-soft: #1a2738;
     --good: #4cc24c;
     --warning: #fab219;
     --serious: #ec835a;
     --critical: #ef6b6b;
-    --good-soft: #17301a;
-    --warning-soft: #33290f;
-    --serious-soft: #3a2218;
-    --critical-soft: #3b1a1a;
+    --good-soft: #15291a;
+    --warning-soft: #2e2510;
+    --serious-soft: #35211a;
+    --critical-soft: #361a1a;
+    color-scheme: dark;
   }
 }
 
@@ -50,6 +58,9 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-ink-fg: var(--ink-fg);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
@@ -71,6 +82,29 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+}
+
+/* <details> markers: our own chevron instead of the browser triangle. */
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+details[open] > summary .chev {
+  transform: rotate(90deg);
+}
+
+/* Thin, quiet scrollbars inside panels. */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+/* Fade the right edge of a horizontally scrolling row so cut-off items read as "more". */
+.fade-x {
+  mask-image: linear-gradient(to right, black calc(100% - 2rem), transparent);
 }
 
 /* Keyboard focus is always visible. */

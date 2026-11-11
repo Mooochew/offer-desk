@@ -123,7 +123,7 @@ try {
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForTimeout(2_500);
   check("after a reload, chat history, results, files and the log are still there",
-    (await page.getByRole("region", { name: "Chat" }).locator("div.ml-8", { hasText: "Show my funnel this month" }).count()) === 1 && (await page.getByText(/^How [\d,]+ jobs became/).count()) > 0 &&
+    (await page.getByRole("region", { name: "Chat" }).locator("[data-role=user]", { hasText: "Show my funnel this month" }).count()) === 1 && (await page.getByText(/^How [\d,]+ jobs became/).count()) > 0 &&
       (await actionLog().getByText("Archive applications").count()) > 0 && (await actionLog().getByText(/apply-checklist-v1/).count()) > 0);
 
   await page.setViewportSize({ width: 390, height: 844 });
