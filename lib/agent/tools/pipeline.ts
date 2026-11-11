@@ -89,7 +89,8 @@ export const updateStageTool: NormalTool<z.infer<typeof stageInput>> = {
 
     return {
       summary: `${updated} application(s) → ${args.stage}`,
-      forModel: { updated, stage: args.stage, date: when.toISOString().slice(0, 10), applications: targets.map((target) => appBrief(target, ctx.now())) },
+      // The user's local date, not UTC (6 PM in California is already "tomorrow" in UTC).
+      forModel: { updated, stage: args.stage, date: localDate(when, ctx.timezone), applications: targets.map((target) => appBrief(target, ctx.now())) },
       forUI: { kind: "pipeline_change", action: "stage", stage: args.stage, items: targets.map(appForUI) },
     };
   },

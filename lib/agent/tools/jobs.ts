@@ -1,4 +1,7 @@
 import { z } from "zod";
+import type { SearchCriteria } from "@/lib/search/filter";
+import { rolesInQuery } from "@/lib/search/title";
+import { tagsFor } from "@/lib/sources/boards";
 import { ToolError } from "../errors";
 import { assignRefs, resolveRefs } from "../refs";
 import type { ResultSet } from "../store";
@@ -22,9 +25,21 @@ const MODEL_TOP = 10;
 /** The same search within this window reuses its result set (the model sometimes re-searches). */
 const REUSE_MS = 10 * 60 * 1000;
 
-function sameCriteria(a: unknown, b: unknown): boolean {
-  const norm = (value: unknown) => JSON.stringify(value, Object.keys((value as object) ?? {}).sort());
-  return norm(a) === norm(b);
+/**
+ * What actually decides a search's results, computed in code: the role words and board tags read
+ * from the query, plus places, remote, age and internships. Two queries worded differently
+ * ("entry-level backend roles" / "backend jobs for new grads") give the same results when these match.
+ */
+function searchKey(criteria: SearchCriteria): string {
+  const places = [...(criteria.places ?? [])].map((place) => place.toLowerCase()).sort();
+  return JSON.stringify({
+    roles: [...rolesInQuery(criteria.query)].sort(),
+    tags: [...tagsFor(criteria.query, places)].sort(),
+    places,
+    remoteOk: criteria.remoteOk ?? false,
+    postedWithinDays: criteria.postedWithinDays ?? null,
+    includeInternships: criteria.includeInternships ?? false,
+  });
 }
 
 const searchInput = z
@@ -55,7 +70,7 @@ export const searchJobsTool: NormalTool<z.infer<typeof searchInput>> = {
     // Seen live: before "save the top 5" the model sometimes repeats the search it just ran, which
     // made a new, untriaged set the "latest" one. An identical search a few minutes later reuses it.
     const latest = await ctx.store.latestResultSet();
-    if (latest && sameCriteria(latest.query, criteria) && ctx.now().getTime() - Date.parse(latest.createdAt) < REUSE_MS) {
+    if (latest && searchKey(latest.query as SearchCriteria) === searchKey(criteria) && ctx.now().getTime() - Date.parse(latest.createdAt) < REUSE_MS) {
       const triage = isStoredTriage(latest.ranked) ? latest.ranked : null;
       return {
         summary: `same search as ${latest.ref} (reused)`,

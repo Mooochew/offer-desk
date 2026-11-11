@@ -272,8 +272,8 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 - **What:** `POST /api/state` returns the user's profile, pipeline (with posting details), recent files, the last 60 actions, the last 30 chat messages and the latest results (triaged or not, with evidence) in one call, via `loadSessionState`. It assigns no new refs. The UI calls it on load and after every turn, confirm, cancel or demo button.
 - **Why:** The browser can't read `postings` (RLS keeps shared tables server-only), so the pipeline needs a server read anyway. One read after each change keeps every panel consistent and makes a reload lossless. The Funnel tab computes its numbers with the same `computeFunnel` code the tool uses, so chat and chart always agree.
 
-## 057. An identical search within 10 minutes reuses its result set
-- **What:** `search_jobs` with the same criteria as the latest set (less than 10 minutes old) returns that set (`reused: true`) with a note to use its existing ranking, instead of fetching again and creating a new set.
+## 057. An equivalent search within 10 minutes reuses its result set
+- **What:** `search_jobs` returns the latest set (`reused: true`, with a note to use its existing ranking) instead of fetching again, when it is less than 10 minutes old and the search would give the same results. "Same" is decided in code from what actually drives the results: the role words and board tags read from the query, places, remote, age window and internships. A reworded query ("backend jobs for new grads" vs "entry-level backend") still matches; the first version compared raw text, and a live UI run slipped past it.
 - **Why:** In live runs the model sometimes repeated the search before "save the top 5" (2 of about 5 runs). That made a new, untriaged set the latest one, and in one UI run it also re-ran triage, costing three extra calls and about 5 s. Fixing it in code is deterministic; a prompt rule would need another eval round.
 
 ## 058. UI verified in a real browser (`npm run check:ui`)
@@ -281,7 +281,8 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 - **Why:** The gate needs evidence that the UI works, not just the API. The browser runs found three real bugs that unit tests and `check:agent` couldn't:
   - the page crashed after the first answer, because newer Chromium returns a Promise from `scrollIntoView` and the auto-scroll effect returned it;
   - a confirmed action still showed "Waiting for your confirmation" in the chat;
-  - the six-column board truncated every title.
+  - the six-column board truncated every title;
+  - "applied today" was reported as the UTC date (November 11 at 6 PM in California). `update_stage` now reports the user's local date, with a test.
 - **Note:** it uses 6 chat turns, and repeated local runs share one per-IP budget (60 agent calls/hour, DECISIONS 047). One run hit that limit, and the UI showed the limit message as designed.
 
 ## 059. Phase 5 scope notes

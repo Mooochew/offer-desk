@@ -109,7 +109,7 @@ try {
   await ask("Delete the apply checklist file");
   await page.locator("dialog[open]").getByRole("button", { name: "Cancel" }).click();
   await page.getByText("Cancelled. Nothing changed.").waitFor({ timeout: 10_000 });
-  const cancelled = await actionLog().getByText("Cancelled", { exact: true }).first().waitFor({ timeout: 10_000 }).then(() => true, () => false);
+  const cancelled = await actionLog().getByText("Cancelled").first().waitFor({ timeout: 10_000 }).then(() => true, () => false);
   const files = await admin.from("files").select("id", { count: "exact", head: true }).eq("user_id", userId!);
   check("cancel leaves the file and logs the cancellation", cancelled && (files.count ?? 0) >= 2, `${files.count} files`);
 

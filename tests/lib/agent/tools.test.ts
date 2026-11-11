@@ -59,11 +59,15 @@ describe("search_jobs and triage_results", () => {
     const { ctx, db } = await searchedAndTriaged();
     const again = await call(ctx, "search_jobs", { query: "entry-level backend", posted_within_days: 7 });
     expect(again.forModel).toMatchObject({ set: "S1", reused: true, note: expect.stringContaining("already triaged") });
+    // Reworded, same meaning in code (same role words and tags): still reused.
+    expect((await call(ctx, "search_jobs", { query: "backend jobs for new grads", posted_within_days: 7 })).forModel).toMatchObject({ set: "S1", reused: true });
     expect(db.resultSets).toHaveLength(1);
+    // Different date window: a new search.
+    expect((await call(ctx, "search_jobs", { query: "entry-level backend", posted_within_days: 30 })).forModel).toMatchObject({ set: "S2" });
     const different = await call(ctx, "search_jobs", { query: "frontend", posted_within_days: 7 });
-    expect(different.forModel).toMatchObject({ set: "S2" });
+    expect(different.forModel).toMatchObject({ set: "S3" });
     const later = { ...ctx, now: () => new Date(NOW.getTime() + 11 * 60 * 1000) };
-    expect((await call(later, "search_jobs", { query: "frontend", posted_within_days: 7 })).forModel).toMatchObject({ set: "S3" });
+    expect((await call(later, "search_jobs", { query: "frontend", posted_within_days: 7 })).forModel).toMatchObject({ set: "S4" });
   });
 
   it("uses the profile's places and remote setting unless the call overrides them", async () => {
@@ -144,6 +148,12 @@ describe("pipeline tools", () => {
       ["applied", "2026-11-09T20:00:00.000Z"],
       ["applied", "2026-11-09T20:00:00.000Z"],
     ]);
+  });
+
+  it("reports the user's local date for 'today', not the UTC date", async () => {
+    const { ctx } = await searchedAndTriaged();
+    const evening = { ...ctx, now: () => new Date("2026-11-11T02:00:00Z") }; // 6 PM Nov 10 in Los Angeles
+    expect((await call(evening, "update_stage", { refs: ["J1"], stage: "applied" })).forModel).toMatchObject({ date: "2026-11-10" });
   });
 
   it("computes 'yesterday' from days_ago in the user's timezone", async () => {
