@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { QuotaExceededError } from "@/lib/llm/openai";
-import { agentQuota, checkChatLimit, clientIp, extractionQuota, hashIp, LIMITS, RateLimitError, type Counter } from "@/lib/safety/limits";
+import { agentQuota, checkChatLimit, checkStateLimit, clientIp, extractionQuota, hashIp, LIMITS, RateLimitError, type Counter } from "@/lib/safety/limits";
 
 function memoryCounter(start: Record<string, number> = {}) {
   const counts = new Map(Object.entries(start));
@@ -93,5 +93,13 @@ describe("client IP", () => {
     expect(hashIp("1.2.3.4", "secret")).toMatch(/^[a-f0-9]{32}$/);
     expect(hashIp("1.2.3.4", "secret")).not.toBe(hashIp("1.2.3.4", "other"));
     expect(hashIp("1.2.3.4", "secret")).not.toContain("1.2.3.4");
+  });
+});
+
+describe("session-state read limit (review N5)", () => {
+  it(`allows ${LIMITS.stateReadsPerIpHour} reads per IP per hour, then refuses`, async () => {
+    const { counter } = memoryCounter({ [`state:ip:iphash:2026-11-10T03`]: LIMITS.stateReadsPerIpHour - 1 });
+    await checkStateLimit(counter, caller, NOW);
+    await expect(checkStateLimit(counter, { userId: "other", ipHash: "iphash" }, NOW)).rejects.toMatchObject({ scope: "ip", retryAfterSeconds: 40 * 60 });
   });
 });

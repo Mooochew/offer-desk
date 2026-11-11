@@ -49,6 +49,12 @@ for (const path of ["/api/agent", "/api/state", "/api/demo/profile", "/api/demo/
   check(`${path} rejects a request without a session`, response.status === 401, `HTTP ${response.status}`);
 }
 
+// The daily warm-up only runs for Vercel Cron's Bearer secret (Phase 6).
+for (const authorization of [undefined, "Bearer wrong-secret"]) {
+  const response = await fetch(`${liveUrl}/api/cron/warm`, { headers: authorization ? { authorization } : {} });
+  check(`/api/cron/warm rejects ${authorization ? "a wrong secret" : "a request without the secret"}`, response.status === 401, `HTTP ${response.status}`);
+}
+
 for (const id of userIds) await admin.auth.admin.deleteUser(id);
 
 console.log(failures === 0 ? "\nLive smoke test passed." : `\n${failures} check(s) FAILED.`);

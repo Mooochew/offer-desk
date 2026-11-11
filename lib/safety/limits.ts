@@ -19,6 +19,8 @@ export const LIMITS = {
   dailyRequests: 500,
   /** Extraction may use at most this much of the daily cap, so chat (routing) always has room. */
   dailyExtractionRequests: 400,
+  /** Session-state reads (/api/state): about 10 queries each, no model cost; one per page load and turn. */
+  stateReadsPerIpHour: 600,
 } as const;
 
 const HOUR_S = 60 * 60;
@@ -68,6 +70,12 @@ export async function checkChatLimit(counter: Counter, caller: Caller, now = new
   if (session > LIMITS.chatPerSessionHour) throw new RateLimitError("session", secondsToNextHour(now));
   const ip = await counter(`chat:ip:${caller.ipHash}:${hour}`, 2 * HOUR_S);
   if (ip > LIMITS.chatPerIpHour) throw new RateLimitError("ip", secondsToNextHour(now));
+}
+
+/** Counts one session-state read per IP per hour (review N5); throws RateLimitError past the limit. */
+export async function checkStateLimit(counter: Counter, caller: Caller, now = new Date()): Promise<void> {
+  const count = await counter(`state:ip:${caller.ipHash}:${hourBucket(now)}`, 2 * HOUR_S);
+  if (count > LIMITS.stateReadsPerIpHour) throw new RateLimitError("ip", secondsToNextHour(now));
 }
 
 /** This network's share of the daily cap, counted for every model call (Phase 4 review S1). */

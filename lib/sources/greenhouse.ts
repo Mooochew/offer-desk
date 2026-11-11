@@ -1,6 +1,6 @@
 import { fetchJson, type FetchJsonOptions } from "@/lib/http/retry";
 import { escapedHtmlToText } from "@/lib/text/html";
-import { cleanTitle, remoteFrom, toIsoDate } from "./normalize";
+import { cleanTitle, hasUrl, remoteFrom, safeUrl, toIsoDate } from "./normalize";
 import type { Board, NormalizedJob } from "./types";
 
 const API = "https://boards-api.greenhouse.io/v1/boards";
@@ -27,7 +27,7 @@ export function normalizeGreenhouseJob(board: Board, job: GreenhouseListJob): No
     location,
     locations: location ? [location] : [],
     remote: remoteFrom({ locationText: location }),
-    url: job.absolute_url,
+    url: safeUrl(job.absolute_url),
     postedAt: toIsoDate(job.first_published ?? job.updated_at),
     employmentType: null,
     description: null,
@@ -38,7 +38,7 @@ export function normalizeGreenhouseJob(board: Board, job: GreenhouseListJob): No
 /** Fetches a board's job list without content (pass one of the two-pass fetch). */
 export async function fetchGreenhouseBoard(board: Board, options?: FetchJsonOptions): Promise<NormalizedJob[]> {
   const body = await fetchJson<{ jobs?: GreenhouseListJob[] }>(`${API}/${board.slug}/jobs`, options);
-  return (body.jobs ?? []).map((job) => normalizeGreenhouseJob(board, job));
+  return (body.jobs ?? []).map((job) => normalizeGreenhouseJob(board, job)).filter(hasUrl);
 }
 
 /** Fetches one job's description (pass two), converted from escaped HTML to plain text. */

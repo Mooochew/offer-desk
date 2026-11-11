@@ -12,6 +12,8 @@ export type ResultsView = {
   query: unknown;
   triaged: boolean;
   searchBreakdown: unknown;
+  /** Source chips for the search ({ sources, usedSnapshot }), so they survive a reload (review N1). */
+  sourceStatus: unknown;
   breakdown: unknown;
   ranked: { ref: string; job: BoardJob; score: unknown; why: string; extraction: unknown }[];
   dropped: { ref: string; job: BoardJob; reason: string; evidence: string | null }[];
@@ -68,6 +70,7 @@ export async function loadSessionState(store: AgentStore, now: Date): Promise<Se
       query: latest.query,
       triaged: Boolean(triage),
       searchBreakdown: latest.breakdown,
+      sourceStatus: latest.sourceStatus ?? null,
       breakdown: triage?.breakdown ?? null,
       ranked: (triage?.ranked ?? []).flatMap((item) => {
         const posting = job(item.postingId);

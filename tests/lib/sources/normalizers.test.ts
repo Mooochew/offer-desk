@@ -6,6 +6,7 @@ import leverPostings from "../../fixtures/lever-postings.json";
 import { fetchAshbyBoard, normalizeAshbyJob } from "@/lib/sources/ashby";
 import { fetchGreenhouseBoard, fetchGreenhouseDescription, normalizeGreenhouseJob } from "@/lib/sources/greenhouse";
 import { fetchLeverBoard, leverDescription, normalizeLeverPosting } from "@/lib/sources/lever";
+import { safeUrl } from "@/lib/sources/normalize";
 import type { Board } from "@/lib/sources/types";
 
 const board = (ats: Board["ats"], name = "Test Co", slug = "testco"): Board => ({ name, ats, slug, tags: [] });
@@ -160,5 +161,25 @@ describe("missing fields and dispatch", () => {
     expect(await fetchGreenhouseBoard(board("greenhouse"), { fetchImpl: fetchReturning({}).impl })).toEqual([]);
     expect(await fetchLeverBoard(board("lever"), { fetchImpl: fetchReturning({}).impl })).toEqual([]);
     expect(await fetchAshbyBoard(board("ashby"), { fetchImpl: fetchReturning({}).impl })).toEqual([]);
+  });
+});
+
+describe("posting links (review N4)", () => {
+  it.each([
+    ["https://boards.greenhouse.io/x/jobs/1", "https://boards.greenhouse.io/x/jobs/1"],
+    ["http://jobs.example.com/a", "http://jobs.example.com/a"],
+    ["javascript:alert(1)", ""],
+    ["data:text/html,hi", ""],
+    ["/relative/path", ""],
+    [null, ""],
+  ])("safeUrl(%s) → %j", (input, expected) => {
+    expect(safeUrl(input)).toBe(expected);
+  });
+
+  it("drops a job whose link isn't http(s) when fetching a board", async () => {
+    const bad = { ...greenhouseList, jobs: [{ ...greenhouseList.jobs[0], absolute_url: "javascript:alert(1)" }, ...greenhouseList.jobs.slice(1)] };
+    const jobs = await fetchGreenhouseBoard(board("greenhouse"), { fetchImpl: fetchReturning(bad).impl });
+    expect(jobs).toHaveLength(greenhouseList.jobs.length - 1);
+    expect(jobs.every((job) => job.url.startsWith("https://"))).toBe(true);
   });
 });

@@ -49,6 +49,8 @@ describe("loadSessionState", () => {
 
     const state = await loadSessionState(store, NOW);
     expect(state.results).toMatchObject({ triaged: false, jobs: [{ ref: "J1" }, { ref: "J2" }] });
+    // The source chips survive a reload (review N1).
+    expect(state.results?.sourceStatus).toMatchObject({ sources: expect.any(Array), usedSnapshot: false });
     expect(state.actions.find((action) => action.id === id)?.status).toBe("expired");
   });
 });

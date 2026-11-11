@@ -60,6 +60,8 @@ export type ResultSet = {
   query: unknown;
   postingIds: string[];
   breakdown: unknown;
+  /** Per-source board status from the search ({ sources, usedSnapshot, failures }), for the UI after a reload. */
+  sourceStatus: unknown;
   ranked: unknown;
   createdAt: string;
 };

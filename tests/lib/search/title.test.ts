@@ -43,6 +43,15 @@ describe("titleMatchesRoles", () => {
     expect(titleMatchesRoles(title, [])).toBe(false);
   });
 
+  // Regression from the Phase 5 live run (review N11): ranked #2 for "backend and full-stack".
+  it.each(["Server Hardware Systems Engineer (Starlink)", "Backend Engineer, Firmware Platform", "Embedded Software Engineer"])(
+    "a hardware/firmware title doesn't match a backend/full-stack search: %s",
+    (title) => {
+      expect(titleMatchesRoles(title, backendOrFullstack)).toBe(false);
+      expect(titleMatchesRoles(title, ["embedded"])).toBe(true);
+    },
+  );
+
   it("with no roles requested, accepts software roles of any specialty", () => {
     expect(titleMatchesRoles("Android Engineer", [])).toBe(true);
     expect(titleMatchesRoles("Data Engineer", [])).toBe(true);

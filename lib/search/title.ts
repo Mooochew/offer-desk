@@ -16,6 +16,8 @@ const ROLE_GROUPS: RoleGroup[] = [
   { name: "embedded", queryWords: /embedded|firmware|hardware/i, titleWords: /embedded|firmware|hardware/i },
 ];
 
+const HARDWARE_TITLE = ROLE_GROUPS.find((group) => group.name === "embedded")!.titleWords;
+
 // Groups for which a plain "Software Engineer" title is still relevant.
 const GENERALIST_GROUPS = new Set(["backend", "frontend", "fullstack"]);
 // "Engineer" or "Developer" alone is not enough: "Battery Systems Engineer" and "Curriculum
@@ -38,6 +40,9 @@ export function titleMatchesRoles(title: string, roles: string[]): boolean {
   if (roles.length === 0) {
     return GENERIC_SOFTWARE_TITLE.test(title) || ROLE_GROUPS.some((group) => group.name !== "embedded" && group.titleWords.test(title));
   }
+  // A hardware/firmware/embedded title only fits when those roles were asked for: "Server Hardware
+  // Systems Engineer" contains "server" but is not a backend role (Phase 5 review N11).
+  if (!roles.includes("embedded") && HARDWARE_TITLE.test(title)) return false;
   const matchesGroup = ROLE_GROUPS.some((group) => roles.includes(group.name) && group.titleWords.test(title));
   if (matchesGroup) return true;
 

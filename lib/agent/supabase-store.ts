@@ -60,6 +60,7 @@ function toResultSet(row: Row): ResultSet {
     query: row.query,
     postingIds: (row.posting_ids as string[]) ?? [],
     breakdown: row.breakdown,
+    sourceStatus: row.source_status ?? null,
     ranked: row.ranked,
     createdAt: row.created_at as string,
   };

@@ -97,7 +97,7 @@ export function memoryDb(now: () => Date = () => new Date("2026-11-10T20:00:00Z"
         return before - db.applications.length;
       },
       async createResultSet(row) {
-        db.resultSets.push({ userId, id: row.id, ref: row.ref, query: row.query, postingIds: row.postingIds, breakdown: row.breakdown, ranked: null, createdAt: stamp() });
+        db.resultSets.push({ userId, id: row.id, ref: row.ref, query: row.query, postingIds: row.postingIds, breakdown: row.breakdown, sourceStatus: row.sourceStatus, ranked: null, createdAt: stamp() });
       },
       async getResultSet(id) {
         const set = mine(db.resultSets).find((row) => row.id === id);

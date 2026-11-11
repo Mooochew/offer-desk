@@ -1,6 +1,6 @@
 import { fetchJson, type FetchJsonOptions } from "@/lib/http/retry";
 import { htmlToText } from "@/lib/text/html";
-import { cleanTitle, remoteFrom, toIsoDate } from "./normalize";
+import { cleanTitle, hasUrl, remoteFrom, safeUrl, toIsoDate } from "./normalize";
 import type { Board, NormalizedJob } from "./types";
 
 type LeverPosting = {
@@ -39,7 +39,7 @@ export function normalizeLeverPosting(board: Board, posting: LeverPosting): Norm
     location,
     locations,
     remote: remoteFrom({ workplaceType: posting.workplaceType, locationText: location }),
-    url: posting.hostedUrl,
+    url: safeUrl(posting.hostedUrl),
     postedAt: toIsoDate(posting.createdAt),
     employmentType: posting.categories?.commitment ?? null,
     description: leverDescription(posting) || null,
@@ -50,5 +50,5 @@ export function normalizeLeverPosting(board: Board, posting: LeverPosting): Norm
 /** Fetches every posting on a Lever board (descriptions included; Lever has no light mode). */
 export async function fetchLeverBoard(board: Board, options?: FetchJsonOptions): Promise<NormalizedJob[]> {
   const postings = await fetchJson<LeverPosting[]>(`https://api.lever.co/v0/postings/${board.slug}?mode=json`, options);
-  return (Array.isArray(postings) ? postings : []).map((posting) => normalizeLeverPosting(board, posting));
+  return (Array.isArray(postings) ? postings : []).map((posting) => normalizeLeverPosting(board, posting)).filter(hasUrl);
 }

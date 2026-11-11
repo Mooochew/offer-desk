@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
 import type { TurnEvent } from "@/lib/agent/loop";
 import type { SessionState } from "@/lib/agent/session-state";
 import type { Preview } from "@/lib/agent/tools/types";
+import { actionStatus } from "@/lib/ui/format";
 import { ActionLog } from "./action-log";
 import { api } from "./api";
 import { ChatPanel, type ChatTurn } from "./chat-panel";
@@ -118,11 +119,9 @@ export function OfferDesk() {
       setPending({ actionId, tool: action.tool, preview: action.preview as Preview, minutesLeft: minutesUntil(action.expiresAt) });
       return;
     }
-    for (const turn of turns) {
-      const event = turn.events.find((item) => item.type === "pending_action" && item.actionId === actionId) as Extract<TurnEvent, { type: "pending_action" }> | undefined;
-      if (event) return setPending({ actionId, tool: event.tool, preview: event.preview, minutesLeft: minutesUntil(event.expiresAt) });
-    }
-    toast("neutral", "That action was already handled.");
+    // Only the server's current state can reopen the dialog; a stale turn event never does (review N9).
+    const label = action ? actionStatus(action.status).label.toLowerCase() : "already handled";
+    toast("neutral", `That action is ${label}. Nothing to confirm.`);
   };
 
   // Every button that calls the server reports network failures instead of failing silently (review S7).
@@ -187,6 +186,9 @@ export function OfferDesk() {
     setTab(next);
     document.getElementById(`tab-${next}`)?.focus();
   };
+  // The stored status of the latest search survives a reload (review N1); the live event is the fallback.
+  const stored = state.results?.sourceStatus as { sources?: SourceStatus[]; usedSnapshot?: boolean } | null | undefined;
+  const chips = stored?.sources ? { sources: stored.sources, usedSnapshot: Boolean(stored.usedSnapshot) } : sources;
   const active = state.pipeline.filter((item) => item.application.stage !== "archived").length;
 
   const board = (
@@ -216,7 +218,7 @@ export function OfferDesk() {
         {loading ? (
           <p className="flex items-center gap-2 text-sm text-muted"><Spinner /> Loading your session…</p>
         ) : tab === "results" ? (
-          <ResultsTab results={state.results} sources={sources.sources} usedSnapshot={sources.usedSnapshot} />
+          <ResultsTab results={state.results} sources={chips.sources} usedSnapshot={chips.usedSnapshot} />
         ) : tab === "pipeline" ? (
           <PipelineTab pipeline={state.pipeline} />
         ) : (

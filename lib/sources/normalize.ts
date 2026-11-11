@@ -13,6 +13,23 @@ export function isEngineeringTitle(title: string): boolean {
   return ENGINEERING_TITLE.test(title) && !NON_ENGINEERING_TITLE.test(title);
 }
 
+/**
+ * The posting link, only if it is an absolute http(s) URL; otherwise "". It ends up in an href, so
+ * a javascript: or data: link from an upstream API must never get through (review N4).
+ */
+export function safeUrl(value: unknown): string {
+  if (typeof value !== "string") return "";
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
+/** Jobs without a usable link can't be applied to, so they are dropped at ingestion. */
+export const hasUrl = (job: { url: string }) => job.url !== "";
+
 export function cleanTitle(title: string): string {
   return title.replace(/\s+/g, " ").trim();
 }
