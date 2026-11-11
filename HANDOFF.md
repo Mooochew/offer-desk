@@ -1,13 +1,14 @@
 # Handoff: Offer Desk (CS4680 Assignment 4)
 
-Updated 2026-11-11 at the end of **Phase 5**. **Phases 0–5 are done. Phase 6 (ship) is next.** The previous session ended here on purpose, so start Phase 6 from this file.
+Updated 2026-11-11 at the end of **Phase 6**. **All build phases (0–6) are done.** What remains is the user's: record the demo video, upload it, and submit the Google Form (`docs/DEMO.md`).
 
 Read this first, then:
-- `PLAN.md` (Phase 6 is at the end of section 6; the demo script is section 9);
-- `DECISIONS.md` (001–060);
+- `README.md` (the submission-facing overview);
+- `docs/DEMO.md` (the recording checklist and script);
+- `DECISIONS.md` (001–063);
 - `TESTING.md` (the gate rules);
 - `PROMPTS.md` (the prompt-engineering write-up);
-- `reviews/phase-4.md` and `reviews/phase-5.md` (what's left open).
+- `reviews/phase-6.md` (the final review; its open nice-to-haves are listed in DECISIONS 063).
 
 ## Where we are
 
@@ -19,10 +20,10 @@ Read this first, then:
 | 3. Extraction and triage | ✅ Done (`reviews/phase-3.md`, fixes applied, check-6) |
 | 4. Agent, tools, safety | ✅ Done (`reviews/phase-4.md` PASS WITH FIXES; fixes in DECISIONS 054) |
 | 5. UI | ✅ Done (`reviews/phase-5.md` PASS WITH FIXES; fixes in DECISIONS 060) |
-| **6. Ship** | **Next.** See "Phase 6 to-do" below |
+| 6. Ship | ✅ Done (`reviews/phase-6.md` PASS WITH FIXES; fixes in DECISIONS 063) |
 
-- Repo: https://github.com/Mooochew/offer-desk (public). Live: https://offer-desk-teal.vercel.app (Vercel auto-deploys `main`; last deployed commit `e9b82b9`, CI green).
-- Supabase migrations 0001–0004 are applied. Phases 4–5 needed no new migration.
+- Repo: https://github.com/Mooochew/offer-desk (public). Live: https://offer-desk-teal.vercel.app (Vercel auto-deploys `main`; Vercel deploys every push to `main`; CI is green).
+- Supabase migrations 0001–0004 are applied. Phases 4–6 needed no new migration.
 - History was rewritten on 2026-11-10 to remove Claude co-author trailers (the user approved). A local tag `backup-before-rewrite` holds the old history.
 
 ## Working agreements (from the user)
@@ -37,30 +38,34 @@ Read this first, then:
 - The user prefers plain explanations, confirms choices, and wants independent work within a phase.
 - The user records the demo video and submits the Google Form themselves. Prepare everything for them and say what's left.
 
-## Phase 6 to-do (PLAN Phase 6 + carry-ins)
+## What's left (user)
 
-1. **README.md** (it's still the Phase 1 stub):
-   - the problem, with real numbers from the app (e.g. "7,917 listings → 9 after the code prefilter → 8 ranked");
-   - features and a screenshot (`npm run check:ui` with `SHOTS=<dir>` makes them);
-   - the Mermaid architecture diagram from PLAN 4.1, updated (`lib/agent`, `/api/state`);
-   - the LLM/code split;
-   - how the assignment requirements map to code (the table in PLAN section 1);
-   - setup and env vars (`.env.example`), and how to run the checks and evals;
-   - known limitations: exact-match dedupe, Adzuna not used, board coverage, snapshot fallback, no streaming, the v4 delete→archive miss, occasional extra searches, per-IP budgets.
-2. **Daily warm-up cron** (DECISIONS 033, carried in since Phase 2): a protected endpoint (e.g. `GET /api/cron/warm` that checks `Authorization: Bearer ${CRON_SECRET}`). It refreshes the most-used boards with `loadBoards` and touches Supabase. Add `vercel.json` `crons` (daily on Hobby) and the `CRON_SECRET` env var in Vercel; **the user must add that secret in the Vercel dashboard.** Test the auth (401 without the secret).
-3. **Phase 5 review leftovers worth doing before recording** (reviews/phase-5.md):
-   - **N11 ranking relevance:** "Server Hardware Systems Engineer (Starlink)" ranks #2 for "backend and full-stack". Consider a title role-match bonus in `lib/triage/score.ts` or the pre-rank, with a test. It shows on screen in the demo.
-   - **N1:** source chips after a reload (add `result_sets.source_status` to `/api/state`).
-   - **N3:** board tabs need arrow-key navigation; dark-mode accent contrast is about 3.7:1.
-   - **N4:** http(s)-only posting URLs at ingestion. **N5:** a rate limit on `/api/state`. **N9:** the Review fallback.
-4. **Finish PROMPTS.md and DECISIONS.md** for submission (they are current through Phase 5; add a short summary at the top of PROMPTS.md if useful).
-5. **Demo prep for the user:** a short recording checklist:
-   - record in a fresh incognito window;
-   - click Load demo profile, then Seed sample pipeline, then run the section 9 prompts;
-   - rehearse the same day (live numbers change);
-   - cut the 6–12 s waits in editing;
-   - don't run live agent checks on recording day (they spend the shared budget).
-6. Gate as usual: `npm run check`, CI, `check:rls`, `check:live`, and one `check:ui` against the live URL (it uses 6 chat turns), then an independent review → `reviews/phase-6.md`.
+1. **Vercel:** `CRON_SECRET` must be set for Production. The user added it; they may switch it to "Sensitive" (delete and re-add it with the same value as `.env.local`). Check it in two ways:
+   - `npm run check:live` asserts `cronConfigured`;
+   - Vercel → Settings → Cron Jobs → **Run** on `/api/cron/warm` should log a 200.
+2. **Record the demo** with `docs/DEMO.md`, rehearsing the same day. Don't run `check:agent`, `check:ui` or the evals that day.
+3. **Upload** to YouTube (Unlisted) and **submit the Google Form** with the repo URL, the live URL and the video URL. Optionally, add the video link to the top of `README.md`.
+
+## Phase 6 summary
+
+- **UI polish** (DECISIONS 061):
+  - an SVG icon set instead of emoji;
+  - ink primary buttons, aligned panel headers and a hairline action log;
+  - the Start here guide and funnel stat tiles;
+  - arrow-key tabs.
+- **Fixes** (DECISIONS 062):
+  - hardware titles no longer match backend searches (N11);
+  - source chips survive a reload (N1);
+  - http(s)-only links (N4);
+  - a limit on `/api/state` (N5);
+  - Review reopens only live proposals (N9).
+- **Daily cron:** `GET /api/cron/warm`, Bearer `CRON_SECRET`, at 14:00 UTC (`vercel.json`).
+- **Docs:** the README, the PROMPTS "At a glance" summary, `docs/DEMO.md` and `docs/screenshots/`.
+- **Review fixes** (DECISIONS 063):
+  - `cronConfigured` in `/api/health`, asserted by `check:live`;
+  - the composer focus ring;
+  - a route test for `/api/state`;
+  - accessibility and contrast nits.
 
 ## Budgets (read before running live checks)
 
@@ -86,7 +91,7 @@ Read this first, then:
 
 ## Current numbers
 
-- **Tests:** `npm run check`: 33 files, 390 tests; line coverage 98.9%, branch coverage 87.5% (floors 90/85).
+- **Tests:** `npm run check`: 36 files, 411 tests; line coverage 98.9%, branch coverage 87.6% (floors 90/85).
 - **Extraction eval** (check-6, 3 runs each): held-out v1 89.4% → **v2 98.9%**; tuning 86.3% → 97.9%.
 - **Routing eval:**
   - Tuning: v1 16/18 → v3 18/18; v4 41/42 over 6 runs.

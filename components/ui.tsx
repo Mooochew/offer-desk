@@ -8,7 +8,7 @@ type Variant = "primary" | "secondary" | "danger" | "ghost";
 const VARIANTS: Record<Variant, string> = {
   primary: "bg-ink text-ink-fg hover:opacity-85 disabled:opacity-40",
   secondary: "border border-border bg-surface text-foreground shadow-[0_1px_0_rgba(0,0,0,0.03)] hover:border-border-strong hover:bg-surface-2 disabled:opacity-50",
-  danger: "bg-critical text-white hover:opacity-90 disabled:opacity-50",
+  danger: "bg-critical text-ink-fg hover:opacity-90 disabled:opacity-50",
   ghost: "text-muted hover:bg-surface-2 hover:text-foreground disabled:opacity-50",
 };
 const SIZES = { sm: "h-7 px-2.5 text-xs", md: "h-8 px-3 text-sm" } as const;

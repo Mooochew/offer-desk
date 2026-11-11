@@ -5,7 +5,7 @@ How Offer Desk uses the LLM, which techniques it relies on, and the measured evi
 > **At a glance**
 > - **Two prompts, both versioned and eval-gated:** extraction (`prompts/extract-v1 → v2`) and tool routing (`prompts/system-v1 → v4`).
 > - **Extraction v1 → v2: 89.4% → 98.9% on a held-out set** (12 postings from unseen companies, 3 runs each). Techniques: role prompt, explicit decision rules with tie-breakers, synthetic few-shot examples, Structured Outputs (strict JSON schema), grounding quotes checked by code, and one corrective retry that shows the model its exact validation errors.
-> - **Routing v1 → v3: 16/18 → 18/18 on the tuning scenarios.** v4 moved date math out of the prompt and into tested code. One known v4 miss ("delete" → archive proposal) fails safe behind the confirmation dialog, and we report it rather than tune on the held-out set.
+> - **Routing v1 → v3: 16/18 → 18/18 on the tuning scenarios** (in-sample: the cases were written around v1's failures; held-out cases stay 12/12). v4 moved date math out of the prompt and into tested code. One known v4 miss ("delete" → archive proposal) fails safe behind the confirmation dialog, and we report it rather than tune on the held-out set.
 > - **Safety by construction:** untrusted posting text is delimited and goes only to a tool-less extraction call; destructive tools can only propose; every argument is validated in code.
 > - Honest limits (small sets, AI-assisted labels) are listed in [Limits](#limits).
 

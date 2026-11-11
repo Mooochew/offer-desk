@@ -315,3 +315,23 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 - **N9:** Review reopens the dialog only for an action the server still lists as awaiting confirmation. Otherwise it shows the action's current status.
 - **Daily warm-up (D033):** `GET /api/cron/warm`, called by Vercel Cron daily at 14:00 UTC (`vercel.json`; Hobby allows daily jobs). It refreshes the 60 boards the demo search selects, and those writes also keep the free Supabase project from pausing. It runs only with `Authorization: Bearer $CRON_SECRET`, compared in constant time, and refuses everything when the secret isn't set. No model calls. Tested by unit tests (auth, refresh counts, second run served from cache) and a route test (401s, 200), and checked against the deployment by `check:live`.
 - **Still open:** N8 (moving more client logic into `lib/ui`) is left as is. The client logic is covered by the browser check, and a refactor this late risks the demo.
+
+## 063. Phase 6 review fixes (reviews/phase-6.md)
+- **S1:** `/api/health` reports `cronConfigured` (whether `CRON_SECRET` is set, never its value), and `check:live` asserts it, so a missing secret on the deployment can't pass for a working cron. Running the job once from the Vercel dashboard (Cron Jobs → Run) is the end-to-end check.
+- **S2:** the chat composer shows an accent focus ring (`focus-within`), so keyboard focus is visible again.
+- **S3:** PLAN and HANDOFF status lines updated.
+- **S4:** route test for `/api/state`: the read is counted, the 401 comes before any counting, and past the limit it returns 429 with `Retry-After` and doesn't read the database.
+- **Nice-to-haves done:**
+  - Confirm and Cancel keep an accessible name while their spinner shows.
+  - The danger button uses the ink foreground, so it is readable in dark mode.
+  - The mobile header buttons' accessible names match their visible text.
+  - The warm-up summary reports stale boards separately from failed ones.
+  - `check:live` covers `/reject`.
+  - "In-sample" is marked in the PROMPTS summary.
+- **Wording correction to DECISIONS 062:** with a 6-hour board TTL, one daily run keeps the cache fresh only for the following hours. The cron's main value is the daily Supabase activity (no pausing), plus a fresh first search after it runs. The README now calls it a "keep-alive + board refresh".
+- **Known false negative (from the N11 fix):** a title like "Backend Engineer, Firmware Platform" no longer matches a backend search. We accept this: such roles are rare among new-grad postings, while hardware titles that contain "server" were showing up at the top of the demo search.
+- **Not changed, with reasons:**
+  - Snapshot URLs don't go through `safeUrl`. The snapshot is a bundled file we generated and review, not upstream input.
+  - "Each tool gets one fix attempt" *is* enforced in code (`lib/agent/loop.ts:156`), so that README line stays.
+  - Review saying "already handled" when the state refresh itself failed is a rare double failure. The server still returns 409 on a stale confirm.
+  - Tabs don't support Home/End; with three tabs, arrow keys suffice.

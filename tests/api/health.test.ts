@@ -29,7 +29,18 @@ describe("POST /api/health", () => {
     fakeRequireUser = async () => ({ user: { id: "abc", is_anonymous: true } });
     const response = await callHealth();
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ ok: true, userId: "abc", isAnonymous: true, serverEnvOk: true });
+    expect(await response.json()).toEqual({ ok: true, userId: "abc", isAnonymous: true, serverEnvOk: true, cronConfigured: expect.any(Boolean) });
+  });
+
+  it("reports whether CRON_SECRET is set, never its value", async () => {
+    fakeRequireUser = async () => ({ user: { id: "abc" } });
+    vi.stubEnv("CRON_SECRET", "s3cret-value");
+    const set = await (await callHealth()).json();
+    expect(set.cronConfigured).toBe(true);
+    expect(JSON.stringify(set)).not.toContain("s3cret-value");
+    vi.stubEnv("CRON_SECRET", "");
+    expect((await (await callHealth()).json()).cronConfigured).toBe(false);
+    vi.unstubAllEnvs();
   });
 
   it("reports serverEnvOk false (without values) when a server secret is missing", async () => {

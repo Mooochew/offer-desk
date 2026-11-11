@@ -36,6 +36,7 @@ for (const label of ["session A", "session B"]) {
   check(`${label} accepted by live API`, response.ok && body.userId === data.user!.id, `HTTP ${response.status}`);
   if (label === "session A") {
     check("server secrets are configured on the deployment", body.serverEnvOk === true);
+    check("CRON_SECRET is set, so the daily warm-up can run", body.cronConfigured === true);
   }
 }
 check("sessions are distinct", userIds.length === 2 && userIds[0] !== userIds[1]);
@@ -44,7 +45,7 @@ const noToken = await fetch(`${liveUrl}/api/health`, { method: "POST" });
 check("request without a session is rejected", noToken.status === 401, `HTTP ${noToken.status}`);
 
 // Phase 4 routes exist on the deployment and refuse anonymous callers (no model call is made).
-for (const path of ["/api/agent", "/api/state", "/api/demo/profile", "/api/demo/seed", "/api/actions/123e4567-e89b-42d3-a456-426614174000/confirm", "/api/files/123e4567-e89b-42d3-a456-426614174000/url"]) {
+for (const path of ["/api/agent", "/api/state", "/api/demo/profile", "/api/demo/seed", "/api/actions/123e4567-e89b-42d3-a456-426614174000/confirm", "/api/actions/123e4567-e89b-42d3-a456-426614174000/reject", "/api/files/123e4567-e89b-42d3-a456-426614174000/url"]) {
   const response = await fetch(`${liveUrl}${path}`, { method: "POST", body: "{}" });
   check(`${path} rejects a request without a session`, response.status === 401, `HTTP ${response.status}`);
 }

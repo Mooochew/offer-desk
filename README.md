@@ -42,7 +42,7 @@ flowchart LR
     AG["/api/agent<br/>turn loop (lib/agent)"]
     ST["/api/state<br/>session after reload"]
     CF["/api/actions/:id/confirm | reject"]
-    CR["/api/cron/warm<br/>daily cache warm-up"]
+    CR["/api/cron/warm<br/>daily keep-alive + board refresh"]
     REG["Tool registry + executor<br/>zod schemas · refs · destructive flag"]
     SRC["Search<br/>board cache · prefilter"]
     TRI["Triage<br/>extract · ground · filter · score"]

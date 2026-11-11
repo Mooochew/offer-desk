@@ -267,8 +267,8 @@ export function OfferDesk() {
         </div>
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
           <span className="mr-1 hidden text-xs text-muted xl:inline">Demo</span>
-          <Button size="sm" onClick={() => demo("profile")} disabled={busy} aria-label="Load demo profile"><IconUser size={13} /><span className="hidden sm:inline">Load demo profile</span><span className="sm:hidden">Demo</span></Button>
-          <Button size="sm" onClick={() => demo("seed")} disabled={busy} aria-label="Seed sample pipeline"><IconLayers size={13} /><span className="hidden sm:inline">Seed sample pipeline</span><span className="sm:hidden">Seed</span></Button>
+          <Button size="sm" onClick={() => demo("profile")} disabled={busy}><IconUser size={13} /><span className="hidden sm:inline">Load demo profile</span><span className="sm:hidden">Demo</span></Button>
+          <Button size="sm" onClick={() => demo("seed")} disabled={busy}><IconLayers size={13} /><span className="hidden sm:inline">Seed sample pipeline</span><span className="sm:hidden">Seed</span></Button>
           <span className="mx-1 hidden h-5 w-px bg-border sm:block" aria-hidden />
           <details className="relative">
             <summary className="flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted hover:bg-surface-2 hover:text-foreground">

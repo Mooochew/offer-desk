@@ -207,7 +207,7 @@ export function ChatPanel({
           </div>
         )}
         <form
-          className="rounded-xl border border-border bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors focus-within:border-border-strong"
+          className="rounded-xl border border-border bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/25"
           onSubmit={(event) => {
             event.preventDefault();
             send(draft);

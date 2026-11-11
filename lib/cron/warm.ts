@@ -29,7 +29,8 @@ export async function warmBoardCache(deps: { store: BoardStore; fetchBoard: (boa
     boards: boards.length,
     refreshed: count("refreshed"),
     cached: count("cached"),
-    failed: results.length - count("refreshed") - count("cached"),
+    stale: count("stale"),
+    failed: count("failed") + count("skipped"),
     jobs: results.reduce((sum, result) => sum + result.jobs.length, 0),
   };
 }

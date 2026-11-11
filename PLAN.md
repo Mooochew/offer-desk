@@ -1,6 +1,6 @@
 # Offer Desk: Build Plan
 
-> CS4680 Assignment 4, AI Agent Project. Status: **confirmed**; Phases 0–5 done; Phase 6 (ship) next — see HANDOFF.md. Decisions: see [Decisions](#decisions) and [DECISIONS.md](DECISIONS.md).
+> CS4680 Assignment 4, AI Agent Project. Status: **built**; Phases 0–6 done (reviews in `reviews/`); what remains is the demo video and the Google Form (see `docs/DEMO.md`). Decisions: see [Decisions](#decisions) and [DECISIONS.md](DECISIONS.md).
 
 ## 1. What we're building
 

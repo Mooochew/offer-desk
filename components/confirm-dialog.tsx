@@ -72,8 +72,8 @@ export function ConfirmDialog({ action, onConfirm, onCancel, onClose }: { action
         <p className="mt-2 text-[11px] text-muted">This list was resolved by code. Confirm runs exactly these {action.preview.count}.</p>
       </div>
       <div className="flex justify-end gap-2 border-t border-border bg-surface-2/60 px-5 py-3">
-        <Button autoFocus onClick={() => run("cancel")} disabled={busy !== null}>{busy === "cancel" ? <Spinner /> : "Cancel"}</Button>
-        <Button variant={deleting ? "danger" : "primary"} onClick={() => run("confirm")} disabled={busy !== null}>
+        <Button autoFocus onClick={() => run("cancel")} disabled={busy !== null} aria-label={busy === "cancel" ? "Cancelling" : undefined}>{busy === "cancel" ? <Spinner /> : "Cancel"}</Button>
+        <Button variant={deleting ? "danger" : "primary"} onClick={() => run("confirm")} disabled={busy !== null} aria-label={busy === "confirm" ? "Confirming" : undefined}>
           {busy === "confirm" ? <Spinner /> : `Confirm (${action.preview.count})`}
         </Button>
       </div>

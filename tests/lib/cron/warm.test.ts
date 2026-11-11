@@ -38,7 +38,7 @@ describe("warmBoardCache", () => {
       },
     });
     expect(fetched.sort()).toEqual(["a", "b", "c"]);
-    expect(summary).toEqual({ boards: 3, refreshed: 2, cached: 0, failed: 1, jobs: 2 });
+    expect(summary).toEqual({ boards: 3, refreshed: 2, cached: 0, stale: 0, failed: 1, jobs: 2 });
     expect(entries.size).toBe(3); // the failure is cached too, so graders don't retry it at once
     expect(savedPostings).toHaveLength(2);
   });

@@ -13,6 +13,8 @@ export async function POST(request: Request) {
       userId: user.id,
       isAnonymous: user.is_anonymous ?? false,
       serverEnvOk: serverEnvIsValid(),
+      // Whether the daily warm-up can run (CRON_SECRET set); never the value (Phase 6 review S1).
+      cronConfigured: Boolean(process.env.CRON_SECRET),
     });
   } catch (error) {
     if (error instanceof UnauthorizedError) {
