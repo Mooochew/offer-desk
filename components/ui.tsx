@@ -24,8 +24,8 @@ const TONES: Record<StatusTone, string> = {
 };
 
 /** Status chip: icon + label + color (never color alone). */
-export function StatusChip({ status }: { status: string }) {
-  const meta = actionStatus(status);
+export function StatusChip({ status, ageSeconds }: { status: string; ageSeconds?: number }) {
+  const meta = actionStatus(status, ageSeconds);
   return (
     <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${TONES[meta.tone]}`}>
       <span aria-hidden>{meta.icon}</span>

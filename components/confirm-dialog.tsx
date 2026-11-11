@@ -56,7 +56,7 @@ export function ConfirmDialog({ action, onConfirm, onCancel, onClose }: { action
           {action.preview.items.map((item) => (
             <li key={item.ref} className="flex items-baseline gap-2 border-b border-border py-1 last:border-0">
               <span className="font-mono text-xs text-muted">{item.ref}</span>
-              <span className="min-w-0 flex-1 truncate" title={item.label}>{item.label}</span>
+              <span className="min-w-0 flex-1 break-words">{item.label}</span>
               <span className="shrink-0 text-xs text-muted">{item.detail}</span>
             </li>
           ))}

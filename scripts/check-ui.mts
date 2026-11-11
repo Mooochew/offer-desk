@@ -81,14 +81,18 @@ try {
   // A company that appears once in the top 5; with two jobs at one company the agent rightly asks which.
   const company = companies.find((name) => companies.filter((other) => other === name).length === 1) ?? companies[0];
   await ask(`Mark the first 5 as applied today. I have an interview with ${company} Thursday at 2`);
-  check("an interview invite card shows Thursday 2:00 PM", (await page.getByText(/Thu, Nov \d+, 2:00 PM/).count()) > 0);
+  check("an interview invite card shows Thursday 2:00 PM", (await page.getByText(/Thu, \w{3} \d+, 2:00 PM/).count()) > 0);
   await shot("04-interview");
 
+  // The rows that SHOULD be proposed, read from the database before asking (review S8).
+  const cutoff = new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString();
+  const expected = await admin.from("applications").select("id").eq("user_id", userId!).neq("stage", "archived").lt("updated_at", cutoff);
+  const expectedIds = (expected.data ?? []).map((row) => row.id as string).sort();
   await ask("Archive everything I haven't touched in 3 weeks");
   const dialog = page.locator("dialog[open]");
   check("archive opens the confirmation dialog", await dialog.isVisible());
   const previewCount = Number((await dialog.getByRole("button", { name: /^Confirm/ }).textContent())?.match(/\d+/)?.[0] ?? -1);
-  check("the dialog lists exactly the previewed items", (await dialog.locator("li").count()) === previewCount, `${previewCount}`);
+  check("the dialog lists every application untouched for 3 weeks", (await dialog.locator("li").count()) === expectedIds.length && previewCount === expectedIds.length, `${previewCount} shown, ${expectedIds.length} expected`);
   const archivedBefore = await admin.from("applications").select("id", { count: "exact", head: true }).eq("user_id", userId!).eq("stage", "archived");
   check("nothing is archived before confirming", archivedBefore.count === 0, `${archivedBefore.count}`);
   await shot("05-dialog");
@@ -96,8 +100,9 @@ try {
   await page.getByText(/Done: archived \d+ application/).waitFor({ timeout: 15_000 });
   await page.waitForTimeout(1_500); // state refresh after confirm
   const chat = page.getByRole("region", { name: "Chat" });
-  const archived = await admin.from("applications").select("id", { count: "exact", head: true }).eq("user_id", userId!).eq("stage", "archived");
-  check("confirm archives the previewed items and the chat stops asking", archived.count === previewCount && (await chat.getByRole("button", { name: "Review" }).count()) === 0, `${archived.count} archived`);
+  const archived = await admin.from("applications").select("id").eq("user_id", userId!).eq("stage", "archived");
+  const archivedIds = (archived.data ?? []).map((row) => row.id as string).sort();
+  check("confirm archives exactly those applications and the chat stops asking", JSON.stringify(archivedIds) === JSON.stringify(expectedIds) && (await chat.getByRole("button", { name: "Review" }).count()) === 0, `${archivedIds.length} archived`);
   await shot("06-confirmed");
 
   await ask("Show my funnel this month");
@@ -113,10 +118,13 @@ try {
   const files = await admin.from("files").select("id", { count: "exact", head: true }).eq("user_id", userId!);
   check("cancel leaves the file and logs the cancellation", cancelled && (files.count ?? 0) >= 2, `${files.count} files`);
 
+  check("generated files are listed with download buttons", (await actionLog().getByText(/^Your files \(\d+\)/).count()) > 0);
+
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForTimeout(2_500);
-  check("after a reload, chat history, results and the log are still there",
-    (await page.getByText("Show my funnel this month").count()) > 0 && (await page.getByText(/^How [\d,]+ jobs became/).count()) > 0 && (await actionLog().getByText("Archive applications").count()) > 0);
+  check("after a reload, chat history, results, files and the log are still there",
+    (await page.getByRole("region", { name: "Chat" }).locator("div.ml-8", { hasText: "Show my funnel this month" }).count()) === 1 && (await page.getByText(/^How [\d,]+ jobs became/).count()) > 0 &&
+      (await actionLog().getByText("Archive applications").count()) > 0 && (await actionLog().getByText(/apply-checklist-v1/).count()) > 0);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: /^log$/i }).click();

@@ -265,12 +265,12 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 - **N1:** `untouched_days` now also narrows a given list of refs. **N2:** agent eval results record a prompt hash, a case-file hash and a dirty flag, and failures record the tool calls made. **N3, N4:** doc counts and paths fixed; TESTING.md lists `check:agent` and `eval:agent`. **N5:** the confirm/reject 404/410/409/500 mapping was already covered by `tests/api/agent.test.ts` ("maps %s to HTTP %i"). **N6, N8:** accepted and recorded in DECISIONS 049. **N7:** worst case recorded in DECISIONS 046, and the deadline now refuses the rest of a parallel batch.
 
 ## 055. UI: Tailwind and hand-written components; no shadcn/ui or Recharts (Phase 5, supersedes D8 and DECISIONS 020)
-- **What:** Three panels (chat, Results/Pipeline/Funnel tabs, action log) built from a few small components (`components/ui.tsx`) on Tailwind with design tokens in `app/globals.css` (light and dark sets). Charts (the search→triage breakdown, the funnel) are one-series horizontal bars in CSS: linear scale from zero, a direct count label on every bar, a hover tooltip and a table view. Action-log statuses use reserved status colors, always with an icon and a label.
+- **What:** Three panels (chat, Results/Pipeline/Funnel tabs, action log) built from a few small components (`components/ui.tsx`) on Tailwind with design tokens in `app/globals.css` (light and dark sets). Charts are one-series horizontal bars in CSS: linear scale from zero, a direct count label on every bar, and no bar at all for zero. The funnel also has a hover tooltip and a table view. The search breakdown shows each step's exact count and what it removed beside its bar (and in a native tooltip), which serves as its table. Action-log statuses use reserved status colors, always with an icon and a label.
 - **Why:** Every dependency is a risk on this machine: adding one package (`playwright-core`, DECISIONS 058) triggered the npm optional-dependency bug again and silently removed all rolldown platform entries from the lockfile. Two bar charts don't need a chart library, and hand-written components keep the bundle small and the markup accessible (`<dialog>` for the confirmation, real tabs, labels).
 
 ## 056. One `/api/state` read for the UI
 - **What:** `POST /api/state` returns the user's profile, pipeline (with posting details), recent files, the last 60 actions, the last 30 chat messages and the latest results (triaged or not, with evidence) in one call, via `loadSessionState`. It assigns no new refs. The UI calls it on load and after every turn, confirm, cancel or demo button.
-- **Why:** The browser can't read `postings` (RLS keeps shared tables server-only), so the pipeline needs a server read anyway. One read after each change keeps every panel consistent and makes a reload lossless. The Funnel tab computes its numbers with the same `computeFunnel` code the tool uses, so chat and chart always agree.
+- **Why:** The browser can't read `postings` (RLS keeps shared tables server-only), so the pipeline needs a server read anyway. One read after each change keeps every panel consistent. After a reload, the chat history, results, pipeline, generated files (listed above the log with Download buttons) and log all come back; the source chips don't (they're only in the turn's events). The Funnel tab computes its numbers with the same `computeFunnel` code the tool uses, and it follows the range the agent last used ("this week" → 7 days), so chat and chart agree.
 
 ## 057. An equivalent search within 10 minutes reuses its result set
 - **What:** `search_jobs` returns the latest set (`reused: true`, with a note to use its existing ranking) instead of fetching again, when it is less than 10 minutes old and the search would give the same results. "Same" is decided in code from what actually drives the results: the role words and board tags read from the query, places, remote, age window and internships. A reworded query ("backend jobs for new grads" vs "entry-level backend") still matches; the first version compared raw text, and a live UI run slipped past it.
@@ -278,7 +278,7 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 
 ## 058. UI verified in a real browser (`npm run check:ui`)
 - **What:** `scripts/check-ui.mts` drives the installed Edge (or Chrome) headless through `playwright-core` (no browser download) and clicks through the PLAN section 9 demo. It checks each screen: empty state, demo buttons, results with funnel, cards, source chips and evidence; the checklist download; the interview card; the confirmation dialog matching the preview, nothing archived before confirming, and exactly the previewed rows archived after; the funnel chart and table; cancel; persistence after a reload; the phone layout; no action left non-final; no console errors. The test user is deleted at the end.
-- **Why:** The gate needs evidence that the UI works, not just the API. The browser runs found three real bugs that unit tests and `check:agent` couldn't:
+- **Why:** The gate needs evidence that the UI works, not just the API. The browser runs found four real bugs that unit tests and `check:agent` couldn't:
   - the page crashed after the first answer, because newer Chromium returns a Promise from `scrollIntoView` and the auto-scroll effect returned it;
   - a confirmed action still showed "Waiting for your confirmation" in the chat;
   - the six-column board truncated every title;
@@ -288,3 +288,15 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 ## 059. Phase 5 scope notes
 - Turns are not streamed (PLAN D5). The UI shows a spinner with "searching and reading postings can take 10–20 seconds", and the step timeline appears when the turn returns. Measured live: 7–17 s per turn.
 - Downloads always request a fresh signed link (`/api/files/:id/url`), so a file card keeps working after the 1-hour expiry.
+
+## 060. Phase 5 review fixes (reviews/phase-5.md)
+- **S1:** chat history is captured once on the first load, not as a count over a sliding window, so new turns never appear twice after a reload.
+- **S2:** the Funnel tab follows the range of the agent's last funnel ("this week" → 7 days); the range buttons include it.
+- **S3:** generated files are listed above the action log with Download buttons, so they survive a reload (DECISIONS 056 reworded).
+- **S4:** the step timeline shows each action's current status (a proposal becomes Done/Cancelled), not the one frozen when the turn ended.
+- **S5:** the first breakdown bar is "All listings searched" (it counts every listing on the searched boards, not engineering jobs).
+- **S6:** rows still "proposed"/"confirmed" after 300 s (longer than `maxDuration`) show as "Interrupted".
+- **S7:** confirm, cancel, the demo buttons and Download report network errors in a toast; the demo buttons are disabled while they run.
+- **S8:** `check:ui` no longer breaks in December (`\w{3}` month) and checks that exactly the applications untouched for 3 weeks (read from the database first) were proposed and then archived. It also checks the files list and that a reload doesn't duplicate chat history.
+- **Nice-to-haves done:** dialog titles wrap (N2); the Send button keeps an accessible name while busy (N3); doc mistakes fixed (N6); scores show "of 100" (N7); `check:live` covers `/api/state` and `/api/files/:id/url` (N8); zero counts draw no bar (N10).
+- **Left for Phase 6 (in HANDOFF):** N1 source chips after a reload, N3 tab arrow-key navigation and dark-mode accent contrast, N4 http(s)-only posting URLs at ingestion, N5 a rate limit on `/api/state`, N8 moving more client logic into `lib/ui` with tests, N9 the Review fallback, N11 ranking relevance ("Server Hardware Systems Engineer" ranks #2 for "backend and full-stack").

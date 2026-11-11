@@ -40,14 +40,15 @@ function FileCard({ file, onDownload }: { file: FilePayload; onDownload: (fileId
   );
 }
 
-function Timeline({ events }: { events: TurnEvent[] }) {
+function Timeline({ events, actionStatus }: { events: TurnEvent[]; actionStatus: Map<string, string> }) {
   const steps = events.filter((event): event is Extract<TurnEvent, { type: "step_done" }> => event.type === "step_done");
   if (steps.length === 0) return null;
   return (
     <ol className="my-2 space-y-1 border-l-2 border-border pl-3">
       {steps.map((step) => (
         <li key={step.actionId} className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
-          <StatusChip status={step.status} />
+          {/* The current status (a proposal becomes Done or Cancelled later), not the one frozen at turn end. */}
+          <StatusChip status={actionStatus.get(step.actionId) ?? step.status} />
           <span className="font-medium">{toolLabel(step.tool)}</span>
           <span className="text-muted">{step.summary}</span>
           <span className="text-muted">· {formatDuration(step.durationMs)}</span>
@@ -117,7 +118,7 @@ export function ChatPanel({
                     <Spinner /> Working on it… searching and reading postings can take 10–20 seconds.
                   </p>
                 )}
-                <Timeline events={turn.events} />
+                <Timeline events={turn.events} actionStatus={actionStatus} />
                 {turn.state === "error" && <p className="text-sm text-critical">{turn.error}</p>}
                 {turn.final && <AnswerText text={turn.final} />}
                 <div className="mt-2 space-y-2">
@@ -175,7 +176,7 @@ export function ChatPanel({
             placeholder="Ask in plain English, e.g. “find new-grad backend roles in Seattle or remote”"
             className="min-h-[2.75rem] flex-1 resize-none rounded-md border border-border bg-surface px-3 py-2 text-sm placeholder:text-muted"
           />
-          <Button type="submit" variant="primary" disabled={busy || !draft.trim()} className="self-end">
+          <Button type="submit" variant="primary" disabled={busy || !draft.trim()} className="self-end" aria-label={busy ? "Sending" : "Send"}>
             {busy ? <Spinner /> : "Send"}
           </Button>
         </form>

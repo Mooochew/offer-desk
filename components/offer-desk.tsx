@@ -38,7 +38,12 @@ export function OfferDesk() {
   const [pending, setPending] = useState<PendingAction | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [sources, setSources] = useState<{ sources: SourceStatus[]; usedSnapshot: boolean }>({ sources: [], usedSnapshot: false });
-  const [historyCount, setHistoryCount] = useState<number | null>(null);
+  // Chat history is captured once, on the first load; later turns live in `turns` (review S1).
+  const [history, setHistory] = useState<SessionState["messages"] | null>(null);
+  // The funnel range follows the last range the agent used ("this week" = 7), review S2.
+  const [funnelRange, setFunnelRange] = useState(30);
+  // When the state was last read; render stays pure (no Date.now() during render).
+  const [loadedAt, setLoadedAt] = useState(0);
 
   const toast = useCallback((tone: Toast["tone"], text: string) => {
     const id = Date.now() + Math.random();
@@ -53,7 +58,8 @@ export function OfferDesk() {
       const { ok: _ok, ...next } = result.body;
       void _ok;
       setState(next);
-      setHistoryCount((count) => count ?? next.messages.length);
+      setHistory((current) => current ?? next.messages);
+      setLoadedAt(Date.now());
       setSessionError(null);
     }
     setLoading(false);
@@ -89,6 +95,8 @@ export function OfferDesk() {
       if (status_) setSources({ sources: status_.sources, usedSnapshot: status_.usedSnapshot });
       const next = tabFor(body.events);
       if (next) setTab(next);
+      const funnel = body.events.find((event) => event.type === "ui_payload" && event.payload.kind === "funnel") as { payload: { rangeDays?: number } } | undefined;
+      if (funnel?.payload.rangeDays) setFunnelRange(funnel.payload.rangeDays);
       const proposal = body.events.find((event) => event.type === "pending_action") as Extract<TurnEvent, { type: "pending_action" }> | undefined;
       if (proposal) setPending({ actionId: proposal.actionId, tool: proposal.tool, preview: proposal.preview, minutesLeft: minutesUntil(proposal.expiresAt) });
       const failure = body.events.find((event) => event.type === "error") as Extract<TurnEvent, { type: "error" }> | undefined;
@@ -116,28 +124,43 @@ export function OfferDesk() {
     toast("neutral", "That action was already handled.");
   };
 
+  // Every button that calls the server reports network failures instead of failing silently (review S7).
+  const networkError = (error: unknown) => toast("critical", `Couldn't reach the server: ${(error as Error).message}`);
+
   const decide = async (kind: "confirm" | "reject") => {
     if (!pending) return;
-    const { body } = kind === "confirm" ? await api.confirm(pending.actionId) : await api.reject(pending.actionId);
-    if (body.ok) toast(kind === "confirm" ? "good" : "neutral", kind === "confirm" ? `Done: ${(body as { summary?: string }).summary ?? "confirmed"}.` : "Cancelled. Nothing changed.");
-    else toast("critical", body.error ?? "That didn't work.");
-    setPending(null);
-    if (kind === "confirm" && body.ok) setTab("pipeline");
+    try {
+      const { body } = kind === "confirm" ? await api.confirm(pending.actionId) : await api.reject(pending.actionId);
+      if (body.ok) toast(kind === "confirm" ? "good" : "neutral", kind === "confirm" ? `Done: ${(body as { summary?: string }).summary ?? "confirmed"}.` : "Cancelled. Nothing changed.");
+      else toast("critical", body.error ?? "That didn't work.");
+      setPending(null);
+      if (kind === "confirm" && body.ok) setTab("pipeline");
+    } catch (error) {
+      networkError(error); // the dialog stays open so the user can try again
+    }
     await refresh();
   };
 
   const demo = async (kind: "profile" | "seed") => {
-    const { body } = kind === "profile" ? await api.demoProfile() : await api.demoSeed();
-    if (!body.ok) toast("critical", body.error ?? "That didn't work.");
-    else if (kind === "profile") toast("good", "Demo profile loaded: new-grad CS, SoCal or remote, TypeScript/Python/Postgres, up to 2 years.");
-    else toast("good", (body as { created?: number }).created ? `Added ${(body as { created?: number }).created} sample applications (some untouched for weeks).` : "The sample pipeline is already there.");
-    if (kind === "seed") setTab("pipeline");
+    setBusy(true); // no double clicks while it runs
+    try {
+      const { body } = kind === "profile" ? await api.demoProfile() : await api.demoSeed();
+      if (!body.ok) toast("critical", body.error ?? "That didn't work.");
+      else if (kind === "profile") toast("good", "Demo profile loaded: new-grad CS, SoCal or remote, TypeScript/Python/Postgres, up to 2 years.");
+      else toast("good", (body as { created?: number }).created ? `Added ${(body as { created?: number }).created} sample applications (some untouched for weeks).` : "The sample pipeline is already there.");
+      if (kind === "seed") setTab("pipeline");
+    } catch (error) {
+      networkError(error);
+    } finally {
+      setBusy(false);
+    }
     await refresh();
   };
 
   const download = async (fileId: string) => {
-    const { body } = await api.fileUrl(fileId);
-    if (body.ok && body.url) {
+    try {
+      const { body } = await api.fileUrl(fileId);
+      if (!body.ok || !body.url) return toast("critical", body.error ?? "Couldn't get the download link.");
       // A link click downloads (the signed URL is served as an attachment) without leaving the page.
       const link = document.createElement("a");
       link.href = body.url;
@@ -145,12 +168,12 @@ export function OfferDesk() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+    } catch (error) {
+      networkError(error);
     }
-    else toast("critical", body.error ?? "Couldn't get the download link.");
   };
 
   const profile = state.profile;
-  const history = historyCount === null ? [] : state.messages.slice(0, historyCount);
   const awaiting = state.actions.filter((action) => action.status === "awaiting_confirmation").length;
 
   const board = (
@@ -171,7 +194,7 @@ export function OfferDesk() {
         ) : tab === "pipeline" ? (
           <PipelineTab pipeline={state.pipeline} />
         ) : (
-          <FunnelTab pipeline={state.pipeline} />
+          <FunnelTab pipeline={state.pipeline} range={funnelRange} onRange={setFunnelRange} />
         )}
       </div>
     </div>
@@ -183,7 +206,21 @@ export function OfferDesk() {
         Action log {awaiting > 0 && <span className="ml-1 rounded-full bg-warning-soft px-2 py-0.5 text-xs text-warning">⏸ {awaiting} to confirm</span>}
       </h2>
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
-        <ActionLog actions={state.actions} onReview={review} />
+        {state.files.length > 0 && (
+          <details className="mb-3 rounded-lg border border-border bg-surface p-2" open>
+            <summary className="cursor-pointer text-sm font-medium">Your files ({state.files.length})</summary>
+            <ul className="mt-2 space-y-1.5">
+              {state.files.map((file) => (
+                <li key={file.id} className="flex items-center gap-2 text-xs">
+                  <span aria-hidden>{file.kind === "ics" ? "\u{1F4C5}" : file.kind === "csv" ? "\u{1F4CA}" : "\u{1F4DD}"}</span>
+                  <span className="min-w-0 flex-1 truncate" title={file.filename}>{file.ref ? `${file.ref} \u00b7 ` : ""}{file.filename}</span>
+                  <Button variant="ghost" className="!px-2 !py-0.5 text-xs" onClick={() => download(file.id)}>Download</Button>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+        <ActionLog actions={state.actions} onReview={review} now={loadedAt} />
       </div>
     </div>
   );
@@ -228,7 +265,7 @@ export function OfferDesk() {
 
       <main className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[minmax(300px,1fr)_minmax(0,2fr)_minmax(260px,0.9fr)]">
         <section aria-label="Chat" className={`min-h-0 border-border bg-surface md:block md:border-r ${mobile === "chat" ? "block" : "hidden"}`}>
-          <ChatPanel history={history} turns={turns} busy={busy} onSend={send} onDownload={download} onReview={review} actionStatus={new Map(state.actions.map((action) => [action.id, action.status]))} />
+          <ChatPanel history={history ?? []} turns={turns} busy={busy} onSend={send} onDownload={download} onReview={review} actionStatus={new Map(state.actions.map((action) => [action.id, action.status]))} />
         </section>
         <section aria-label="Board" className={`min-h-0 md:block ${mobile === "board" ? "block" : "hidden"}`}>{board}</section>
         <section aria-label="Action log" className={`min-h-0 border-border bg-surface md:block md:border-l ${mobile === "log" ? "block" : "hidden"}`}>{log}</section>

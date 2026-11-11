@@ -44,7 +44,7 @@ const noToken = await fetch(`${liveUrl}/api/health`, { method: "POST" });
 check("request without a session is rejected", noToken.status === 401, `HTTP ${noToken.status}`);
 
 // Phase 4 routes exist on the deployment and refuse anonymous callers (no model call is made).
-for (const path of ["/api/agent", "/api/demo/profile", "/api/demo/seed", "/api/actions/123e4567-e89b-42d3-a456-426614174000/confirm"]) {
+for (const path of ["/api/agent", "/api/state", "/api/demo/profile", "/api/demo/seed", "/api/actions/123e4567-e89b-42d3-a456-426614174000/confirm", "/api/files/123e4567-e89b-42d3-a456-426614174000/url"]) {
   const response = await fetch(`${liveUrl}${path}`, { method: "POST", body: "{}" });
   check(`${path} rejects a request without a session`, response.status === 401, `HTTP ${response.status}`);
 }

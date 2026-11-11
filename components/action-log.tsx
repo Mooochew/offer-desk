@@ -5,7 +5,7 @@ import { formatDuration, timeAgo, toolLabel } from "@/lib/ui/format";
 import { Button, EmptyState, StatusChip } from "./ui";
 
 /** Every tool call, newest first: status, duration, and the exact arguments the model sent. */
-export function ActionLog({ actions, onReview }: { actions: ActionRecord[]; onReview: (actionId: string) => void }) {
+export function ActionLog({ actions, onReview, now }: { actions: ActionRecord[]; onReview: (actionId: string) => void; now: number }) {
   if (actions.length === 0) {
     return <EmptyState title="Nothing yet">Every tool call the agent makes is logged here with its arguments, status and duration.</EmptyState>;
   }
@@ -14,7 +14,7 @@ export function ActionLog({ actions, onReview }: { actions: ActionRecord[]; onRe
       {actions.map((action) => (
         <li key={action.id} className={`rounded-lg border bg-surface p-2 text-xs ${action.status === "awaiting_confirmation" ? "border-warning" : "border-border"}`}>
           <div className="flex flex-wrap items-center gap-1.5">
-            <StatusChip status={action.status} />
+            <StatusChip status={action.status} ageSeconds={(now - Date.parse(action.createdAt)) / 1000} />
             <span className="font-medium">{toolLabel(action.tool)}</span>
             {action.destructive && <span className="text-critical" title="Destructive: needs your confirmation">⚠</span>}
             <span className="ml-auto text-muted">{formatDuration(action.durationMs)} · {timeAgo(action.createdAt)}</span>

@@ -429,7 +429,7 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 
 1. Click **Load demo profile** (new-grad CS, SoCal or remote, TS/Python/Postgres).
 2. *"Find entry-level backend and full-stack roles in SoCal or remote posted this week"*. The step timeline and source chips appear live.
-3. The breakdown shows the real funnel (thousands of engineering jobs → a few dozen after the title/location/date prefilter → fewer after requirement checks), with the evidence popover on a result dropped for "3+ years" or an active clearance. Numbers change daily; rehearse the same day.
+3. The breakdown shows the real funnel (thousands of listings on the searched boards → a few dozen after the title/location/date prefilter → fewer after requirement checks), with the evidence popover on a result dropped for "3+ years" or an active clearance. Numbers change daily; rehearse the same day.
 4. *"Save the top 5 and give me an apply checklist"* → applications created + a checklist file card. (Use a count the rehearsal shows is available after triage.)
 5. *"Mark the first 5 as applied today; I have an interview with [company] Thursday at 2"* → stages update + `.ics` card.
 6. *"Archive everything I haven't touched in 3 weeks"* (on the seeded pipeline) → modal with the preview list → Confirm.

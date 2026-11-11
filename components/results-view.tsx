@@ -41,7 +41,7 @@ function Breakdown({ search, triage }: { search: SearchBreakdown | null; triage:
             <span className="truncate text-muted">{step.label}</span>
             <span className="flex items-center gap-2">
               {/* Linear from zero, so length stays honest; tiny steps get a visible stub and the exact count. */}
-              <span className="h-3 rounded-r-[4px] bg-accent" style={{ width: `${Math.max(0.75, (step.count / max) * 70)}%` }} />
+              {step.count > 0 && <span className="h-3 rounded-r-[4px] bg-accent" style={{ width: `${Math.max(0.75, (step.count / max) * 70)}%` }} />}
               <span className="font-medium tabular-nums">{step.count.toLocaleString()}</span>
               {step.removed && <span className="hidden text-muted sm:inline">{step.removed}</span>}
             </span>
@@ -95,7 +95,7 @@ function RankedCard({ item, index }: { item: ResultsView["ranked"][number]; inde
         {score !== undefined && (
           <div className="text-right">
             <p className="text-lg font-semibold tabular-nums">{score}</p>
-            <p className="text-[11px] text-muted">score</p>
+            <p className="text-[11px] text-muted">of 100</p>
           </div>
         )}
       </div>

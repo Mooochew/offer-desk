@@ -59,8 +59,7 @@ export function PipelineTab({ pipeline }: { pipeline: PipelineItem[] }) {
 
 const RANGES = [7, 30, 90] as const;
 
-export function FunnelTab({ pipeline }: { pipeline: PipelineItem[] }) {
-  const [range, setRange] = useState<number>(30);
+export function FunnelTab({ pipeline, range, onRange: setRange }: { pipeline: PipelineItem[]; range: number; onRange: (days: number) => void }) {
   const [asTable, setAsTable] = useState(false);
   const stats = useMemo(() => {
     const sources = new Map(pipeline.map((item) => [item.posting.id, item.posting.source]));
@@ -81,7 +80,7 @@ export function FunnelTab({ pipeline }: { pipeline: PipelineItem[] }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Funnel options">
-        {RANGES.map((days) => (
+        {[...new Set<number>([...RANGES, range])].sort((a, b) => a - b).map((days) => (
           <Button key={days} variant={range === days ? "primary" : "secondary"} onClick={() => setRange(days)} aria-pressed={range === days}>Last {days} days</Button>
         ))}
         <Button variant="ghost" onClick={() => setAsTable(!asTable)} aria-pressed={asTable}>{asTable ? "Show chart" : "Show table"}</Button>
@@ -103,7 +102,7 @@ export function FunnelTab({ pipeline }: { pipeline: PipelineItem[] }) {
               <li key={bar.label} className="group grid grid-cols-[8rem_1fr] items-center gap-2 text-sm">
                 <span className="text-muted">{bar.label}</span>
                 <span className="relative flex items-center gap-2">
-                  <span className="h-6 rounded-r-[4px] bg-accent transition-opacity group-hover:opacity-80" style={{ width: `${Math.max(0.75, (bar.count / max) * 80)}%` }} />
+                  {bar.count > 0 && <span className="h-6 rounded-r-[4px] bg-accent transition-opacity group-hover:opacity-80" style={{ width: `${Math.max(0.75, (bar.count / max) * 80)}%` }} />}
                   <span className="font-semibold tabular-nums">{bar.count}</span>
                   <span role="tooltip" className="pointer-events-none absolute -top-7 left-0 hidden rounded bg-foreground px-2 py-0.5 text-xs text-background group-hover:block">
                     {bar.label}: {bar.count} ({stats.funnel.added ? Math.round((bar.count / stats.funnel.added) * 100) : 0}% of added)

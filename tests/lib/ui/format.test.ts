@@ -11,6 +11,11 @@ describe("UI format helpers", () => {
     }
     expect(actionStatus("weird")).toEqual({ label: "weird", icon: "•", tone: "neutral" });
     expect(actionStatus("failed").tone).toBe("critical");
+    // Phase 5 review S6: a row cut off mid-call shows as interrupted, not "Running" forever.
+    expect(actionStatus("confirmed", 30).label).toBe("Running");
+    expect(actionStatus("confirmed", 301)).toMatchObject({ label: "Interrupted", tone: "serious" });
+    expect(actionStatus("proposed", 9999).label).toBe("Interrupted");
+    expect(actionStatus("executed", 9999).label).toBe("Done");
   });
 
   it("formats tool names, durations, ages and years", () => {
@@ -35,7 +40,7 @@ describe("UI format helpers", () => {
     const triage = { candidates: 28, checked: 25, notChecked: 3, unread: 1, droppedYears: 5, droppedClearance: 1, remaining: 18 };
     const steps = funnelSteps(search, triage);
     expect(steps.map((step) => [step.label, step.count])).toEqual([
-      ["Engineering jobs", 7917],
+      ["All listings searched", 7917],
       ["Matching role", 1762],
       ["Not senior", 787],
       ["Not internships", 704],

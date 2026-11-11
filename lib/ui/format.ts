@@ -14,7 +14,17 @@ export const ACTION_STATUS: Record<string, { label: string; icon: string; tone: 
   failed: { label: "Failed", icon: "✕", tone: "critical" },
 };
 
-export function actionStatus(status: string) {
+/** Longer than the route's maxDuration: a row still "proposed"/"confirmed" after this was cut off. */
+export const INTERRUPTED_AFTER_SECONDS = 300;
+
+/**
+ * Status meta for the log. A row still "proposed" or "confirmed" after maxDuration means the server
+ * was stopped mid-call (DECISIONS 054), so it shows as interrupted instead of "Running" forever.
+ */
+export function actionStatus(status: string, ageSeconds?: number) {
+  if ((status === "proposed" || status === "confirmed") && ageSeconds !== undefined && ageSeconds > INTERRUPTED_AFTER_SECONDS) {
+    return { label: "Interrupted", icon: "⚠", tone: "serious" as const };
+  }
   return ACTION_STATUS[status] ?? { label: status, icon: "•", tone: "neutral" as const };
 }
 
@@ -57,7 +67,7 @@ export type TriageBreakdown = { candidates: number; checked: number; notChecked:
  */
 export function funnelSteps(search: SearchBreakdown | null, triage: TriageBreakdown | null): { label: string; count: number; removed?: string }[] {
   if (!search) return [];
-  const steps: { label: string; count: number; removed?: string }[] = [{ label: "Engineering jobs", count: search.considered }];
+  const steps: { label: string; count: number; removed?: string }[] = [{ label: "All listings searched", count: search.considered }];
   let left = search.considered;
   const cut = (label: string, removed: number, why: string) => {
     if (removed <= 0) return;
