@@ -149,6 +149,8 @@ export interface AgentStore {
   /** One conditional update: awaiting_confirmation → rejected. Null if it didn't apply. */
   rejectAction(id: string): Promise<ActionRecord | null>;
   pendingActions(now: string): Promise<ActionRecord[]>;
+  /** Most recent actions, newest first (the action log panel). */
+  listActions(limit: number): Promise<ActionRecord[]>;
   /** Marks proposals past their expiry as "expired" (so the log never shows stale "awaiting"). Returns how many. */
   expireActions(now: string): Promise<number>;
 

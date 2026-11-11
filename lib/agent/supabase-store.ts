@@ -352,6 +352,11 @@ export function createSupabaseAgentStore(admin: SupabaseClient, user: SupabaseCl
       return (data ?? []).map(toAction);
     },
 
+    async listActions(limit) {
+      const data = check(await admin.from("action_log").select(ACTION_COLUMNS).eq("user_id", userId).order("created_at", { ascending: false }).limit(limit), "action log read");
+      return (data ?? []).map(toAction);
+    },
+
     async expireActions(now) {
       const data = check(
         await admin.from("action_log").update({ status: "expired" }).eq("user_id", userId).eq("status", "awaiting_confirmation").lte("expires_at", now).select("id"),

@@ -170,6 +170,9 @@ export function memoryDb(now: () => Date = () => new Date("2026-11-10T20:00:00Z"
       async pendingActions(at) {
         return mine(db.actions).filter((row) => row.status === "awaiting_confirmation" && row.expiresAt !== null && row.expiresAt > at);
       },
+      async listActions(limit) {
+        return mine(db.actions).slice(-limit).reverse().map((row) => structuredClone(row));
+      },
       async expireActions(at) {
         const stale = mine(db.actions).filter((row) => row.status === "awaiting_confirmation" && row.expiresAt !== null && row.expiresAt <= at);
         for (const row of stale) row.status = "expired";

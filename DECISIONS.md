@@ -263,3 +263,27 @@ No source sent rate-limit headers, so we use conservative concurrency (8) and ba
 - **S4 (LLM date math):** relative days are resolved in code (DECISIONS 050, corrected); prompt v4.
 - **S5 (no link refresh):** `POST /api/files/:id/url` returns a fresh signed link for the user's own file. Tool results include `fileId` for it.
 - **N1:** `untouched_days` now also narrows a given list of refs. **N2:** agent eval results record a prompt hash, a case-file hash and a dirty flag, and failures record the tool calls made. **N3, N4:** doc counts and paths fixed; TESTING.md lists `check:agent` and `eval:agent`. **N5:** the confirm/reject 404/410/409/500 mapping was already covered by `tests/api/agent.test.ts` ("maps %s to HTTP %i"). **N6, N8:** accepted and recorded in DECISIONS 049. **N7:** worst case recorded in DECISIONS 046, and the deadline now refuses the rest of a parallel batch.
+
+## 055. UI: Tailwind and hand-written components; no shadcn/ui or Recharts (Phase 5, supersedes D8 and DECISIONS 020)
+- **What:** Three panels (chat, Results/Pipeline/Funnel tabs, action log) built from a few small components (`components/ui.tsx`) on Tailwind with design tokens in `app/globals.css` (light and dark sets). Charts (the search→triage breakdown, the funnel) are one-series horizontal bars in CSS: linear scale from zero, a direct count label on every bar, a hover tooltip and a table view. Action-log statuses use reserved status colors, always with an icon and a label.
+- **Why:** Every dependency is a risk on this machine: adding one package (`playwright-core`, DECISIONS 058) triggered the npm optional-dependency bug again and silently removed all rolldown platform entries from the lockfile. Two bar charts don't need a chart library, and hand-written components keep the bundle small and the markup accessible (`<dialog>` for the confirmation, real tabs, labels).
+
+## 056. One `/api/state` read for the UI
+- **What:** `POST /api/state` returns the user's profile, pipeline (with posting details), recent files, the last 60 actions, the last 30 chat messages and the latest results (triaged or not, with evidence) in one call, via `loadSessionState`. It assigns no new refs. The UI calls it on load and after every turn, confirm, cancel or demo button.
+- **Why:** The browser can't read `postings` (RLS keeps shared tables server-only), so the pipeline needs a server read anyway. One read after each change keeps every panel consistent and makes a reload lossless. The Funnel tab computes its numbers with the same `computeFunnel` code the tool uses, so chat and chart always agree.
+
+## 057. An identical search within 10 minutes reuses its result set
+- **What:** `search_jobs` with the same criteria as the latest set (less than 10 minutes old) returns that set (`reused: true`) with a note to use its existing ranking, instead of fetching again and creating a new set.
+- **Why:** In live runs the model sometimes repeated the search before "save the top 5" (2 of about 5 runs). That made a new, untriaged set the latest one, and in one UI run it also re-ran triage, costing three extra calls and about 5 s. Fixing it in code is deterministic; a prompt rule would need another eval round.
+
+## 058. UI verified in a real browser (`npm run check:ui`)
+- **What:** `scripts/check-ui.mts` drives the installed Edge (or Chrome) headless through `playwright-core` (no browser download) and clicks through the PLAN section 9 demo. It checks each screen: empty state, demo buttons, results with funnel, cards, source chips and evidence; the checklist download; the interview card; the confirmation dialog matching the preview, nothing archived before confirming, and exactly the previewed rows archived after; the funnel chart and table; cancel; persistence after a reload; the phone layout; no action left non-final; no console errors. The test user is deleted at the end.
+- **Why:** The gate needs evidence that the UI works, not just the API. The browser runs found three real bugs that unit tests and `check:agent` couldn't:
+  - the page crashed after the first answer, because newer Chromium returns a Promise from `scrollIntoView` and the auto-scroll effect returned it;
+  - a confirmed action still showed "Waiting for your confirmation" in the chat;
+  - the six-column board truncated every title.
+- **Note:** it uses 6 chat turns, and repeated local runs share one per-IP budget (60 agent calls/hour, DECISIONS 047). One run hit that limit, and the UI showed the limit message as designed.
+
+## 059. Phase 5 scope notes
+- Turns are not streamed (PLAN D5). The UI shows a spinner with "searching and reading postings can take 10–20 seconds", and the step timeline appears when the turn returns. Measured live: 7–17 s per turn.
+- Downloads always request a fresh signed link (`/api/files/:id/url`), so a file card keeps working after the 1-hour expiry.

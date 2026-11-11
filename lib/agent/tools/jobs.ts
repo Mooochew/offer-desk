@@ -19,6 +19,13 @@ import type { NormalTool, ToolContext } from "./types";
 const SEARCH_REFS = 50;
 /** Jobs the model sees per result: enough for "the top 5", small enough to keep tokens flat. */
 const MODEL_TOP = 10;
+/** The same search within this window reuses its result set (the model sometimes re-searches). */
+const REUSE_MS = 10 * 60 * 1000;
+
+function sameCriteria(a: unknown, b: unknown): boolean {
+  const norm = (value: unknown) => JSON.stringify(value, Object.keys((value as object) ?? {}).sort());
+  return norm(a) === norm(b);
+}
 
 const searchInput = z
   .object({
@@ -45,6 +52,23 @@ export const searchJobsTool: NormalTool<z.infer<typeof searchInput>> = {
       postedWithinDays: args.posted_within_days,
       includeInternships: args.include_internships,
     };
+    // Seen live: before "save the top 5" the model sometimes repeats the search it just ran, which
+    // made a new, untriaged set the "latest" one. An identical search a few minutes later reuses it.
+    const latest = await ctx.store.latestResultSet();
+    if (latest && sameCriteria(latest.query, criteria) && ctx.now().getTime() - Date.parse(latest.createdAt) < REUSE_MS) {
+      const triage = isStoredTriage(latest.ranked) ? latest.ranked : null;
+      return {
+        summary: `same search as ${latest.ref} (reused)`,
+        forModel: {
+          set: latest.ref,
+          reused: true,
+          matches: latest.postingIds.length,
+          note: triage
+            ? `This exact search ran minutes ago and ${latest.ref} is already triaged. Use its ranked refs (in the state block or the earlier triage_results); don't triage again.`
+            : `This exact search ran minutes ago. Use ${latest.ref}; call triage_results on it if needed.`,
+        },
+      };
+    }
     const result = await ctx.services.search(criteria, ctx.deadline);
 
     const setId = crypto.randomUUID();
@@ -150,7 +174,7 @@ export const triageResultsTool: NormalTool<z.infer<typeof triageInput>> = {
         // Named exactly: the default filter drops ACTIVE-clearance jobs only (eligibility is opt-in).
         dropped: {
           too_many_years: breakdown.droppedYears,
-          [filters.excludeClearanceEligible ? "needs_clearance_or_eligibility" : "needs_active_clearance"]: breakdown.droppedClearance,
+          [filters.excludeClearanceEligible ? "needs_active_clearance_or_eligibility" : "needs_an_active_clearance_already_held"]: breakdown.droppedClearance,
         },
         unread: breakdown.unread,
         not_checked: breakdown.notChecked,

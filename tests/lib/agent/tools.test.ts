@@ -55,6 +55,17 @@ describe("search_jobs and triage_results", () => {
     expect(JSON.stringify(search.forModel)).not.toContain("SECRET-DESCRIPTION");
   });
 
+  it("reuses an identical search from the last few minutes instead of making a new set", async () => {
+    const { ctx, db } = await searchedAndTriaged();
+    const again = await call(ctx, "search_jobs", { query: "entry-level backend", posted_within_days: 7 });
+    expect(again.forModel).toMatchObject({ set: "S1", reused: true, note: expect.stringContaining("already triaged") });
+    expect(db.resultSets).toHaveLength(1);
+    const different = await call(ctx, "search_jobs", { query: "frontend", posted_within_days: 7 });
+    expect(different.forModel).toMatchObject({ set: "S2" });
+    const later = { ...ctx, now: () => new Date(NOW.getTime() + 11 * 60 * 1000) };
+    expect((await call(later, "search_jobs", { query: "frontend", posted_within_days: 7 })).forModel).toMatchObject({ set: "S3" });
+  });
+
   it("uses the profile's places and remote setting unless the call overrides them", async () => {
     const memory = memoryDb(() => NOW);
     const store = memory.storeFor("u1");
@@ -76,7 +87,7 @@ describe("search_jobs and triage_results", () => {
     expect(triaged.forModel).toMatchObject({
       set: "S1",
       ranked: 2,
-      dropped: { too_many_years: 1, needs_active_clearance: 0 },
+      dropped: { too_many_years: 1, needs_an_active_clearance_already_held: 0 },
       top: [{ ref: "J1", score: 80, years_min: 1, clearance: "unknown", location_type: "hybrid", new_grad: "unknown" }, { ref: "J2", score: 70 }],
     });
     // The UI gets the evidence, so the user can check every drop.
@@ -89,7 +100,7 @@ describe("search_jobs and triage_results", () => {
     const strict = { ...ctx, services: { ...ctx.services, triage: async (_jobs: never, _profile: never, filters: unknown) => (seen.push(filters), emptyTriage()) } } as unknown as ToolContext;
     const outcome = await call(strict, "triage_results", { set_ref: "S1", max_years: 0, exclude_clearance_eligible: true });
     expect(seen).toEqual([{ maxYears: 0, excludeActiveClearance: true, excludeClearanceEligible: true }]);
-    expect(outcome.forModel).toMatchObject({ dropped: { needs_clearance_or_eligibility: 0 } });
+    expect(outcome.forModel).toMatchObject({ dropped: { needs_active_clearance_or_eligibility: 0 } });
     expect(await store.getProfile()).toBeNull();
   });
 

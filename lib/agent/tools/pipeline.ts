@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { addDays, localDate, zonedTimeToUtc } from "@/lib/files/time";
 import { ToolError } from "../errors";
+import { computeFunnel } from "../funnel";
 import { assignRefs, resolveRefs } from "../refs";
 import { STAGES, type Application, type Stage } from "../store";
 import { DAY_MS, daysSince, jobBrief, MAX_BULK, refArg, resolvePipelineTargets, withPostings, type PipelineTarget } from "./shared";
@@ -171,37 +172,15 @@ export const getFunnelStatsTool: NormalTool<z.infer<typeof funnelInput>> = {
   input: funnelInput,
   async run(args, ctx) {
     const range = args.range_days ?? 30;
-    const since = ctx.now().getTime() - range * DAY_MS;
     const applications = await ctx.store.listApplications({});
     // No refs needed here, so postings are read directly (Phase 4 review S2: refs cost seconds).
     const sources = new Map((await ctx.store.getPostings([...new Set(applications.map((app) => app.postingId))])).map((posting) => [posting.id, posting.source]));
-
-    const byStage = Object.fromEntries(STAGES.map((stage) => [stage, 0])) as Record<Stage, number>;
-    const bySource: Record<string, number> = {};
-    for (const app of applications) {
-      byStage[app.stage]++;
-      const source = sources.get(app.postingId) ?? "unknown";
-      bySource[source] = (bySource[source] ?? 0) + 1;
-    }
-
-    // The funnel is a cohort: applications added within the range, and the furthest stage each
-    // reached. Everything past "saved" counts as applied (you can't get a screen without applying).
-    const cohort = applications.filter((app) => Date.parse(app.createdAt) >= since);
-    const reached = (stages: Stage[]) => cohort.filter((app) => stages.includes(app.stage) || (app.stage === "archived" && app.appliedAt !== null && stages.includes("applied"))).length;
-    const funnel = {
-      added: cohort.length,
-      applied: reached(["applied", "screen", "interview", "offer", "rejected"]),
-      responded: reached(["screen", "interview", "offer"]),
-      interviewed: reached(["interview", "offer"]),
-      offers: reached(["offer"]),
-    };
-    const responseRate = funnel.applied ? Math.round((funnel.responded / funnel.applied) * 100) : null;
-    const pipelineNow = { active: applications.length - byStage.archived, by_stage: byStage };
-
+    const stats = computeFunnel(applications, (id) => sources.get(id) ?? "unknown", ctx.now(), range);
+    const { funnel } = stats;
     return {
       summary: `last ${range} days: ${funnel.added} added, ${funnel.applied} applied, ${funnel.responded} responses`,
-      forModel: { range_days: range, funnel_in_range: funnel, response_rate_percent: responseRate, pipeline_now: pipelineNow, by_source_all_time: bySource },
-      forUI: { kind: "funnel", rangeDays: range, funnel, responseRate, pipelineNow, bySource },
+      forModel: { range_days: range, funnel_in_range: funnel, response_rate_percent: stats.responseRate, pipeline_now: stats.pipelineNow, by_source_all_time: stats.bySource },
+      forUI: { kind: "funnel", ...stats },
     };
   },
 };
