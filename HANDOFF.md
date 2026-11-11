@@ -1,6 +1,6 @@
 # Handoff: Offer Desk (CS4680 Assignment 4)
 
-Updated 2026-11-11 after **Phase 4 review fixes**. Read this first, then `PLAN.md` (phases), `DECISIONS.md` (001–054), `TESTING.md` (gate rules), `PROMPTS.md` (prompt-engineering write-up).
+Updated 2026-11-11 after **Phase 5 (UI) was built** (gate review pending). Read this first, then `PLAN.md` (phases), `DECISIONS.md` (001–059), `TESTING.md` (gate rules), `PROMPTS.md` (prompt-engineering write-up).
 
 ## Where we are
 
@@ -11,7 +11,7 @@ Updated 2026-11-11 after **Phase 4 review fixes**. Read this first, then `PLAN.m
 | 2. Job data layer | ✅ Done (review: `reviews/phase-2.md`, fixes applied) |
 | 3. Extraction and triage | ✅ Done (review: `reviews/phase-3.md` PASS WITH FIXES; fixes applied, check-6) |
 | **4. Agent, tools, safety** | **Done** (review PASS WITH FIXES, fixes applied) |
-| 5. UI | Not started |
+| **5. UI** | **Built; live checks pass (`check:ui` in a real browser). Next: independent review `reviews/phase-5.md`** |
 | 6. Ship | Not started |
 
 - Repo: https://github.com/Mooochew/offer-desk (public). Live: https://offer-desk-teal.vercel.app (Vercel auto-deploys `main`).
@@ -40,7 +40,13 @@ Live triage: 25/25 read, 0 unread.
 - Phase 4 review: `reviews/phase-4.md` PASS WITH FIXES; fixes in DECISIONS 054.
 - Live: `npm run check:agent` runs the demo script through the HTTP API (local: `npm run build && npm start`; deployed: `BASE_URL=... npm run check:agent`). Each run uses 6 chat turns; the per-IP limit is 30/hour (local runs share one IP key).
 - On Windows, stopping a background `npm start` task can leave the Node process holding port 3000; kill it via `Get-NetTCPConnection -LocalPort 3000`.
-- `npm run check`: 380 tests.
+- `npm run check`: 390 tests.
+
+## Phase 5 (UI)
+
+- `components/`: `offer-desk.tsx` (state, turns, toasts, dialog), `chat-panel.tsx`, `results-view.tsx`, `pipeline-view.tsx` (board + funnel), `action-log.tsx`, `confirm-dialog.tsx`, `ui.tsx`. Server read for reloads: `POST /api/state` (`lib/agent/session-state.ts`). Funnel math shared by tool and chart: `lib/agent/funnel.ts`. Decisions 055–059.
+- `npm run check:ui` drives headless Edge (`BROWSER_CHANNEL=chrome` for Chrome) via `playwright-core` through the demo; `SHOTS=<dir>` saves screenshots. It uses 6 chat turns (about 18 agent calls); the per-IP budget is 60 agent calls/hour, so running `check:agent` + `check:ui` twice in one hour hits the limit (by design).
+- Adding `playwright-core` dropped every rolldown binding from the lockfile; fixed by restoring the lockfile and adding only that entry (see TESTING.md quirks).
 
 ## Key facts for the next session
 
