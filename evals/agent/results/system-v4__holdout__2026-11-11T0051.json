@@ -1,0 +1,64 @@
+{
+  "version": "system-v4",
+  "set": "holdout",
+  "model": "gpt-6-luna",
+  "runs": 3,
+  "commit": "733990e",
+  "dirty": true,
+  "prompt_sha": "c699dd90cf64",
+  "cases_sha": "38a397913011",
+  "results": [
+    {
+      "name": "save two refs",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "Saved J2 (Ramp, Backend Engineer) as A2 and J5 (Stripe, Software Engineer, New Grad) as A3.",
+        "Saved J2 (Ramp — Backend Engineer) as A2 and J5 (Stripe — Software Engineer, New Grad) as A3.",
+        "Saved J2 (Ramp, Backend Engineer) as A2 and J5 (Stripe, Software Engineer, New Grad) as A3."
+      ]
+    },
+    {
+      "name": "export the pipeline",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "Exported your pipeline as **offer-desk-pipeline-2026-11-10.csv** (3 applications). The download is available in the app.",
+        "Exported your pipeline as a spreadsheet: **offer-desk-pipeline-2026-11-10.csv** (3 rows). The download is available in the app.",
+        "Exported your pipeline as a spreadsheet: **offer-desk-pipeline-2026-11-10.csv** (3 rows). The download is available in the app."
+      ]
+    },
+    {
+      "name": "delete by company → proposal for both",
+      "pass": [
+        true,
+        true,
+        false
+      ],
+      "finals": [
+        "Deletion of your two Notion applications is awaiting confirmation. Nothing has been deleted yet; press **Confirm** in the dialog to proceed.",
+        "Your two Notion applications—Product Engineer (A3) and Full Stack Engineer (A2)—are queued for deletion. Nothing has changed yet; press **Confirm** in the dialog to proceed.",
+        "I found two saved Notion applications: **Product Engineer** (A3) and **Full Stack Engineer** (A2). The request to delete them wasn’t completed; archiving has been proposed, and you’ll need to press **"
+      ]
+    },
+    {
+      "name": "funnel this month",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "This month, you’ve added 3 jobs, but haven’t applied to any yet, so there are no responses or interviews to report. Your current pipeline has 3 active jobs, all saved. All 3 came from Greenhouse.",
+        "This month, you’ve added 3 jobs to your pipeline, but haven’t marked any as applied yet. Your current pipeline has 3 active jobs, all saved. No responses, interviews, or offers so far. All 3 came from",
+        "This month, you’ve added 3 jobs to your pipeline. None have been marked applied yet, and there are no responses, interviews, or offers recorded. Your current pipeline has 3 active jobs, all saved."
+      ]
+    }
+  ]
+}

@@ -109,11 +109,11 @@ export function createToolContext(input: RequestContextInput): ToolContext {
 
 export const registry = createRegistry();
 
-export function createTurnDeps(ctx: ToolContext, admin: SupabaseClient, startedAt = Date.now()): TurnDeps {
+export function createTurnDeps(ctx: ToolContext, admin: SupabaseClient, caller: Caller, startedAt = Date.now()): TurnDeps {
   return {
     ctx,
     registry,
-    create: createResponder({ countRequest: agentQuota(counterFor(admin)) }),
+    create: createResponder({ countRequest: agentQuota(counterFor(admin), caller) }),
     model: getServerEnv().openaiModel,
     prompt: CURRENT_SYSTEM_PROMPT,
     toolDeadline: startedAt + TOOLS_MS,

@@ -44,6 +44,11 @@ function parseArgs(raw: string): unknown {
   }
 }
 
+async function logRefused(ctx: ToolContext, tool: string, rawArgs: string, code: string, message: string) {
+  const id = await ctx.store.insertAction({ turnId: ctx.turnId, tool: tool.slice(0, 64), destructive: false, args: parseArgs(rawArgs), status: "proposed" });
+  await ctx.store.updateAction(id, { status: "invalid", error: `${code}: ${message}`, resultSummary: `not run (${code})`, durationMs: 0 });
+}
+
 /** A code-written answer for when the model gives none (or isn't reachable). Facts only. */
 function fallbackText(outcomes: ToolCallOutcome[], pending: PendingAction[]): string {
   const done = outcomes.filter((outcome) => outcome.status === "executed").map((outcome) => outcome.summary);
@@ -113,6 +118,8 @@ export async function runTurn(message: string, deps: TurnDeps): Promise<TurnResu
     const output: ResponseOutputItem[] = response.output ?? [];
     const calls = output.filter((item) => item.type === "function_call");
     if (calls.length === 0 || mustAnswer) {
+      // Calls returned when the model had to answer are not run, but still logged (review S3).
+      for (const call of calls) await logRefused(ctx, call.name, call.arguments, "not_run", "The model had to answer without tools at this point.");
       final = response.output_text.trim();
       break;
     }
@@ -120,9 +127,18 @@ export async function runTurn(message: string, deps: TurnDeps): Promise<TurnResu
     input.push(...(output as ResponseInputItem[]));
     for (const call of calls) {
       let result: unknown;
-      if (outcomes.length >= MAX_TOOL_CALLS || stopTools || pending.length > 0) {
-        // Not run: over the per-turn cap, or a destructive action is already waiting.
-        result = { error: { code: pending.length ? "awaiting_confirmation" : "tool_limit", message: pending.length ? "Another action is waiting for confirmation; answer the user now." : `Only ${MAX_TOOL_CALLS} tool calls per turn; answer with what you have.` } };
+      const refusal =
+        pending.length > 0
+          ? { code: "awaiting_confirmation", message: "Another action is waiting for confirmation; answer the user now." }
+          : outcomes.length >= MAX_TOOL_CALLS || stopTools
+            ? { code: "tool_limit", message: `Only ${MAX_TOOL_CALLS} tool calls per turn; answer with what you have.` }
+            : Date.now() >= deps.toolDeadline
+              ? { code: "time_limit", message: "Out of time for this turn; answer with what you have." }
+              : null;
+      if (refusal) {
+        // Not run, but logged with a terminal status so the audit log has every call (review S3).
+        await logRefused(ctx, call.name, call.arguments, refusal.code, refusal.message);
+        result = { error: refusal };
       } else {
         const step = outcomes.length + 1;
         events.push({ type: "step_started", step, tool: call.name, args: parseArgs(call.arguments) });

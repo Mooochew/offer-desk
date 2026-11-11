@@ -23,12 +23,16 @@ vi.mock("@/lib/agent/runtime", () => ({
 vi.mock("@/lib/agent/loop", () => ({ runTurn: (message: string) => fakeRunTurn(message) }));
 vi.mock("@/lib/agent/executor", () => ({ confirmAction: async () => fakeOutcome, rejectAction: async () => fakeOutcome }));
 vi.mock("next/server", () => ({ after: (task: unknown) => scheduled.push(task) }));
+let fakeLink: unknown = { url: "https://signed", filename: "jobs.csv", expiresInSeconds: 3600 };
+vi.mock("@/lib/agent/supabase-store", () => ({ createSupabaseAgentStore: () => ({}) }));
+vi.mock("@/lib/agent/file-links", () => ({ freshFileLink: async () => fakeLink }));
 
 const { UnauthorizedError } = await import("@/lib/supabase/server");
 const { RateLimitError } = await import("@/lib/safety/limits");
 const { POST: agent, maxDuration } = await import("@/app/api/agent/route");
 const { POST: confirm } = await import("@/app/api/actions/[id]/confirm/route");
 const { POST: reject } = await import("@/app/api/actions/[id]/reject/route");
+const { POST: fileUrl } = await import("@/app/api/files/[id]/url/route");
 
 const ID = "123e4567-e89b-42d3-a456-426614174000";
 const post = (body: unknown) => new Request("http://localhost/api/agent", { method: "POST", body: typeof body === "string" ? body : JSON.stringify(body) });
@@ -115,6 +119,31 @@ describe("POST /api/actions/:id/confirm|reject", () => {
       throw new UnauthorizedError("Invalid or expired session");
     };
     expect((await confirm(new Request("http://localhost", { method: "POST" }), params(ID))).status).toBe(401);
+    fakeRequireUser = async () => ({ user: { id: "u1" }, supabase: {} });
+  });
+});
+
+describe("POST /api/files/:id/url", () => {
+  const request = () => new Request("http://localhost", { method: "POST" });
+
+  it("returns a fresh link for the user's file", async () => {
+    const response = await fileUrl(request(), params(ID));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true, url: "https://signed", filename: "jobs.csv", expiresInSeconds: 3600 });
+  });
+
+  it("returns 404 for a file that isn't the user's, or an id that isn't a UUID", async () => {
+    fakeLink = null;
+    expect((await fileUrl(request(), params(ID))).status).toBe(404);
+    fakeLink = { url: "https://signed", filename: "x", expiresInSeconds: 1 };
+    expect((await fileUrl(request(), params("../other-user/file"))).status).toBe(404);
+  });
+
+  it("returns 401 without a session", async () => {
+    fakeRequireUser = async () => {
+      throw new UnauthorizedError("Missing session token");
+    };
+    expect((await fileUrl(request(), params(ID))).status).toBe(401);
     fakeRequireUser = async () => ({ user: { id: "u1" }, supabase: {} });
   });
 });

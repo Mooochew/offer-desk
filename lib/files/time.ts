@@ -74,3 +74,31 @@ export function formatLocal(instant: Date, timezone: string): string {
     timeZoneName: "short",
   }).format(instant);
 }
+
+export const DAY_WORDS = ["today", "tomorrow", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
+export type DayWord = (typeof DAY_WORDS)[number];
+const WEEKDAY_NAMES = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
+/** Adds days to a "YYYY-MM-DD" calendar date. */
+export function addDays(date: string, days: number): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
+
+/**
+ * Resolves a relative day the user said ("thursday", "tomorrow") to a local calendar date, in code
+ * (Phase 4 review S4: the model shouldn't do date math). A weekday means its next occurrence; today's
+ * own weekday means today if `time` (HH:MM) is still ahead, otherwise a week later.
+ */
+export function resolveDay(word: DayWord, now: Date, timezone: string, time?: string): string {
+  const today = localDate(now, timezone);
+  if (word === "today") return today;
+  if (word === "tomorrow") return addDays(today, 1);
+  const current = WEEKDAY_NAMES.indexOf(localWeekday(now, timezone).toLowerCase());
+  let ahead = (WEEKDAY_NAMES.indexOf(word) - current + 7) % 7;
+  if (ahead === 0) {
+    const nowLocal = new Intl.DateTimeFormat("en-GB", { timeZone: timezone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(now);
+    if (!time || time <= nowLocal) ahead = 7;
+  }
+  return addDays(today, ahead);
+}

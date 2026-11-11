@@ -352,6 +352,14 @@ export function createSupabaseAgentStore(admin: SupabaseClient, user: SupabaseCl
       return (data ?? []).map(toAction);
     },
 
+    async expireActions(now) {
+      const data = check(
+        await admin.from("action_log").update({ status: "expired" }).eq("user_id", userId).eq("status", "awaiting_confirmation").lte("expires_at", now).select("id"),
+        "action expiry",
+      );
+      return (data ?? []).length;
+    },
+
     async addMessage(turnId, role, content) {
       check(await admin.from("messages").insert({ user_id: userId, turn_id: turnId, role, content }), "message write");
     },

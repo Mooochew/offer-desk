@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildChecklist } from "@/lib/files/checklist";
 import { csvCell, toCsv } from "@/lib/files/csv";
 import { buildInvite, foldLine, icsEscape, icsUtc } from "@/lib/files/ics";
-import { formatLocal, localDate, localWeekday, validTimezone, zonedTimeToUtc } from "@/lib/files/time";
+import { addDays, formatLocal, localDate, localWeekday, resolveDay, validTimezone, zonedTimeToUtc } from "@/lib/files/time";
 
 describe("CSV", () => {
   it("quotes commas, quotes and newlines (RFC 4180)", () => {
@@ -42,6 +42,26 @@ describe("time zones", () => {
     for (const bad of ["2026-02-30T10:00", "2026-13-01T10:00", "2026-11-12T25:00", "Thursday at 2", "2026-11-12"]) {
       expect(zonedTimeToUtc(bad, "America/Los_Angeles")).toBeNull();
     }
+  });
+
+  // Phase 4 review S4: relative days are resolved in code, not by the model.
+  it("resolves relative days to the next local date", () => {
+    const tuesdayNoon = new Date("2026-11-10T20:00:00Z"); // Tue Nov 10, 12:00 in Los Angeles
+    const la = "America/Los_Angeles";
+    expect(resolveDay("thursday", tuesdayNoon, la, "14:00")).toBe("2026-11-12");
+    expect(resolveDay("monday", tuesdayNoon, la, "09:00")).toBe("2026-11-16");
+    expect(resolveDay("today", tuesdayNoon, la)).toBe("2026-11-10");
+    expect(resolveDay("tomorrow", tuesdayNoon, la)).toBe("2026-11-11");
+    // Same weekday: today if the time is still ahead, else next week.
+    expect(resolveDay("tuesday", tuesdayNoon, la, "15:00")).toBe("2026-11-10");
+    expect(resolveDay("tuesday", tuesdayNoon, la, "09:00")).toBe("2026-11-17");
+    // At 23:30 UTC on Tuesday it's still Tuesday in Los Angeles but already Wednesday in Tokyo.
+    const late = new Date("2026-11-10T23:30:00Z");
+    expect(resolveDay("thursday", late, la, "14:00")).toBe("2026-11-12");
+    expect(resolveDay("thursday", late, "Asia/Tokyo", "14:00")).toBe("2026-11-12");
+    expect(resolveDay("tomorrow", late, "Asia/Tokyo")).toBe("2026-11-12");
+    expect(addDays("2026-12-31", 1)).toBe("2027-01-01");
+    expect(addDays("2026-03-01", -1)).toBe("2026-02-28");
   });
 
   it("validates IANA timezones", () => {

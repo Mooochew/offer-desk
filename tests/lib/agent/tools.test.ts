@@ -135,6 +135,13 @@ describe("pipeline tools", () => {
     ]);
   });
 
+  it("computes 'yesterday' from days_ago in the user's timezone", async () => {
+    const { ctx, db } = await searchedAndTriaged();
+    expect((await call(ctx, "update_stage", { refs: ["J1"], stage: "applied", days_ago: 1 })).forModel).toMatchObject({ date: "2026-11-09" });
+    expect(db.applications[0].appliedAt).toBe("2026-11-09T20:00:00.000Z");
+    expect((await call(ctx, "update_stage", { refs: ["J1"], stage: "applied", days_ago: 1, date: "2026-11-09" })).status).toBe("invalid");
+  });
+
   it("can't archive through update_stage, and refuses future or impossible dates", async () => {
     const { ctx } = await searchedAndTriaged();
     expect((await call(ctx, "update_stage", { refs: ["J1"], stage: "archived" })).status).toBe("invalid");
@@ -175,16 +182,16 @@ describe("pipeline tools", () => {
       }),
     );
     const outcome = await call(toolContext(memory.storeFor("u1"), { now: () => NOW }), "get_funnel_stats", { range_days: 30 });
+    // Phase 4 review S2: the funnel is the cohort added within the range (0, 10, 20 and 30 days ago,
+    // inclusive); the 40-, 50- and 60-day-old applications only show in the all-time pipeline.
     expect(outcome.forModel).toEqual({
       range_days: 30,
-      by_stage: { saved: 1, applied: 2, screen: 1, interview: 1, offer: 0, rejected: 1, archived: 1 },
-      funnel: { saved: 6, applied: 5, responded: 2, interview: 1, offer: 0 },
-      response_rate_percent: 40,
-      // 0, 10, 20 and 30 days ago are inside a 30-day window (inclusive).
-      saved_in_range: 4,
-      applied_in_range: 3,
-      by_source: { greenhouse: 4, lever: 3 },
+      funnel_in_range: { added: 4, applied: 3, responded: 1, interviewed: 0, offers: 0 },
+      response_rate_percent: 33,
+      pipeline_now: { active: 6, by_stage: { saved: 1, applied: 2, screen: 1, interview: 1, offer: 0, rejected: 1, archived: 1 } },
+      by_source_all_time: { greenhouse: 4, lever: 3 },
     });
+    expect(memory.db.refs).toEqual([]); // no refs needed, none assigned
   });
 });
 
@@ -210,6 +217,16 @@ describe("destructive pipeline tools", () => {
     const confirmed = await confirmAction(registry, proposal.actionId, ctx);
     expect(confirmed.status).toBe("executed");
     expect(db.applications.filter((app) => app.stage === "archived")).toHaveLength(3);
+  });
+
+  it("applies untouched_days to given refs too", async () => {
+    const { ctx, storeFor } = stalePipeline(2);
+    const apps = await storeFor("u1").listApplications();
+    const fresh = apps.find((app) => Date.parse(app.updatedAt) === NOW.getTime())!;
+    const refs = await assignRefs(storeFor("u1"), "application", apps.map((app) => app.id));
+    const proposal = await call(ctx, "archive_applications", { refs: [...refs.values()], untouched_days: 21 });
+    expect(proposal.pending?.preview.count).toBe(2);
+    expect(proposal.pending?.preview.items.map((item) => item.ref)).not.toContain(refs.get(fresh.id));
   });
 
   it("refuses selections that match nothing or more than 100", async () => {
@@ -270,6 +287,22 @@ describe("file tools", () => {
     expect(ics).toContain("DTSTART:20261112T220000Z");
     expect(ics).toContain("DTEND:20261112T224500Z");
     expect(ics).toContain("SUMMARY:Interview: Full Stack Engineer at Globex");
+  });
+
+  it("turns 'Thursday at 2' into the date in code (day + time)", async () => {
+    const { ctx, db } = await searchedAndTriaged();
+    const outcome = await call(ctx, "create_interview_invite", { ref: "J1", day: "thursday", time: "14:00" });
+    expect(outcome.forModel).toMatchObject({ starts: "Thu, Nov 12, 2:00 PM PST", filename: "interview-acme-2026-11-12.ics" });
+    expect(db.applications[0].nextStepAt).toBe("2026-11-12T22:00:00.000Z");
+    expect((await call(ctx, "create_interview_invite", { ref: "J1", day: "thursday" })).status).toBe("invalid");
+    expect((await call(ctx, "create_interview_invite", { ref: "J1", day: "thursday", time: "14:00", start_local: "2026-11-12T14:00" })).status).toBe("invalid");
+  });
+
+  it("keeps an offer an offer when an interview is scheduled", async () => {
+    const { ctx, db } = await searchedAndTriaged();
+    await call(ctx, "update_stage", { refs: ["J1"], stage: "offer" });
+    expect((await call(ctx, "create_interview_invite", { ref: "J1", day: "friday", time: "10:00" })).forModel).toMatchObject({ stage: "offer" });
+    expect(db.applications[0].stage).toBe("offer");
   });
 
   it("rejects invite times that are malformed, impossible or in the past", async () => {

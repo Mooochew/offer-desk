@@ -130,6 +130,25 @@ describe("runTurn", () => {
     expect(db.actions[0].status).toBe("awaiting_confirmation");
   });
 
+  // Phase 4 review S3: every call the model made has a terminal status in the audit log.
+  it("logs calls that were refused or not run as invalid, so none is missing or left 'proposed'", async () => {
+    const many = Array.from({ length: 7 }, () => ({ name: "ping", args: {} }));
+    const capped = setup([{ calls: many }, { text: "Stopped." }]);
+    await runTurn("go", capped.deps);
+    expect(capped.db.actions).toHaveLength(7);
+    expect(capped.db.actions.filter((row) => row.status === "invalid").map((row) => row.error)).toEqual([expect.stringMatching(/^tool_limit/)]);
+
+    const held = setup([{ calls: [{ name: "nuke", args: {} }, { name: "ping", args: {} }] }, { text: "Waiting." }]);
+    await runTurn("go", held.deps);
+    expect(held.db.actions.map((row) => row.status)).toEqual(["awaiting_confirmation", "invalid"]);
+    expect(held.db.actions[1].error).toMatch(/^awaiting_confirmation/);
+
+    const late = setup([{ calls: [{ name: "ping", args: {} }], text: "Late." }], { toolDeadline: Date.now() - 1 });
+    await runTurn("go", late.deps);
+    expect(late.db.actions).toMatchObject([{ status: "invalid", error: expect.stringMatching(/^not_run/) }]);
+    expect([capped, held, late].flatMap((run) => run.db.actions).some((row) => row.status === "proposed")).toBe(false);
+  });
+
   it("gives each tool one fix attempt; a second failure ends tool use", async () => {
     const bad = { name: "ping", args: { n: "one" } };
     const { deps, model } = setup([{ calls: [bad] }, { calls: [bad] }, { calls: [bad], text: "Sorry, that failed." }]);
@@ -208,5 +227,10 @@ describe("buildState", () => {
     expect(state.latest_results).toMatchObject({ triaged: true, top_ranked: [{ ref: "J1", company: "Globex", score: 77 }] });
     expect(state.pending_confirmations).toEqual([{ action: "Archive 2 applications?", expires_in_minutes: 10 }]);
     expect(state.recent_files).toEqual([{ ref: "F1", filename: "jobs.csv" }]);
+
+    // Past its expiry, an ignored proposal is marked expired and leaves the state block.
+    const later = await buildState(store, new Date("2026-11-10T20:16:00Z"), "America/Los_Angeles");
+    expect(later.pending_confirmations).toEqual([]);
+    expect(memory.db.actions[0].status).toBe("expired");
   });
 });

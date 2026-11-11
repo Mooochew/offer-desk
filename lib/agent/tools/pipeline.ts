@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zonedTimeToUtc } from "@/lib/files/time";
+import { addDays, localDate, zonedTimeToUtc } from "@/lib/files/time";
 import { ToolError } from "../errors";
 import { assignRefs, resolveRefs } from "../refs";
 import { STAGES, type Application, type Stage } from "../store";
@@ -61,9 +61,11 @@ const stageInput = z
   .object({
     refs: z.array(refArg).min(1).max(MAX_BULK).describe("Application refs (A#) or job refs (J#); jobs not saved yet are added"),
     stage: movableStage,
-    date: isoDate.optional().describe("When it happened (YYYY-MM-DD, the user's local date). Omit for today."),
+    days_ago: z.number().int().min(0).max(365).optional().describe('"yesterday" = 1. Omit for today. Code computes the date.'),
+    date: isoDate.optional().describe("Only when the user gave an exact date (YYYY-MM-DD, local). Otherwise use days_ago."),
   })
-  .strict();
+  .strict()
+  .refine((args) => !(args.date && args.days_ago !== undefined), { message: "give date or days_ago, not both" });
 
 export const updateStageTool: NormalTool<z.infer<typeof stageInput>> = {
   name: "update_stage",
@@ -72,7 +74,8 @@ export const updateStageTool: NormalTool<z.infer<typeof stageInput>> = {
   input: stageInput,
   async run(args, ctx) {
     const targets = await resolvePipelineTargets(ctx, args.refs, true);
-    const when = args.date ? zonedTimeToUtc(`${args.date}T12:00`, ctx.timezone) : ctx.now();
+    const day = args.date ?? (args.days_ago !== undefined ? addDays(localDate(ctx.now(), ctx.timezone), -args.days_ago) : null);
+    const when = day ? zonedTimeToUtc(`${day}T12:00`, ctx.timezone) : ctx.now();
     if (!when) throw new ToolError("bad_date", `${args.date} is not a real date.`);
     if (when.getTime() > ctx.now().getTime() + DAY_MS) throw new ToolError("future_date", "That date is in the future. Use the day it actually happened.");
 
@@ -162,40 +165,43 @@ const funnelInput = z.object({ range_days: z.number().int().min(1).max(365).opti
 
 export const getFunnelStatsTool: NormalTool<z.infer<typeof funnelInput>> = {
   name: "get_funnel_stats",
-  description: "Counts of the user's applications by stage and by job source, plus what happened in the last N days. All numbers are computed in code.",
+  description:
+    "The user's job-search funnel for the last N days (applications added in that window and how far they got), plus the current pipeline by stage and by job source. All numbers are computed in code.",
   destructive: false,
   input: funnelInput,
   async run(args, ctx) {
     const range = args.range_days ?? 30;
     const since = ctx.now().getTime() - range * DAY_MS;
-    const targets = await withPostings(ctx.store, await ctx.store.listApplications({}));
+    const applications = await ctx.store.listApplications({});
+    // No refs needed here, so postings are read directly (Phase 4 review S2: refs cost seconds).
+    const sources = new Map((await ctx.store.getPostings([...new Set(applications.map((app) => app.postingId))])).map((posting) => [posting.id, posting.source]));
 
     const byStage = Object.fromEntries(STAGES.map((stage) => [stage, 0])) as Record<Stage, number>;
     const bySource: Record<string, number> = {};
-    let savedInRange = 0;
-    let appliedInRange = 0;
-    for (const { application, posting } of targets) {
-      byStage[application.stage]++;
-      bySource[posting.source] = (bySource[posting.source] ?? 0) + 1;
-      if (Date.parse(application.createdAt) >= since) savedInRange++;
-      if (application.appliedAt && Date.parse(application.appliedAt) >= since) appliedInRange++;
+    for (const app of applications) {
+      byStage[app.stage]++;
+      const source = sources.get(app.postingId) ?? "unknown";
+      bySource[source] = (bySource[source] ?? 0) + 1;
     }
-    // Everything past "saved" counts as applied for the funnel (you can't screen without applying).
-    const reachedApplied = byStage.applied + byStage.screen + byStage.interview + byStage.offer + byStage.rejected;
-    const reachedResponse = byStage.screen + byStage.interview + byStage.offer;
+
+    // The funnel is a cohort: applications added within the range, and the furthest stage each
+    // reached. Everything past "saved" counts as applied (you can't get a screen without applying).
+    const cohort = applications.filter((app) => Date.parse(app.createdAt) >= since);
+    const reached = (stages: Stage[]) => cohort.filter((app) => stages.includes(app.stage) || (app.stage === "archived" && app.appliedAt !== null && stages.includes("applied"))).length;
     const funnel = {
-      saved: targets.length - byStage.archived,
-      applied: reachedApplied,
-      responded: reachedResponse,
-      interview: byStage.interview + byStage.offer,
-      offer: byStage.offer,
+      added: cohort.length,
+      applied: reached(["applied", "screen", "interview", "offer", "rejected"]),
+      responded: reached(["screen", "interview", "offer"]),
+      interviewed: reached(["interview", "offer"]),
+      offers: reached(["offer"]),
     };
-    const responseRate = reachedApplied ? Math.round((reachedResponse / reachedApplied) * 100) : null;
+    const responseRate = funnel.applied ? Math.round((funnel.responded / funnel.applied) * 100) : null;
+    const pipelineNow = { active: applications.length - byStage.archived, by_stage: byStage };
 
     return {
-      summary: `funnel over ${range} days: ${savedInRange} saved, ${appliedInRange} applied`,
-      forModel: { range_days: range, by_stage: byStage, funnel, response_rate_percent: responseRate, saved_in_range: savedInRange, applied_in_range: appliedInRange, by_source: bySource },
-      forUI: { kind: "funnel", rangeDays: range, byStage, funnel, responseRate, savedInRange, appliedInRange, bySource },
+      summary: `last ${range} days: ${funnel.added} added, ${funnel.applied} applied, ${funnel.responded} responses`,
+      forModel: { range_days: range, funnel_in_range: funnel, response_rate_percent: responseRate, pipeline_now: pipelineNow, by_source_all_time: bySource },
+      forUI: { kind: "funnel", rangeDays: range, funnel, responseRate, pipelineNow, bySource },
     };
   },
 };
@@ -221,6 +227,11 @@ async function prepareBulk(args: BulkArgs, ctx: ToolContext, verb: string, skipA
   if (args.refs) {
     targets = await resolvePipelineTargets(ctx, args.refs, false);
     if (args.stage) targets = targets.filter((target) => target.application.stage === args.stage);
+    // Every selector given narrows the refs (review N1): none is silently ignored.
+    if (args.untouched_days) {
+      const cutoff = new Date(ctx.now().getTime() - args.untouched_days * DAY_MS).toISOString();
+      targets = targets.filter((target) => target.application.updatedAt < cutoff);
+    }
   } else {
     targets = await withPostings(ctx.store, await selectApplications(ctx, args, !skipArchived));
   }

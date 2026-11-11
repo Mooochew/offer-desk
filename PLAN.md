@@ -1,6 +1,6 @@
 # Offer Desk: Build Plan
 
-> CS4680 Assignment 4, AI Agent Project. Status: **confirmed**; Phases 0–3 done; Phase 4 built (gate review next), Phase 5 after. Decisions: see [Decisions](#decisions) and [DECISIONS.md](DECISIONS.md).
+> CS4680 Assignment 4, AI Agent Project. Status: **confirmed**; Phases 0–3 done; Phase 4 done (reviewed, fixes applied); Phase 5 next. Decisions: see [Decisions](#decisions) and [DECISIONS.md](DECISIONS.md).
 
 ## 1. What we're building
 
@@ -117,13 +117,13 @@ components/                     chat, results, pipeline, action-log, confirm-mod
 lib/
   llm/        client.ts (OpenAI + retry), retry.ts
   agent/      loop.ts, context.ts (state summary), events.ts
-  tools/      registry.ts, refs.ts (short-ref resolver), executor.ts, defs/*.ts (one file per tool)
+  agent/      store.ts, supabase-store.ts, refs.ts, executor.ts (incl. confirm), state.ts, loop.ts, runtime.ts, tools/*.ts (as built, DECISIONS 043)
   sources/    greenhouse.ts, lever.ts, ashby.ts, adzuna.ts, fanout.ts, normalize.ts, cache.ts
   triage/     prefilter.ts, extract.ts, filter.ts, score.ts, dedupe.ts
   files/      csv.ts, checklist.ts, ics.ts, storage.ts
   safety/     rate-limit.ts, caps.ts
   db/         supabase clients (server user-scoped + service role), typed queries
-prompts/      system.v1.md, extract.v1.md, extract.v2.md, examples/*.json
+prompts/      system-v1..v4.ts, extract-v1.ts, extract-v2.ts (as built: TypeScript modules)
 data/         ats_boards.json, demo_profile.json, sample_postings.json (snapshot)
 scripts/      probe-sources.ts, verify-boards.ts, eval-extraction.ts, snapshot-postings.ts
 evals/        extraction/*.json (hand-labeled postings + expected fields)
@@ -368,7 +368,7 @@ Every phase ends with these steps, in order (standards in [TESTING.md](TESTING.m
 **Goal:** natural language in, real actions out, every step validated and logged, with destructive actions held for confirmation.
 1. Tool registry + refs resolver + executor (validate → resolve → ownership check → log → run or hold).
 2. All tools from section 4.8, including file builders (CSV, Markdown, `.ics`) + Storage + signed URLs.
-3. `prompts/system.v1.md` (role, grounding rules, clarifying questions, smallest-action rule, confirmation rule).
+3. `prompts/system-v1.ts`, now v4 (role, grounding rules, clarifying questions, smallest-action rule, confirmation rule).
 4. Agent loop with the state summary, last 3 turns, a 6-call cap, and turn events.
 5. Confirm/reject endpoints, expiry, system note after the outcome.
 6. Rate limits (per session **and per IP**, DECISIONS 018) + global OpenAI quota + `maxDuration`. Confirm is one atomic conditional update; refs numbered with an atomic counter (DECISIONS 019).

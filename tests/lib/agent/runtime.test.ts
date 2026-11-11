@@ -67,7 +67,7 @@ describe("agent runtime wiring", () => {
     expect(createToolContext({ ...base, timezone: "Not/AZone" }).timezone).toBe("America/Los_Angeles");
     const ctx = createToolContext(base);
     expect(ctx.store.userId).toBe("u1");
-    expect(createTurnDeps(ctx, fakeAdmin(), 1_000)).toMatchObject({ toolDeadline: 1_000 + TOOLS_MS, model: "gpt-6-luna", prompt: { version: "system-v3" } });
+    expect(createTurnDeps(ctx, fakeAdmin(), callerFor("u1", "1.2.3.4"), 1_000)).toMatchObject({ toolDeadline: 1_000 + TOOLS_MS, model: "gpt-6-luna", prompt: { version: "system-v4" } });
   });
 
   it("counts with the atomic counter and fails closed on counter errors", async () => {

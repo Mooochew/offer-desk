@@ -1,0 +1,64 @@
+{
+  "version": "system-v4",
+  "set": "holdout",
+  "model": "gpt-6-luna",
+  "runs": 3,
+  "commit": "733990e",
+  "dirty": true,
+  "prompt_sha": "c699dd90cf64",
+  "cases_sha": "e2b1c75b033e",
+  "results": [
+    {
+      "name": "save two refs",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "[save_to_pipeline({\"refs\":[\"J2\",\"J5\"]})] Saved J2 (Ramp, Backend Engineer) as A2 and J5 (Stripe, Software Engineer, New Grad) as A3.",
+        "[save_to_pipeline({\"refs\":[\"J2\",\"J5\"]})] Saved J2 (Ramp, Backend Engineer) as A2 and J5 (Stripe, Software Engineer, New Grad) as A3.",
+        "[save_to_pipeline({\"refs\":[\"J2\",\"J5\"]})] Saved J2 (Ramp — Backend Engineer) as A2 and J5 (Stripe — Software Engineer, New Grad) as A3."
+      ]
+    },
+    {
+      "name": "export the pipeline",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "[export_csv({})] Exported your pipeline as a spreadsheet: **offer-desk-pipeline-2026-11-10.csv** (3 rows). The download is available in the app.",
+        "[export_csv({})] Exported your pipeline as a spreadsheet: **offer-desk-pipeline-2026-11-10.csv** (3 rows). The download is available in the app.",
+        "[export_csv({})] Exported your pipeline as a spreadsheet: **offer-desk-pipeline-2026-11-10.csv** (3 rows). The app shows the download card."
+      ]
+    },
+    {
+      "name": "delete by company → proposal for both",
+      "pass": [
+        true,
+        true,
+        false
+      ],
+      "finals": [
+        "[list_pipeline({}), delete_applications({\"refs\":[\"A3\",\"A2\"]})] The delete action is awaiting your confirmation in the dialog. It will delete both Notion applications—Product Engineer (A3) and Full Stack Engineer (A2)—if you",
+        "[list_pipeline({}), delete_applications({\"refs\":[\"A3\",\"A2\"]})] Delete 2 Notion applications? Nothing has changed yet. Please press **Confirm** in the dialog to proceed.",
+        "[list_pipeline({}), archive_applications({\"refs\":[\"A3\",\"A2\"]})] I found two saved Notion applications: Product Engineer (A3) and Full Stack Engineer (A2). Archiving them is awaiting your confirmation—press **Confirm** in the"
+      ]
+    },
+    {
+      "name": "funnel this month",
+      "pass": [
+        true,
+        true,
+        true
+      ],
+      "finals": [
+        "[get_funnel_stats({\"range_days\":30})] In the last 30 days, you added 3 jobs to your pipeline, but none have been marked applied, responded to, interviewed, or offered. Your current pipeline has 3 ac",
+        "[get_funnel_stats({\"range_days\":30})] This month, you added 3 jobs to your pipeline. None have moved to applied or beyond yet, so there’s no response rate to report. You currently have 3 active jobs",
+        "[get_funnel_stats({\"range_days\":30})] This month, you’ve added 3 jobs to your pipeline, but haven’t marked any as applied yet. Your response rate is unavailable because there are no applications rec"
+      ]
+    }
+  ]
+}

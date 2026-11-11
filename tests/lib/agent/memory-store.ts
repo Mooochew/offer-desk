@@ -170,6 +170,11 @@ export function memoryDb(now: () => Date = () => new Date("2026-11-10T20:00:00Z"
       async pendingActions(at) {
         return mine(db.actions).filter((row) => row.status === "awaiting_confirmation" && row.expiresAt !== null && row.expiresAt > at);
       },
+      async expireActions(at) {
+        const stale = mine(db.actions).filter((row) => row.status === "awaiting_confirmation" && row.expiresAt !== null && row.expiresAt <= at);
+        for (const row of stale) row.status = "expired";
+        return stale.length;
+      },
       async addMessage(turnId, role, content) {
         db.messages.push({ userId, turnId, role, content, createdAt: stamp() });
       },

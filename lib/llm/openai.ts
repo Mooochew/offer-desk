@@ -19,7 +19,7 @@ export class QuotaExceededError extends Error {
     super(
       scope === "daily"
         ? `Daily AI request limit (${limit}) reached. Try again tomorrow.`
-        : `Hourly AI reading limit for this ${scope === "session" ? "session" : "network"} (${limit}) reached. Try again in an hour.`,
+        : `AI usage limit for this ${scope === "session" ? "session" : "network"} (${limit} requests) reached. Try again later.`,
     );
   }
 }

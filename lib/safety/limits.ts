@@ -10,6 +10,11 @@ export const LIMITS = {
   chatPerIpHour: 30,
   extractionsPerSessionHour: 75,
   extractionsPerIpHour: 150,
+  /** Agent (routing) model calls: one chat turn can make up to 8 (lib/agent/loop.ts). */
+  agentCallsPerSessionHour: 40,
+  agentCallsPerIpHour: 60,
+  /** All OpenAI requests (agent + extraction) from one network per UTC day: at most 40% of the cap. */
+  requestsPerIpDay: 200,
   /** All OpenAI requests per UTC day. */
   dailyRequests: 500,
   /** Extraction may use at most this much of the daily cap, so chat (routing) always has room. */
@@ -65,10 +70,28 @@ export async function checkChatLimit(counter: Counter, caller: Caller, now = new
   if (ip > LIMITS.chatPerIpHour) throw new RateLimitError("ip", secondsToNextHour(now));
 }
 
-/** Counts one agent (routing) model request against the global daily cap. */
-export function agentQuota(counter: Counter, now: () => Date = () => new Date()) {
+/** This network's share of the daily cap, counted for every model call (Phase 4 review S1). */
+async function checkIpDay(counter: Counter, caller: Caller, day: string) {
+  if ((await counter(`openai-ip:${caller.ipHash}:${day}`, TWO_DAYS_S)) > LIMITS.requestsPerIpDay) throw new QuotaExceededError(LIMITS.requestsPerIpDay, "ip");
+}
+
+/**
+ * Counts one agent (routing) model call. Chat turns are limited separately (checkChatLimit), but
+ * one turn can make several model calls, so calls are budgeted too: per session and per IP per
+ * hour, per IP per day, then the global daily cap. One visitor can't drain the shared cap.
+ */
+export function agentQuota(counter: Counter, caller: Caller, now: () => Date = () => new Date()) {
   return async () => {
-    const day = now().toISOString().slice(0, 10);
+    const at = now();
+    const hour = hourBucket(at);
+    const day = at.toISOString().slice(0, 10);
+    if ((await counter(`agent:user:${caller.userId}:${hour}`, 2 * HOUR_S)) > LIMITS.agentCallsPerSessionHour) {
+      throw new QuotaExceededError(LIMITS.agentCallsPerSessionHour, "session");
+    }
+    if ((await counter(`agent:ip:${caller.ipHash}:${hour}`, 2 * HOUR_S)) > LIMITS.agentCallsPerIpHour) {
+      throw new QuotaExceededError(LIMITS.agentCallsPerIpHour, "ip");
+    }
+    await checkIpDay(counter, caller, day);
     if ((await counter(`openai:${day}`, TWO_DAYS_S)) > LIMITS.dailyRequests) throw new QuotaExceededError(LIMITS.dailyRequests);
   };
 }
@@ -89,6 +112,7 @@ export function extractionQuota(counter: Counter, caller: Caller, now: () => Dat
     if ((await counter(`extract:ip:${caller.ipHash}:${hour}`, 2 * HOUR_S)) > LIMITS.extractionsPerIpHour) {
       throw new QuotaExceededError(LIMITS.extractionsPerIpHour, "ip");
     }
+    await checkIpDay(counter, caller, day);
     if ((await counter(`openai-extract:${day}`, TWO_DAYS_S)) > LIMITS.dailyExtractionRequests) throw new QuotaExceededError(LIMITS.dailyRequests);
     if ((await counter(`openai:${day}`, TWO_DAYS_S)) > LIMITS.dailyRequests) throw new QuotaExceededError(LIMITS.dailyRequests);
   };

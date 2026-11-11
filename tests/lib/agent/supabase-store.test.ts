@@ -125,6 +125,7 @@ async function exerciseAll(store: ReturnType<typeof setup>["store"]) {
   await store.claimAction("act1", at);
   await store.rejectAction("act1");
   await store.pendingActions(at);
+  await store.expireActions(at);
   await store.addMessage("t1", "user", "hi");
   await store.recentMessages(5);
 }

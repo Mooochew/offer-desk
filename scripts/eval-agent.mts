@@ -10,11 +10,11 @@ import { runTurn, type TurnResult } from "@/lib/agent/loop";
 import { createRegistry } from "@/lib/agent/tools/registry";
 import { createResponder } from "@/lib/llm/openai";
 import type { Extraction } from "@/lib/triage/schema";
-import { SYSTEM_V1, SYSTEM_V2, SYSTEM_V3 } from "@/prompts";
+import { SYSTEM_V1, SYSTEM_V2, SYSTEM_V3, SYSTEM_V4 } from "@/prompts";
 import { boardJobFrom, emptySearch, emptyTriage, memoryDb, toolContext } from "@/tests/lib/agent/memory-store";
 
-const prompts = { "system-v1": SYSTEM_V1, "system-v2": SYSTEM_V2, "system-v3": SYSTEM_V3 };
-const version = (process.argv[2] ?? "system-v3") as keyof typeof prompts;
+const prompts = { "system-v1": SYSTEM_V1, "system-v2": SYSTEM_V2, "system-v3": SYSTEM_V3, "system-v4": SYSTEM_V4 };
+const version = (process.argv[2] ?? "system-v4") as keyof typeof prompts;
 const runs = Number(process.argv[3] ?? 3);
 const set = (process.argv[4] ?? "tuning") as "tuning" | "holdout";
 if (!prompts[version]) throw new Error(`unknown prompt ${version}`);
@@ -68,11 +68,10 @@ const CASES: Check[] = [
     name: "named company → the saved job",
     message: "I have an interview with Coinbase Thursday at 2",
     pass: async (result, w) => {
-      const invite = argsOf(result, "create_interview_invite")[0];
-      if (!invite || invite.start_local !== "2026-11-12T14:00") return false;
+      // Judged by the result (Thu 2026-11-12 14:00 Pacific = 22:00 UTC), whatever argument form was used.
       const [app] = await w.store.listApplications({ stages: ["interview"] });
       const posting = app && (await w.store.getPostings([app.postingId]))[0];
-      return posting?.title === "Software Engineer, Wallets";
+      return ran(result, "create_interview_invite") && app?.nextStepAt === "2026-11-12T22:00:00.000Z" && posting?.title === "Software Engineer, Wallets";
     },
   },
   {
@@ -152,7 +151,9 @@ for (let run = 1; run <= runs; run++) {
     }
     const result = await runTurn(item.message, { ctx: { ...w.ctx, turnId: crypto.randomUUID() }, registry: w.registry, create, model, prompt: prompts[version], toolDeadline: Date.now() + 60_000 });
     results[index].pass.push(await item.pass(result, w));
-    results[index].finals.push(result.final.slice(0, 200));
+    // Record what the model did, not just what it said, so a failure can be diagnosed from the file.
+    const calls = result.events.filter((event) => event.type === "step_started").map((event) => `${(event as { tool: string }).tool}(${JSON.stringify((event as { args: unknown }).args)})`);
+    results[index].finals.push(`[${calls.join(", ")}] ${result.final.slice(0, 160)}`);
   }
   console.log(`run ${run}/${runs} done`);
 }
@@ -169,6 +170,12 @@ console.log(`\noverall ${((total / (cases.length * runs)) * 100).toFixed(1)}%`);
 
 mkdirSync("evals/agent/results", { recursive: true });
 const commit = execSync("git rev-parse --short HEAD").toString().trim();
+// Provenance (review N2): HEAD alone doesn't show uncommitted prompts or cases, so hash them too.
+const dirty = execSync("git status --porcelain prompts scripts/eval-agent.mts").toString().trim() !== "";
+const { createHash } = await import("node:crypto");
+const { readFileSync } = await import("node:fs");
+const hash = (path: string) => createHash("sha256").update(readFileSync(path)).digest("hex").slice(0, 12);
+const provenance = { commit, dirty, prompt_sha: createHash("sha256").update(prompts[version].instructions).digest("hex").slice(0, 12), cases_sha: hash("scripts/eval-agent.mts") };
 const file = `evals/agent/results/${version}__${set}__${new Date().toISOString().slice(0, 16).replace(/:/g, "")}.json`;
-writeFileSync(file, JSON.stringify({ version, set, model, runs, commit, results }, null, 2));
+writeFileSync(file, JSON.stringify({ version, set, model, runs, ...provenance, results }, null, 2));
 console.log(`Saved ${file}`);

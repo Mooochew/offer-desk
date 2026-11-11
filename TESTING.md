@@ -10,9 +10,9 @@ Every phase ends at a **gate** (see [PLAN.md](PLAN.md#phase-gate)). A phase is n
 | **Unit** | Deterministic code (normalizers, dedupe, filters, scoring, validators, tool executor, confirmation flow, file builders) | `npm test` | Local + CI |
 | **Coverage** | Floors on `lib/**`: 90% lines, 90% functions, 85% branches (raised from 80/80/75 after Phase 2) | `npm run test:coverage` | Local + CI |
 | **Build** | Production build succeeds | `npm run build` | Local + CI |
-| **Live checks** | Real Supabase, real job boards, real OpenAI and the deployed URL: RLS isolation, session flow, a full search (cold + cached), triage with extraction (first run + cached rerun with 0 model calls) | `npm run check:rls`, `npm run check:live`, `npm run check:search`, `npm run check:triage` | Local, at each gate |
+| **Live checks** | Real Supabase, real job boards, real OpenAI and the deployed URL: RLS isolation, session flow, a full search (cold + cached), triage with extraction (first run + cached rerun with 0 model calls), and the demo script through the agent API with confirmation and cross-user probes | `npm run check:rls`, `npm run check:live`, `npm run check:search`, `npm run check:triage`, `npm run check:agent` (needs a running server or `BASE_URL`) | Local, at each gate |
 | **Data checks** | Board registry still alive; snapshot and eval files valid and consistent | `npm run boards:verify` (local), `tests/data/*` (CI) | Local + CI |
-| **Prompt evals** | LLM extraction accuracy per field against 16 audited labels, mean and min–max over 3 runs, next to the trivial baseline | `npm run eval -- <version> 3` | Local, when a prompt or the answer checks change |
+| **Prompt evals** | LLM extraction accuracy per field against 16 audited labels (+12 held-out), mean and min–max over 3 runs, next to the trivial baseline; agent routing: what the model did on fixed scenarios (tools, refs, arguments) | `npm run eval -- <version> 3 <tuning\|holdout>`, `npm run eval:agent -- <version> 3 <tuning\|holdout>` | Local, when a prompt or the answer checks change |
 | **Independent review** | Architecture, test quality, assignment alignment | Phase reviewer agent | At each gate |
 
 `npm run check` runs static + unit + coverage + build in one command. CI (`.github/workflows/ci.yml`) runs the same steps on every push to `main`.

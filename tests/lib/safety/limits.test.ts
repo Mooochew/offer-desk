@@ -50,19 +50,35 @@ describe("AI budgets (DECISIONS 040)", () => {
   it("keeps part of the daily cap for chat: extraction stops at its share, agent calls continue", async () => {
     const { counter } = memoryCounter({ "openai-extract:2026-11-10": LIMITS.dailyExtractionRequests, "openai:2026-11-10": LIMITS.dailyExtractionRequests });
     await expect(extractionQuota(counter, caller, () => NOW)()).rejects.toBeInstanceOf(QuotaExceededError);
-    await expect(agentQuota(counter, () => NOW)()).resolves.toBeUndefined();
+    await expect(agentQuota(counter, caller, () => NOW)()).resolves.toBeUndefined();
   });
 
   it("stops everything at the daily cap", async () => {
     const { counter } = memoryCounter({ "openai:2026-11-10": LIMITS.dailyRequests });
-    await expect(agentQuota(counter, () => NOW)()).rejects.toMatchObject({ scope: "daily" });
+    await expect(agentQuota(counter, caller, () => NOW)()).rejects.toMatchObject({ scope: "daily" });
     await expect(extractionQuota(counter, caller, () => NOW)()).rejects.toMatchObject({ scope: "daily" });
   });
 
   it("counts an allowed extraction against every budget", async () => {
     const { counter, counts } = memoryCounter();
     await extractionQuota(counter, caller, () => NOW)();
-    expect([...counts.keys()].sort()).toEqual(["extract:ip:iphash:2026-11-10T03", "extract:user:u1:2026-11-10T03", "openai-extract:2026-11-10", "openai:2026-11-10"]);
+    expect([...counts.keys()].sort()).toEqual(["extract:ip:iphash:2026-11-10T03", "extract:user:u1:2026-11-10T03", "openai-extract:2026-11-10", "openai-ip:iphash:2026-11-10", "openai:2026-11-10"]);
+  });
+
+  // Phase 4 review S1: a chat turn can make several model calls, so calls are budgeted, not just turns.
+  it("caps agent model calls per session and per IP per hour, before the shared cap is touched", async () => {
+    const session = memoryCounter({ "agent:user:u1:2026-11-10T03": LIMITS.agentCallsPerSessionHour });
+    await expect(agentQuota(session.counter, caller, () => NOW)()).rejects.toMatchObject({ scope: "session" });
+    expect(session.counts.has("openai:2026-11-10")).toBe(false);
+    const ip = memoryCounter({ "agent:ip:iphash:2026-11-10T03": LIMITS.agentCallsPerIpHour });
+    await expect(agentQuota(ip.counter, { userId: "fresh", ipHash: "iphash" }, () => NOW)()).rejects.toMatchObject({ scope: "ip" });
+  });
+
+  it("limits one network to its share of the day across chat and extraction", async () => {
+    const { counter } = memoryCounter({ "openai-ip:iphash:2026-11-10": LIMITS.requestsPerIpDay });
+    await expect(agentQuota(counter, caller, () => NOW)()).rejects.toMatchObject({ scope: "ip", limit: LIMITS.requestsPerIpDay });
+    await expect(extractionQuota(counter, caller, () => NOW)()).rejects.toMatchObject({ scope: "ip", limit: LIMITS.requestsPerIpDay });
+    expect(LIMITS.requestsPerIpDay).toBeLessThan(LIMITS.dailyRequests / 2);
   });
 });
 

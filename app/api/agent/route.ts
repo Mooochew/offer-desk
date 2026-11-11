@@ -24,10 +24,11 @@ export async function POST(request: Request) {
 
     const admin = createAdminSupabase();
     const ip = clientIp(request);
-    await checkChatLimit(counterFor(admin), callerFor(user.id, ip));
+    const caller = callerFor(user.id, ip);
+    await checkChatLimit(counterFor(admin), caller);
 
     const ctx = createToolContext({ admin, user: supabase, userId: user.id, ip, timezone: body.data.timezone, background: (task) => after(task), startedAt });
-    const result = await runTurn(body.data.message, createTurnDeps(ctx, admin, startedAt));
+    const result = await runTurn(body.data.message, createTurnDeps(ctx, admin, caller, startedAt));
     return Response.json({ ok: true, ...result });
   } catch (error) {
     return errorResponse(error, "agent turn");

@@ -2,14 +2,14 @@ import { z } from "zod";
 import { buildChecklist, type ChecklistItem } from "@/lib/files/checklist";
 import { toCsv } from "@/lib/files/csv";
 import { buildInvite } from "@/lib/files/ics";
-import { formatLocal, localDate, zonedTimeToUtc } from "@/lib/files/time";
+import { DAY_WORDS, formatLocal, localDate, resolveDay, zonedTimeToUtc } from "@/lib/files/time";
 import { ToolError } from "../errors";
 import { assignRefs, resolveRefs } from "../refs";
 import { STAGES, type FileKind, type PostingInfo, type StoredFile } from "../store";
 import { DAY_MS, isStoredTriage, refArg, resolvePipelineTargets, withPostings, type PipelineTarget } from "./shared";
 import type { DestructiveTool, NormalTool, Preview, ToolContext } from "./types";
 
-/** Signed download links last an hour; the UI can ask for a fresh one later. */
+/** Signed download links last an hour; the UI gets a fresh one from POST /api/files/:id/url. */
 export const SIGNED_URL_SECONDS = 60 * 60;
 
 const CONTENT_TYPES: Record<FileKind, string> = {
@@ -37,7 +37,7 @@ async function saveFile(ctx: ToolContext, kind: FileKind, filename: string, body
 }
 
 function fileForUI(ref: string, file: StoredFile, url: string, extra: Record<string, unknown> = {}) {
-  return { kind: "file", ref, fileKind: file.kind, filename: file.filename, url, createdAt: file.createdAt, ...extra };
+  return { kind: "file", ref, fileId: file.id, fileKind: file.kind, filename: file.filename, url, createdAt: file.createdAt, ...extra };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -153,14 +153,18 @@ export const generateApplyChecklistTool: NormalTool<z.infer<typeof checklistInpu
 const inviteInput = z
   .object({
     ref: refArg.describe("Application (A#) or job (J#) the interview is for"),
+    day: z.enum(DAY_WORDS).optional().describe('A relative day as the user said it ("thursday", "tomorrow"); code turns it into the date. Use with time.'),
+    time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "use HH:MM, 24-hour").optional().describe('Local start time, 24-hour, e.g. "14:00" for 2 PM. Use with day.'),
     start_local: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "use YYYY-MM-DDTHH:MM in the user's local time")
-      .describe('Local start time, e.g. "2026-11-12T14:00" for Thursday at 2 PM'),
+      .optional()
+      .describe('Only when the user gave an exact date: local start, e.g. "2026-11-19T14:00". Otherwise use day + time.'),
     duration_min: z.number().int().min(15).max(480).optional().describe("Default 60"),
     title: z.string().trim().min(1).max(120).optional(),
   })
-  .strict();
+  .strict()
+  .refine((args) => (args.start_local ? !args.day && !args.time : Boolean(args.day && args.time)), { message: "give day + time, or start_local (exact date), not both" });
 
 export const createInterviewInviteTool: NormalTool<z.infer<typeof inviteInput>> = {
   name: "create_interview_invite",
@@ -168,8 +172,9 @@ export const createInterviewInviteTool: NormalTool<z.infer<typeof inviteInput>> 
   destructive: false,
   input: inviteInput,
   async run(args, ctx) {
-    const start = zonedTimeToUtc(args.start_local, ctx.timezone);
-    if (!start) throw new ToolError("bad_time", `${args.start_local} is not a real date and time.`);
+    const local = args.start_local ?? `${resolveDay(args.day!, ctx.now(), ctx.timezone, args.time)}T${args.time}`;
+    const start = zonedTimeToUtc(local, ctx.timezone);
+    if (!start) throw new ToolError("bad_time", `${local} is not a real date and time.`);
     if (start.getTime() < ctx.now().getTime() - DAY_MS) throw new ToolError("in_past", "That time is in the past. Check the date (today is in the state block).");
 
     const [target] = await resolvePipelineTargets(ctx, [args.ref], true);
@@ -185,14 +190,16 @@ export const createInterviewInviteTool: NormalTool<z.infer<typeof inviteInput>> 
       url: posting.url,
       createdAt: ctx.now(),
     });
-    await ctx.store.updateApplications([target.application.id], { stage: "interview", nextStepAt: start.toISOString() });
+    // An offer stays an offer (review N6); the interview still becomes the next step.
+    const stage = target.application.stage === "offer" ? "offer" : "interview";
+    await ctx.store.updateApplications([target.application.id], { stage, nextStepAt: start.toISOString() });
 
-    const filename = `interview-${slug(posting.company)}-${args.start_local.slice(0, 10)}.ics`;
+    const filename = `interview-${slug(posting.company)}-${local.slice(0, 10)}.ics`;
     const { file, ref, url } = await saveFile(ctx, "ics", filename, ics);
     const when = formatLocal(start, ctx.timezone);
     return {
-      summary: `${ref}: ${filename} (${when}); ${target.ref} → interview`,
-      forModel: { file: ref, filename, application: target.ref, stage: "interview", starts: when, duration_min: duration },
+      summary: `${ref}: ${filename} (${when}); ${target.ref} → ${stage}`,
+      forModel: { file: ref, filename, application: target.ref, stage, starts: when, duration_min: duration },
       forUI: fileForUI(ref, file, url, { application: target.ref, startsAt: start.toISOString(), startsLocal: when, durationMinutes: duration }),
     };
   },

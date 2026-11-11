@@ -12,6 +12,8 @@ const TOP = 10;
  * files. User-written fields are clipped (Phase 2 review S5) and the whole block is labeled data.
  */
 export async function buildState(store: AgentStore, now: Date, timezone: string) {
+  // Proposals nobody confirmed become "expired" in the log (Phase 4 review S3).
+  await store.expireActions(now.toISOString());
   const [stored, applications, latest, pending, files] = await Promise.all([
     store.getProfile(),
     store.listApplications({}),

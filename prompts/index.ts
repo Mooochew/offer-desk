@@ -14,5 +14,6 @@ export const CURRENT_EXTRACTION_PROMPT = EXTRACT_V2;
 export { SYSTEM_V1 } from "./system-v1";
 export { SYSTEM_V2 } from "./system-v2";
 export { SYSTEM_V3 } from "./system-v3";
-/** The agent's system prompt in use. v3 = v1 + the narrowed "named company = your pipeline" rule (PROMPTS.md). */
-export { SYSTEM_V3 as CURRENT_SYSTEM_PROMPT } from "./system-v3";
+export { SYSTEM_V4 } from "./system-v4";
+/** The agent's system prompt in use. v4 = v3 with relative dates resolved in code (PROMPTS.md). */
+export { SYSTEM_V4 as CURRENT_SYSTEM_PROMPT } from "./system-v4";

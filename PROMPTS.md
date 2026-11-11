@@ -7,7 +7,7 @@ How Offer Desk uses the LLM, which techniques it relies on, and the measured evi
 | Job | Prompt | Output | Checked by code |
 |---|---|---|---|
 | Read a job posting's requirements | `prompts/extract-v2.ts` | Strict JSON: years, clearance, location type, degree, new-grad fit, skills, evidence quotes | zod schema + grounding rules (`lib/triage/schema.ts`) + skill grounding (`lib/triage/skills.ts`) |
-| Choose tools for a chat request | `prompts/system-v3.ts` | Function calls (Responses API) | zod argument schemas, ref ownership, confirmation flow (see [Agent prompt](#agent-prompt-tool-routing)) |
+| Choose tools for a chat request | `prompts/system-v4.ts` | Function calls (Responses API) | zod argument schemas, ref ownership, confirmation flow (see [Agent prompt](#agent-prompt-tool-routing)) |
 
 Everything else (search filters, dedupe, the year/clearance filter, scoring, "why it matched", every count shown to the user) is deterministic code.
 
@@ -107,7 +107,7 @@ The last row is the eval doing its job: a stricter validator introduced a false 
 
 ## Agent prompt (tool routing)
 
-The tool-using agent (`prompts/system-v3.ts`) chooses tools and fills in their arguments; code does everything else. Its techniques, each paired with a code check:
+The tool-using agent (`prompts/system-v4.ts`) chooses tools and fills in their arguments; code does everything else. Its techniques, each paired with a code check:
 
 | Technique | Where | Code-side check |
 |---|---|---|
@@ -144,7 +144,16 @@ The tool-using agent (`prompts/system-v3.ts`) chooses tools and fills in their a
 
 **Added after v3 (not used to change it):** one live v3 run re-ran `search_jobs` before "save the top 5", so the new search (S2, not yet triaged) became the latest set. The saved jobs that run couldn't be checked; the next live run saved exactly the ranked top 5, and `check:agent` now asserts that. A tuning case for it ("save the top 2" → J1, J2, no new search) passed 3/3 with v3. In that run, one other case failed because OpenAI didn't respond (the turn answered "The AI service isn't responding right now"). That's the outage path working, not a routing error (`system-v3__tuning__2026-11-11T0005.json`). Known limitation: occasional extra searches.
 
-**Honest reading:** the tuning cases were written around the failures, so 18/18 is in-sample. The held-out cases don't separate v1 from v3 (both 12/12); they show v3 didn't break the basic routing, not that it generalizes better. The set is small (10 cases), and the live check (`npm run check:agent`, the demo script end to end) is the main evidence that the whole flow works.
+**Honest reading:** the tuning cases were written around the failures, so 18/18 is in-sample. The held-out cases don't separate v1 from v3 (both 12/12); they show v3 didn't break the basic routing, not that it generalizes better. The set is small (11 cases: 7 tuning, 4 held-out), and the live check (`npm run check:agent`, the demo script end to end) is the main evidence that the whole flow works.
+
+**v3 → v4 (code does date math).** The Phase 4 review pointed out that v1–v3 had the model turn "Thursday at 2" into a calendar date, and a wrong but future date (next week's Thursday) would pass every check. v4 changes only the date rule: the model passes the words (`day: "thursday", time: "14:00"`, or `days_ago`), and `resolveDay` in `lib/files/time.ts` computes the date, with unit tests including the same-weekday and timezone edge cases. The interview case is now judged on the resulting time (Thu 2026-11-12 14:00 Pacific), whatever argument form the model used.
+
+| 6 runs each (two batches of 3) | v3 | v4 |
+|---|---|---|
+| Tuning, 7 cases | 41/42 (the miss was an OpenAI outage) | 41/42 ("save the top 2": one run's refs differed; that file predates logging the tool calls) |
+| Held-out, 4 cases | 24/24 | **22/24** |
+
+v4's two held-out misses are the same: for "Delete my Notion applications", it proposed `archive_applications` instead of `delete_applications` (logged: `list_pipeline({})`, `archive_applications({"refs":["A3","A2"]})`). That fails safe: the dialog says "Archive 2 applications?" and nothing runs without Confirm. But it doesn't do what was asked, and it is the one place v4 measured worse than v3. We kept v4 anyway: its change fixes a correctness gap that code now enforces, and changing the prompt again for this case would mean tuning on the held-out set. Fixing it fairly needs new held-out cases (planned with the Phase 5 UI work). With 4 held-out cases × 6 runs, 22/24 vs 24/24 isn't a statistically clear difference either.
 
 ## Limits
 
@@ -162,7 +171,7 @@ npm run eval -- extract-v1 3 holdout
 npm run eval -- extract-v2 3 holdout
 npm run eval -- extract-v2 3 tuning
 npm run check:triage     # live: search → extraction → filters → scores, plus a cached rerun
-npm run eval:agent -- system-v3 3 tuning
-npm run eval:agent -- system-v3 3 holdout
+npm run eval:agent -- system-v4 3 tuning
+npm run eval:agent -- system-v4 3 holdout
 npm run check:agent      # live: the demo script through the HTTP API (needs a running server; BASE_URL)
 ```

@@ -270,6 +270,6 @@ describe("triageJobs", () => {
       loadDescriptions: async () => new Map([["p", POSTING_DESCRIPTION]]),
       clock: () => NOW,
     });
-    expect(result.unread).toEqual([{ job, reason: "AI limit reached", detail: expect.stringContaining("Hourly AI reading limit for this session (75)") }]);
+    expect(result.unread).toEqual([{ job, reason: "AI limit reached", detail: expect.stringContaining("AI usage limit for this session (75 requests)") }]);
   });
 });

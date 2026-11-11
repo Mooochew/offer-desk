@@ -149,6 +149,8 @@ export interface AgentStore {
   /** One conditional update: awaiting_confirmation → rejected. Null if it didn't apply. */
   rejectAction(id: string): Promise<ActionRecord | null>;
   pendingActions(now: string): Promise<ActionRecord[]>;
+  /** Marks proposals past their expiry as "expired" (so the log never shows stale "awaiting"). Returns how many. */
+  expireActions(now: string): Promise<number>;
 
   addMessage(turnId: string, role: ChatMessage["role"], content: string): Promise<void>;
   /** Most recent messages, oldest first. */
